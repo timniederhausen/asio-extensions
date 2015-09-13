@@ -9,6 +9,7 @@
 #define ASIOEXT_FILEHANDLE_HPP
 
 #include "asioext/detail/config.hpp"
+#include "asioext/detail/throw_error.hpp"
 
 #if ASIOEXT_HAS_PRAGMA_ONCE
 #pragma once
@@ -92,7 +93,12 @@ public:
   ///
   /// This destructor attempts to close the currently owned file handle.
   /// Failures are silently ignored.
-  ASIOEXT_DECL ~file_handle();
+  ~file_handle()
+  {
+    asio::error_code ec;
+    close(ec);
+    // error is swallowed
+  }
 
   /// @brief Open a file and construct a file_handle.
   ///
@@ -209,7 +215,12 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL void open(const std::string& filename, uint32_t flags);
+  void open(const std::string& filename, uint32_t flags)
+  {
+    asio::error_code ec;
+    open(filename, flags, ec);
+    detail::throw_error(ec);
+  }
 
   /// @brief Open a file and assign its handle to this file_handle.
   ///
@@ -230,8 +241,12 @@ public:
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc open(const std::string&,uint32_t)
-  ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint32_t flags);
+  void open(const boost::filesystem::path& filename, uint32_t flags)
+  {
+    asio::error_code ec;
+    open(filename, flags, ec);
+    detail::throw_error(ec);
+  }
 
   /// @copydoc open(const std::string&,uint32_t,asio::error_code&)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
@@ -247,7 +262,12 @@ public:
   /// This function is used to close the handle.
   ///
   /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL void close();
+  void close()
+  {
+    asio::error_code ec;
+    close(ec);
+    detail::throw_error(ec);
+  }
 
   /// @brief Close the handle.
   ///
@@ -265,7 +285,12 @@ public:
   /// @param handle A native handle.
   ///
   /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL void assign(const native_handle_type& handle);
+  void assign(const native_handle_type& handle)
+  {
+    asio::error_code ec;
+    assign(handle, ec);
+    detail::throw_error(ec);
+  }
 
   /// @brief Assign an existing native handle to the file_handle.
   ///
@@ -291,7 +316,13 @@ public:
   /// @return The total number of bytes in this file.
   ///
   /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL uint64_t size();
+  uint64_t size()
+  {
+    asio::error_code ec;
+    uint64_t s = size(ec);
+    detail::throw_error(ec);
+    return s;
+  }
 
   /// @brief Get the size of a file.
   ///
@@ -311,7 +342,13 @@ public:
   /// @return The current absolute file position.
   ///
   /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL uint64_t position();
+  uint64_t position()
+  {
+    asio::error_code ec;
+    uint64_t s = position(ec);
+    detail::throw_error(ec);
+    return s;
+  }
 
   /// @brief Get the current file position.
   ///
@@ -337,7 +374,13 @@ public:
   /// @return The new absolute file position.
   ///
   /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL uint64_t seek(seek_origin origin, int64_t offset);
+  uint64_t seek(seek_origin origin, int64_t offset)
+  {
+    asio::error_code ec;
+    uint64_t s = seek(origin, offset, ec);
+    detail::throw_error(ec);
+    return s;
+  }
 
   /// @brief Change the read/write position.
   ///

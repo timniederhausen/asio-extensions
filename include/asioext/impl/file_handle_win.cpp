@@ -25,13 +25,6 @@ file_handle::file_handle()
   // ctor
 }
 
-file_handle::~file_handle()
-{
-  asio::error_code ec;
-  close(ec);
-  // error is swallowed
-}
-
 file_handle::file_handle(const std::string& filename, uint32_t flags)
   : handle_(INVALID_HANDLE_VALUE)
 {
@@ -84,13 +77,6 @@ file_handle& file_handle::operator=(file_handle&& other)
 
 #endif
 
-void file_handle::open(const std::string& filename, uint32_t flags)
-{
-  asio::error_code ec;
-  open(filename, flags, ec);
-  detail::throw_error(ec);
-}
-
 void file_handle::open(const std::string& filename, uint32_t flags,
                        asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
@@ -104,14 +90,6 @@ void file_handle::open(const std::string& filename, uint32_t flags,
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 void file_handle::open(const boost::filesystem::path& filename,
-                       uint32_t flags)
-{
-  asio::error_code ec;
-  open(filename, flags, ec);
-  detail::throw_error(ec);
-}
-
-void file_handle::open(const boost::filesystem::path& filename,
                        uint32_t flags,
                        asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
@@ -123,13 +101,6 @@ void file_handle::open(const boost::filesystem::path& filename,
 bool file_handle::is_open() const ASIOEXT_NOEXCEPT
 {
   return handle_ != INVALID_HANDLE_VALUE;
-}
-
-void file_handle::close()
-{
-  asio::error_code ec;
-  close(ec);
-  detail::throw_error(ec);
 }
 
 void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
@@ -148,13 +119,6 @@ void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
     ec.assign(::GetLastError(), asio::error::get_system_category());
 }
 
-void file_handle::assign(const native_handle_type& handle)
-{
-  asio::error_code ec;
-  assign(handle, ec);
-  detail::throw_error(ec);
-}
-
 void file_handle::assign(const native_handle_type& handle,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
@@ -163,14 +127,6 @@ void file_handle::assign(const native_handle_type& handle,
     return;
 
   handle_ = handle;
-}
-
-uint64_t file_handle::size()
-{
-  asio::error_code ec;
-  uint64_t s = size(ec);
-  detail::throw_error(ec);
-  return s;
 }
 
 uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
@@ -186,25 +142,9 @@ uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
   return 0;
 }
 
-uint64_t file_handle::position()
-{
-  asio::error_code ec;
-  uint64_t s = position(ec);
-  detail::throw_error(ec);
-  return s;
-}
-
 uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
   return seek(from_current, 0, ec);
-}
-
-uint64_t file_handle::seek(seek_origin origin, int64_t offset)
-{
-  asio::error_code ec;
-  uint64_t s = seek(origin, offset, ec);
-  detail::throw_error(ec);
-  return s;
 }
 
 uint64_t file_handle::seek(seek_origin origin, int64_t offset,
