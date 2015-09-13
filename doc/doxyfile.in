@@ -4,9 +4,9 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "asio extensions"
+PROJECT_NAME           = "Asio Extensions"
 PROJECT_NUMBER         =
-PROJECT_BRIEF          = "Various utility components building upon asio"
+PROJECT_BRIEF          = "Various utility components building upon Asio"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = @asioext_BINARY_DIR@/doc
 CREATE_SUBDIRS         = NO
