@@ -45,7 +45,7 @@ file_handle::file_handle(const std::string& filename, uint32_t flags,
   open(filename, flags, ec);
 }
 
-#if defined(ASIOEXT_USE_BOOST_FILESYSTEM)
+#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 file_handle::file_handle(const boost::filesystem::path& filename,
                          uint32_t flags)
@@ -101,7 +101,7 @@ void file_handle::open(const std::string& filename, uint32_t flags,
   handle_ = detail::win_file_ops::open(p.c_str(), flags, ec);
 }
 
-#if defined(ASIOEXT_USE_BOOST_FILESYSTEM)
+#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 void file_handle::open(const boost::filesystem::path& filename,
                        uint32_t flags)

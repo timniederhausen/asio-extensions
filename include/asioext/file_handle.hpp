@@ -22,7 +22,7 @@
 
 #include <asio/error_code.hpp>
 
-#if defined(ASIOEXT_USE_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
+#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 #include <boost/filesystem/path.hpp>
 #endif
 
@@ -124,7 +124,7 @@ public:
   ASIOEXT_DECL file_handle(const std::string& filename, uint32_t flags,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT;
 
-#if defined(ASIOEXT_USE_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
+#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc file_handle(const std::string&,uint32_t)
   ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
                            uint32_t flags);
@@ -228,7 +228,7 @@ public:
   ASIOEXT_DECL void open(const std::string& filename, uint32_t flags,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT;
 
-#if defined(ASIOEXT_USE_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
+#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc open(const std::string&,uint32_t)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags);

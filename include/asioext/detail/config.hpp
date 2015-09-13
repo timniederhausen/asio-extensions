@@ -1,9 +1,6 @@
-//
-// Copyright (c) 2015 Tim Niederhausen (tim@rnc-ag.de)
-//
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
+/// @copyright Copyright (c) 2015 Tim Niederhausen (tim@rnc-ag.de)
+/// Distributed under the Boost Software License, Version 1.0.
+/// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef ASIOEXT_DETAIL_CONFIG_HPP
 #define ASIOEXT_DETAIL_CONFIG_HPP
@@ -54,7 +51,12 @@
 # define ASIOEXT_DECL
 #endif
 
+#if defined(ASIOEXT_STANDALONE)
+# define ASIOEXT_DISABLE_BOOST_FILESYSTEM 1
+#endif
+
 #if !defined(ASIOEXT_MSVC) && defined(ASIO_MSVC)
+// ASIO_MSVC contains the compiler version (i.e. the _MSC_VER value)
 # define ASIOEXT_MSVC ASIO_MSVC
 #endif
 
@@ -94,16 +96,22 @@
 //#    define ASIOEXT_HAS_PRAGMA_ONCE 1
 #   endif
 #  endif
-#  if defined(ASIOEXT_MSVC)
-#   if (_MSC_VER >= 1020)
-#    define ASIOEXT_HAS_PRAGMA_ONCE 1
-#   endif
+#  if defined(ASIOEXT_MSVC) && (_MSC_VER >= 1020)
+#   define ASIOEXT_HAS_PRAGMA_ONCE 1
 #  endif
 # endif
 #endif
 
 #if !defined(ASIOEXT_WINDOWS) && defined(ASIO_WINDOWS)
 # define ASIOEXT_WINDOWS 1
+#endif
+
+#if !defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
+# if !defined(ASIOEXT_DISABLE_BOOST_FILESYSTEM)
+#  if (BOOST_VERSION >= 104600)
+#   define ASIOEXT_HAS_BOOST_FILESYSTEM 1
+#  endif
+# endif
 #endif
 
 #endif
