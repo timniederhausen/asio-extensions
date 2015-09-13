@@ -24,9 +24,7 @@ void set_error(asio::error_code& ec)
   ec.assign(GetLastError(), asio::error::get_system_category());
 }
 
-handle_type open(const wchar_t* filename,
-                 uint_fast32_t flags,
-                 asio::error_code& ec)
+handle_type open(const wchar_t* filename, uint32_t flags, asio::error_code& ec)
 {
   if (!open_flags::is_valid(flags)) {
     ec = asio::error::invalid_argument;

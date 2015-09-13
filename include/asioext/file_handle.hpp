@@ -106,8 +106,7 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL file_handle(const std::string& filename,
-                           uint_fast32_t flags);
+  ASIOEXT_DECL file_handle(const std::string& filename, uint32_t flags);
 
   /// @brief Open a file and construct a file_handle.
   ///
@@ -122,18 +121,17 @@ public:
   /// the object is reset.
   ///
   /// @see open_flags
-  ASIOEXT_DECL file_handle(const std::string& filename,
-                           uint_fast32_t flags,
+  ASIOEXT_DECL file_handle(const std::string& filename, uint32_t flags,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_USE_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc file_handle(const std::string&,uint_fast32_t)
+  /// @copydoc file_handle(const std::string&,uint32_t)
   ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
-                           uint_fast32_t flags);
+                           uint32_t flags);
 
-  /// @copydoc file_handle(const std::string&,uint_fast32_t,asio::error_code&)
+  /// @copydoc file_handle(const std::string&,uint32_t,asio::error_code&)
   ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
-                           uint_fast32_t flags,
+                           uint32_t flags,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
@@ -211,8 +209,7 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL void open(const std::string& filename,
-                         uint_fast32_t flags);
+  ASIOEXT_DECL void open(const std::string& filename, uint32_t flags);
 
   /// @brief Open a file and assign its handle to this file_handle.
   ///
@@ -228,18 +225,17 @@ public:
   /// the object is reset.
   ///
   /// @see open_flags
-  ASIOEXT_DECL void open(const std::string& filename,
-                         uint_fast32_t flags,
+  ASIOEXT_DECL void open(const std::string& filename, uint32_t flags,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_USE_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const std::string&,uint_fast32_t)
+  /// @copydoc open(const std::string&,uint32_t)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint_fast32_t flags);
+                         uint32_t flags);
 
-  /// @copydoc open(const std::string&,uint_fast32_t,asio::error_code&)
+  /// @copydoc open(const std::string&,uint32_t,asio::error_code&)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint_fast32_t flags,
+                         uint32_t flags,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
