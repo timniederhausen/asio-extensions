@@ -8,6 +8,7 @@ project(asioext)
 option(ASIOEXT_BUILD_DOC "Build documentation" ON)
 option(ASIOEXT_BUILD_TESTS "Build examples" ON)
 option(ASIOEXT_BUILD_EXAMPLES "Build tests" ON)
+option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
 
 add_subdirectory(src)
 
