@@ -2,6 +2,11 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# simple example
+add_executable(asioext.ex.simple simple.cpp)
+set_property(TARGET asioext.ex.simple PROPERTY OUTPUT_NAME simple)
+target_link_libraries(asioext.ex.simple asioext.static)
+
 # cp example tool
 add_executable(asioext.ex.cp cp.cpp)
 set_property(TARGET asioext.ex.cp PROPERTY OUTPUT_NAME cp)
