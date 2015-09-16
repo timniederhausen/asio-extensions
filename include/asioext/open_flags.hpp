@@ -83,9 +83,6 @@ enum creation_attributes
   attribute_executable = 1 << 8,
 };
 
-/// Default file opening flags.
-static const uint32_t default = access_read | open_existing;
-
 /// @brief Check whether a set of flags is valid.
 ///
 /// This function checks whether the given @c flags are valid, i.e.
