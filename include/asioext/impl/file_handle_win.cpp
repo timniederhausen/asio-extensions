@@ -132,8 +132,7 @@ void file_handle::assign(const native_handle_type& handle,
 uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
   LARGE_INTEGER size;
-  if (::GetFileSizeEx(handle_, &size))
-  {
+  if (::GetFileSizeEx(handle_, &size)) {
     ec.clear();
     return static_cast<uint64_t>(size.QuadPart);
   }
@@ -153,7 +152,7 @@ uint64_t file_handle::seek(seek_origin origin, int64_t offset,
   LARGE_INTEGER pos, res;
   pos.QuadPart = offset;
 
-  if (::SetFilePointerEx(handle_, pos, &res, FILE_CURRENT))
+  if (::SetFilePointerEx(handle_, pos, &res, static_cast<int>(origin)))
     return res.QuadPart;
 
   ec.assign(::GetLastError(), asio::error::get_system_category());
