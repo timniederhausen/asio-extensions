@@ -618,7 +618,13 @@ ASIOEXT_NS_END
 
 #include "asioext/detail/pop_options.hpp"
 
-#include "asioext/impl/file_handle_win.hpp"
+#include "asioext/impl/file_handle.hpp"
+
+#if defined(ASIOEXT_WINDOWS)
+# include "asioext/impl/file_handle_win.hpp"
+#else
+# include "asioext/impl/file_handle_posix.hpp"
+#endif
 
 #if defined(ASIOEXT_HEADER_ONLY)
 # if defined(ASIOEXT_WINDOWS)
