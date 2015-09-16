@@ -7,6 +7,7 @@
 
 #include "asioext/detail/config.hpp"
 
+#include "asioext/impl/file_handle.cpp"
 #include "asioext/impl/open_flags.cpp"
 
 #if defined(ASIOEXT_WINDOWS)
