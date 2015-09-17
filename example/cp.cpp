@@ -11,7 +11,6 @@
 #include <cstdio>
 #include <iostream>
 
-// This function uses the new asio::dynamic_buffer feature.
 // While convenient, this method buffers the entire file which might not be
 // possible/feasible for large files.
 void copy_file_oneshot(asioext::file_handle& src, asioext::file_handle& dst)
@@ -19,7 +18,7 @@ void copy_file_oneshot(asioext::file_handle& src, asioext::file_handle& dst)
   std::vector<char> buffer(static_cast<std::size_t>(src.size()));
 
   asio::error_code ec;
-  const std::size_t actual = asio::read(src, asio::dynamic_buffer(buffer), ec);
+  const std::size_t actual = asio::read(src, asio::buffer(buffer), ec);
 
   if (ec && ec != asio::error::eof)
     return;
@@ -31,18 +30,18 @@ void copy_file_oneshot(asioext::file_handle& src, asioext::file_handle& dst)
 void copy_file_blocks(asioext::file_handle& src, asioext::file_handle& dst)
 {
   std::array<char, 2048> buffer;
-  bool at_end = false;
 
-  while (!at_end) {
+  for (bool at_end = false; !at_end; ) {
     // We need the actual bytes read here since the last block might be smaller.
     asio::error_code ec;
     const std::size_t actual = asio::read(src, asio::buffer(buffer), ec);
 
-    if (ec == asio::error::eof)
-      at_end = true;
-    // Exit if we encountered an error (other than end-of-file).
-    else if (ec)
-      return;
+    if (ec) {
+      if (ec == asio::error::eof)
+        at_end = true;
+      else
+        throw asio::system_error(ec);
+    }
 
     asio::write(dst, asio::buffer(buffer.data(), actual));
   }
@@ -52,12 +51,12 @@ void copy_file(const std::string& src_path, const std::string& dst_path)
 {
   static const std::size_t kOneShotThreshold = 10 * 1024;
 
-  // Exercise for the reader: Add support for - (i.e. stdout/stdin)
-  asioext::file_handle src(src_path,
+  // Exercise for the reader: Add support for '-' (i.e. stdout/stdin)
+  asioext::file_handle src(src_path.c_str(),
                            asioext::open_flags::access_read |
                            asioext::open_flags::open_existing);
 
-  asioext::file_handle dst(dst_path,
+  asioext::file_handle dst(dst_path.c_str(),
                            asioext::open_flags::access_write |
                            asioext::open_flags::create_always);
 

@@ -20,7 +20,7 @@ file_handle::~file_handle()
   // error is swallowed
 }
 
-void file_handle::open(const std::string& filename, uint32_t flags)
+void file_handle::open(const char* filename, uint32_t flags)
 {
   asio::error_code ec;
   open(filename, flags, ec);

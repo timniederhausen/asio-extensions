@@ -18,7 +18,6 @@
 #define _FILE_OFFSET_BITS 64
 
 #include <cstddef> // for size_t
-#include <sys/types.h> // for off_t etc.
 #include <sys/uio.h> // for iovec
 
 #undef _FILE_OFFSET_BITS
@@ -34,24 +33,24 @@ typedef int handle_type;
 
 ASIOEXT_DECL void set_error(asio::error_code& ec, int e);
 
-ASIOEXT_DECL handle_type open(const char* path, int flags,
+ASIOEXT_DECL handle_type open(const char* path, uint32_t flags,
                               asio::error_code& ec);
 
 ASIOEXT_DECL void close(handle_type fd, asio::error_code& ec);
 
-ASIOEXT_DECL std::size_t sync_readv(handle_type fd, iovec* bufs, int count,
-                                    asio::error_code& ec);
+ASIOEXT_DECL std::size_t readv(handle_type fd, iovec* bufs, int count,
+                               asio::error_code& ec);
 
-ASIOEXT_DECL std::size_t sync_writev(handle_type fd,
-                                     const iovec* bufs, int count,
-                                     asio::error_code& ec);
+ASIOEXT_DECL std::size_t writev(handle_type fd,
+                                const iovec* bufs, int count,
+                                asio::error_code& ec);
 
-ASIOEXT_DECL std::size_t sync_preadv(handle_type fd, iovec* bufs, int count,
-                                     off_t offset, asio::error_code& ec);
+ASIOEXT_DECL std::size_t preadv(handle_type fd, iovec* bufs, int count,
+                                uint64_t offset, asio::error_code& ec);
 
-ASIOEXT_DECL std::size_t sync_pwritev(handle_type fd,
-                                      const iovec* bufs, int count,
-                                      off_t offset, asio::error_code& ec);
+ASIOEXT_DECL std::size_t pwritev(handle_type fd,
+                                 const iovec* bufs, int count,
+                                 uint64_t offset, asio::error_code& ec);
 
 }
 }

@@ -7,33 +7,37 @@
 
 #include "asioext/file_handle.hpp"
 
-#include "asioext/detail/win_file_ops.hpp"
-#include "asioext/detail/win_path.hpp"
+#include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/throw_error.hpp"
 
 #include <asio/error.hpp>
 
-#include <windows.h>
+#define _FILE_OFFSET_BITS 64
+
+#include <cstddef> // for size_t
+#include <sys/stat.h>
+
+#undef _FILE_OFFSET_BITS
 
 #include "asioext/detail/push_options.hpp"
 
 ASIOEXT_NS_BEGIN
 
 file_handle::file_handle() ASIOEXT_NOEXCEPT
-  : handle_(INVALID_HANDLE_VALUE)
+  : handle_(-1)
 {
   // ctor
 }
 
 file_handle::file_handle(const char* filename, uint32_t flags)
-  : handle_(INVALID_HANDLE_VALUE)
+  : handle_(-1)
 {
   open(filename, flags);
 }
 
 file_handle::file_handle(const char* filename, uint32_t flags,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(INVALID_HANDLE_VALUE)
+  : handle_(-1)
 {
   open(filename, flags, ec);
 }
@@ -42,7 +46,7 @@ file_handle::file_handle(const char* filename, uint32_t flags,
 
 file_handle::file_handle(const boost::filesystem::path& filename,
                          uint32_t flags)
-  : handle_(INVALID_HANDLE_VALUE)
+  : handle_(-1)
 {
   open(filename, flags);
 }
@@ -50,7 +54,7 @@ file_handle::file_handle(const boost::filesystem::path& filename,
 file_handle::file_handle(const boost::filesystem::path& filename,
                          uint32_t flags,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(INVALID_HANDLE_VALUE)
+  : handle_(-1)
 {
   open(filename, flags, ec);
 }
@@ -62,16 +66,16 @@ file_handle::file_handle(const boost::filesystem::path& filename,
 file_handle::file_handle(file_handle&& other) ASIOEXT_NOEXCEPT
   : handle_(other.handle_)
 {
-  other.handle_ = INVALID_HANDLE_VALUE;
+  other.handle_ = -1;
 }
 
 file_handle& file_handle::operator=(file_handle&& other)
 {
-  if (handle_ != INVALID_HANDLE_VALUE)
+  if (handle_ != -1)
     close();
 
   handle_ = other.handle_;
-  other.handle_ = INVALID_HANDLE_VALUE;
+  other.handle_ = -1;
   return *this;
 }
 
@@ -80,11 +84,7 @@ file_handle& file_handle::operator=(file_handle&& other)
 void file_handle::open(const char* filename, uint32_t flags,
                        asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  detail::win_path p(filename, std::strlen(filename), ec);
-  if (ec)
-    return;
-
-  handle_ = detail::win_file_ops::open(p.c_str(), flags, ec);
+  handle_ = detail::posix_file_ops::open(filename, flags, ec);
 }
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
@@ -93,30 +93,24 @@ void file_handle::open(const boost::filesystem::path& filename,
                        uint32_t flags,
                        asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  handle_ = detail::win_file_ops::open(filename.c_str(), flags, ec);
+  handle_ = detail::posix_file_ops::open(filename.c_str(), flags, ec);
 }
 
 #endif
 
 bool file_handle::is_open() const ASIOEXT_NOEXCEPT
 {
-  return handle_ != INVALID_HANDLE_VALUE;
+  return handle_ != -1;
 }
 
 void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  if (handle_ == INVALID_HANDLE_VALUE) {
+  if (handle_ == -1) {
     ec.clear();
     return;
   }
 
-  const BOOL ret = ::CloseHandle(handle_);
-  handle_ = INVALID_HANDLE_VALUE;
-
-  if (ret)
-    ec.clear();
-  else
-    ec.assign(::GetLastError(), asio::error::get_system_category());
+  detail::posix_file_ops::close(handle_, ec);
 }
 
 void file_handle::assign(const native_handle_type& handle,
@@ -131,14 +125,13 @@ void file_handle::assign(const native_handle_type& handle,
 
 uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  LARGE_INTEGER size;
-  if (::GetFileSizeEx(handle_, &size)) {
-    ec.clear();
-    return static_cast<uint64_t>(size.QuadPart);
+  struct stat st;
+  if (fstat(handle_, &st) != 0) {
+    ec.assign(errno, asio::error::get_system_category());
+    return -1;
   }
 
-  ec.assign(::GetLastError(), asio::error::get_system_category());
-  return 0;
+  return st.st_size;
 }
 
 uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
@@ -149,13 +142,13 @@ uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
 uint64_t file_handle::seek(seek_origin origin, int64_t offset,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  LARGE_INTEGER pos, res;
-  pos.QuadPart = offset;
+  const off_t res = ::lseek(handle_, offset, static_cast<int>(origin));
+  if (res != -1) {
+    ec.clear();
+    return static_cast<uint64_t>(res);
+  }
 
-  if (::SetFilePointerEx(handle_, pos, &res, static_cast<int>(origin)))
-    return res.QuadPart;
-
-  ec.assign(::GetLastError(), asio::error::get_system_category());
+  ec.assign(errno, asio::error::get_system_category());
   return 0;
 }
 

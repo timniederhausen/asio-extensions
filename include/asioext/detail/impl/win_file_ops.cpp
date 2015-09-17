@@ -2,8 +2,8 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_DETAIL_IMPL_POSIXFILEOPS_CPP
-#define ASIOEXT_DETAIL_IMPL_POSIXFILEOPS_CPP
+#ifndef ASIOEXT_DETAIL_IMPL_WINFILEOPS_CPP
+#define ASIOEXT_DETAIL_IMPL_WINFILEOPS_CPP
 
 #include "asioext/detail/win_file_ops.hpp"
 #include "asioext/open_flags.hpp"
