@@ -38,6 +38,11 @@ ASIOEXT_DECL handle_type open(const char* path, uint32_t flags,
 
 ASIOEXT_DECL void close(handle_type fd, asio::error_code& ec);
 
+ASIOEXT_DECL uint64_t size(handle_type fd, asio::error_code& ec);
+
+ASIOEXT_DECL uint64_t seek(handle_type fd, int origin, int64_t offset,
+                           asio::error_code& ec);
+
 ASIOEXT_DECL std::size_t readv(handle_type fd, iovec* bufs, int count,
                                asio::error_code& ec);
 

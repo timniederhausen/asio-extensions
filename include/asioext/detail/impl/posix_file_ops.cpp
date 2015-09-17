@@ -85,6 +85,32 @@ void close(handle_type fd, asio::error_code& ec)
     set_error(ec, errno);
 }
 
+uint64_t size(handle_type fd, asio::error_code& ec)
+{
+  struct stat st;
+  if (fstat(fd, &st) != 0) {
+    set_error(ec, errno);
+    return 0;
+  }
+
+  return st.st_size;
+}
+
+uint64_t seek(handle_type fd, int origin, int64_t offset,
+              asio::error_code& ec)
+{
+  const off_t res = ::lseek(fd, static_cast<off_t>(offset),
+                            static_cast<int>(origin));
+
+  if (res != -1) {
+    ec.clear();
+    return static_cast<uint64_t>(res);
+  }
+
+  set_error(ec, errno);
+  return 0;
+}
+
 std::size_t readv(handle_type fd, iovec* bufs, int count, asio::error_code& ec)
 {
   while (true) {

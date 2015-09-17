@@ -26,9 +26,18 @@ namespace win_file_ops {
 // http://stackoverflow.com/questions/4121173/how-do-i-forward-declare-handle-win32
 typedef void* handle_type;
 
+ASIOEXT_DECL void set_error(asio::error_code& ec);
+
 ASIOEXT_DECL handle_type open(const wchar_t* filename,
                               uint32_t flags,
                               asio::error_code& ec);
+
+ASIOEXT_DECL void close(handle_type fd, asio::error_code& ec);
+
+ASIOEXT_DECL uint64_t size(handle_type fd, asio::error_code& ec);
+
+ASIOEXT_DECL uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
+                           asio::error_code& ec);
 
 ASIOEXT_DECL uint32_t read(handle_type fd,
                            void* buffer, uint32_t size,

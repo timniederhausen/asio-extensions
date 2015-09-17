@@ -12,12 +12,7 @@
 
 #include <asio/error.hpp>
 
-#define _FILE_OFFSET_BITS 64
-
 #include <cstddef> // for size_t
-#include <sys/stat.h>
-
-#undef _FILE_OFFSET_BITS
 
 #include "asioext/detail/push_options.hpp"
 
@@ -125,13 +120,7 @@ void file_handle::assign(const native_handle_type& handle,
 
 uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  struct stat st;
-  if (fstat(handle_, &st) != 0) {
-    ec.assign(errno, asio::error::get_system_category());
-    return -1;
-  }
-
-  return st.st_size;
+  return detail::posix_file_ops::size(handle_, ec);
 }
 
 uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
@@ -142,14 +131,7 @@ uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
 uint64_t file_handle::seek(seek_origin origin, int64_t offset,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  const off_t res = ::lseek(handle_, offset, static_cast<int>(origin));
-  if (res != -1) {
-    ec.clear();
-    return static_cast<uint64_t>(res);
-  }
-
-  ec.assign(errno, asio::error::get_system_category());
-  return 0;
+  return detail::posix_file_ops::seek(handle_, origin, offset, ec);
 }
 
 ASIOEXT_NS_END

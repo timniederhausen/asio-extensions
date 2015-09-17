@@ -110,13 +110,8 @@ void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
     return;
   }
 
-  const BOOL ret = ::CloseHandle(handle_);
+  detail::win_file_ops::close(handle_, ec);
   handle_ = INVALID_HANDLE_VALUE;
-
-  if (ret)
-    ec.clear();
-  else
-    ec.assign(::GetLastError(), asio::error::get_system_category());
 }
 
 void file_handle::assign(const native_handle_type& handle,
@@ -131,14 +126,7 @@ void file_handle::assign(const native_handle_type& handle,
 
 uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  LARGE_INTEGER size;
-  if (::GetFileSizeEx(handle_, &size)) {
-    ec.clear();
-    return static_cast<uint64_t>(size.QuadPart);
-  }
-
-  ec.assign(::GetLastError(), asio::error::get_system_category());
-  return 0;
+  return detail::win_file_ops::size(handle_, ec);
 }
 
 uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
@@ -149,14 +137,7 @@ uint64_t file_handle::position(asio::error_code& ec) ASIOEXT_NOEXCEPT
 uint64_t file_handle::seek(seek_origin origin, int64_t offset,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
-  LARGE_INTEGER pos, res;
-  pos.QuadPart = offset;
-
-  if (::SetFilePointerEx(handle_, pos, &res, static_cast<int>(origin)))
-    return res.QuadPart;
-
-  ec.assign(::GetLastError(), asio::error::get_system_category());
-  return 0;
+  return detail::win_file_ops::seek(handle_, origin, offset, ec);
 }
 
 ASIOEXT_NS_END
