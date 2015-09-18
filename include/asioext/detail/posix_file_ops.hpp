@@ -38,6 +38,8 @@ ASIOEXT_DECL handle_type open(const char* path, uint32_t flags,
 
 ASIOEXT_DECL void close(handle_type fd, asio::error_code& ec);
 
+ASIOEXT_DECL handle_type duplicate(handle_type fd, asio::error_code& ec);
+
 ASIOEXT_DECL uint64_t size(handle_type fd, asio::error_code& ec);
 
 ASIOEXT_DECL uint64_t seek(handle_type fd, int origin, int64_t offset,

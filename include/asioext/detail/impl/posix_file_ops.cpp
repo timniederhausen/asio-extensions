@@ -85,6 +85,18 @@ void close(handle_type fd, asio::error_code& ec)
     set_error(ec, errno);
 }
 
+handle_type duplicate(handle_type fd, asio::error_code& ec)
+{
+  const int new_fd = ::dup(fd);
+  if (new_fd != -1) {
+    ec.clear();
+    return new_fd;
+  }
+
+  set_error(ec, errno);
+  return -1;
+}
+
 uint64_t size(handle_type fd, asio::error_code& ec)
 {
   struct stat st;

@@ -73,6 +73,20 @@ void close(handle_type fd, asio::error_code& ec)
     set_error(ec);
 }
 
+handle_type duplicate(handle_type fd, asio::error_code& ec)
+{
+  const handle_type current_process = ::GetCurrentProcess();
+  handle_type new_fd = INVALID_HANDLE_VALUE;
+
+  if (::DuplicateHandle(current_process, fd, current_process, &new_fd,
+      0, FALSE, DUPLICATE_SAME_ACCESS))
+    ec.clear();
+  else
+    set_error(ec);
+
+  return new_fd;
+}
+
 uint64_t size(handle_type fd, asio::error_code& ec)
 {
   LARGE_INTEGER size;

@@ -118,6 +118,11 @@ void file_handle::assign(const native_handle_type& handle,
   handle_ = handle;
 }
 
+file_handle file_handle::duplicate(asio::error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return detail::posix_file_ops::duplicate(handle_, ec);
+}
+
 uint64_t file_handle::size(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
   return detail::posix_file_ops::size(handle_, ec);

@@ -50,7 +50,7 @@ ASIOEXT_NS_BEGIN
 /// @e Shared @e objects: Unsafe.
 ///
 /// @note If copying a handle (which is a costly operation) is really necessary,
-/// the @ref duplicate_handle function can be used.
+/// the @ref duplicate function can be used.
 class file_handle
 {
 public:
@@ -94,9 +94,17 @@ public:
   /// Failures are silently ignored.
   ASIOEXT_DECL ~file_handle();
 
+  /// @brief Construct a file_handle using a native handle.
+  ///
+  /// This constructor takes ownership of the given native file handle.
+  ///
+  /// @param handle The native file handle which shall be assigned to this
+  /// file_handle object.
+  ASIOEXT_DECL file_handle(const native_handle_type& handle) ASIOEXT_NOEXCEPT;
+
   /// @brief Open a file and construct a file_handle.
   ///
-  /// This constructor initializes the file_handle with a new handle to a file.
+  /// This constructor opens a new handle to the given file.
   ///
   /// @param filename The path of the file to open.
   ///
@@ -110,7 +118,7 @@ public:
 
   /// @brief Open a file and construct a file_handle.
   ///
-  /// This constructor initializes the file_handle with a new handle to a file.
+  /// This constructor opens a new handle to the given file.
   ///
   /// @param filename The path of the file to open.
   ///
@@ -278,6 +286,35 @@ public:
   /// the object is reset.
   ASIOEXT_DECL void assign(const native_handle_type& handle,
                            asio::error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Duplicate the given file_handle.
+  ///
+  /// This function duplicates the native handle and returns a new file_handle
+  /// object.
+  ///
+  /// @return A new file_handle referring to the same file as this file_handle.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+  ///
+  /// @note This is provided as a function instead of a
+  /// copy-contructor/assignment-operator since copying a file_handle is a
+  /// non-trivial operation which is rarely needed.
+  file_handle duplicate();
+
+  /// @brief Duplicate the given file_handle.
+  ///
+  /// This function duplicates the native handle and returns a new file_handle
+  /// object.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ///
+  /// @return A new file_handle referring to the same file as this file_handle.
+  ///
+  /// @note This is provided as a function instead of a
+  /// copy-contructor/assignment-operator since copying a file_handle is a
+  /// non-trivial operation which is rarely needed.
+  file_handle duplicate(asio::error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -599,20 +636,6 @@ private:
 
   native_handle_type handle_;
 };
-
-/// @brief Duplicate the given file_handle.
-///
-/// This function duplicates @c handle and returns a new @c file_handle
-/// object. The new handle refers to the same file as @c handle,
-/// but doesn't necessarily have the same native handle.
-///
-/// @return A new file_handle referring to the same file as @c handle.
-///
-/// @note This is provided as a free function instead of a e.g. copy-contructor
-/// since copying file_handles is a non-trivial operation which always needs to
-/// duplicate the underlying OS handle and thus isn't what you would expect
-/// when copying a lightweight handle object.
-file_handle duplicate_handle(const file_handle& handle);
 
 ASIOEXT_NS_END
 

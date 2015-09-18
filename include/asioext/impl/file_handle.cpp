@@ -13,6 +13,12 @@
 
 ASIOEXT_NS_BEGIN
 
+file_handle::file_handle(const native_handle_type& handle) ASIOEXT_NOEXCEPT
+  : handle_(handle)
+{
+  // ctor
+}
+
 file_handle::~file_handle()
 {
   asio::error_code ec;
@@ -51,6 +57,14 @@ void file_handle::assign(const native_handle_type& handle)
   asio::error_code ec;
   assign(handle, ec);
   detail::throw_error(ec);
+}
+
+file_handle file_handle::duplicate()
+{
+  asio::error_code ec;
+  file_handle h = duplicate(ec);
+  detail::throw_error(ec);
+  return h;
 }
 
 uint64_t file_handle::size()
