@@ -11,7 +11,7 @@ endif()
 
 configure_file(doxyfile.in doxyfile @ONLY)
 
-add_custom_target(asioext.doc ALL
+add_custom_target(asioext.doc
 	COMMAND ${DOXYGEN_EXECUTABLE} doxyfile
 	VERBATIM
 )
