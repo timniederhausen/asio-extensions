@@ -5,10 +5,29 @@
 cmake_minimum_required(VERSION 3.0)
 project(asioext)
 
+include(CMakeDependentOption)
+
 option(ASIOEXT_BUILD_DOC "Build documentation" ON)
-option(ASIOEXT_BUILD_TESTS "Build examples" ON)
-option(ASIOEXT_BUILD_EXAMPLES "Build tests" ON)
 option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
+cmake_dependent_option(ASIOEXT_BUILD_TESTS "Build examples" ON
+                       "NOT ASIOEXT_STANDALONE" OFF)
+cmake_dependent_option(ASIOEXT_BUILD_EXAMPLES "Build examples" ON
+                       "NOT ASIOEXT_STANDALONE" OFF)
+
+find_package(Threads REQUIRED)
+
+if (NOT ASIOEXT_STANDALONE)
+	set(components system filesystem)
+
+	if (ASIOEXT_BUILD_TESTS)
+		list(APPEND components unit_test_framework)
+	endif ()
+
+	find_package(Boost "1.55.0" COMPONENTS ${components} REQUIRED)
+else ()
+	# Standalone mode requires at least C++11
+	set(CMAKE_CXX_STANDARD 11)
+endif ()
 
 add_subdirectory(src)
 
