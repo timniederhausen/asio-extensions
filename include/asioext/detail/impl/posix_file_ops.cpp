@@ -26,7 +26,7 @@ namespace posix_file_ops {
 
 void set_error(asio::error_code& ec, int e)
 {
-  ec.assign(e, asio::error::get_system_category());
+  ec = asio::error_code(e, asio::error::get_system_category());
 }
 
 handle_type open(const char* path, uint32_t flags, asio::error_code& ec)
@@ -58,7 +58,7 @@ handle_type open(const char* path, uint32_t flags, asio::error_code& ec)
   while (true) {
     handle_type fd = ::open(path, native_flags, mode);
     if (fd != -1) {
-      ec.clear();
+      ec = asio::error_code();
       return fd;
     }
 
@@ -80,7 +80,7 @@ void close(handle_type fd, asio::error_code& ec)
   const int r = ::close(fd);
 
   if (r != -1)
-    ec.clear();
+    ec = asio::error_code();
   else
     set_error(ec, errno);
 }
@@ -89,7 +89,7 @@ handle_type duplicate(handle_type fd, asio::error_code& ec)
 {
   const int new_fd = ::dup(fd);
   if (new_fd != -1) {
-    ec.clear();
+    ec = asio::error_code();
     return new_fd;
   }
 
@@ -115,7 +115,7 @@ uint64_t seek(handle_type fd, int origin, int64_t offset,
                             static_cast<int>(origin));
 
   if (res != -1) {
-    ec.clear();
+    ec = asio::error_code();
     return static_cast<uint64_t>(res);
   }
 
@@ -134,7 +134,7 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, asio::error_code& ec)
     }
 
     if (r != -1) {
-      ec.clear();
+      ec = asio::error_code();
       return static_cast<std::size_t>(r);
     }
 
@@ -153,7 +153,7 @@ std::size_t writev(handle_type fd, const iovec* bufs, int count,
   while (true) {
     const ssize_t r = ::writev(fd, bufs, count);
     if (r != -1) {
-      ec.clear();
+      ec = asio::error_code();
       return static_cast<std::size_t>(r);
     }
 
@@ -178,7 +178,7 @@ std::size_t preadv(handle_type fd, iovec* bufs, int count,
     }
 
     if (r != -1) {
-      ec.clear();
+      ec = asio::error_code();
       return static_cast<std::size_t>(r);
     }
 
@@ -197,7 +197,7 @@ std::size_t pwritev(handle_type fd, const iovec* bufs, int count,
   while (true) {
     const ssize_t r = ::pwritev(fd, bufs, count, offset);
     if (r != -1) {
-      ec.clear();
+      ec = asio::error_code();
       return static_cast<std::size_t>(r);
     }
 

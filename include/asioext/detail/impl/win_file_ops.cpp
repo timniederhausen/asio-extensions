@@ -21,7 +21,8 @@ namespace win_file_ops {
 
 void set_error(asio::error_code& ec)
 {
-  ec.assign(::GetLastError(), asio::error::get_system_category());
+  ec = asio::error_code(::GetLastError(),
+                        asio::error::get_system_category());
 }
 
 handle_type open(const wchar_t* filename, uint32_t flags, asio::error_code& ec)
@@ -60,7 +61,7 @@ handle_type open(const wchar_t* filename, uint32_t flags, asio::error_code& ec)
   if (h == INVALID_HANDLE_VALUE)
     set_error(ec);
   else
-    ec.clear();
+    ec = asio::error_code();
 
   return h;
 }
@@ -68,7 +69,7 @@ handle_type open(const wchar_t* filename, uint32_t flags, asio::error_code& ec)
 void close(handle_type fd, asio::error_code& ec)
 {
   if (::CloseHandle(fd))
-    ec.clear();
+    ec = asio::error_code();
   else
     set_error(ec);
 }
@@ -80,7 +81,7 @@ handle_type duplicate(handle_type fd, asio::error_code& ec)
 
   if (::DuplicateHandle(current_process, fd, current_process, &new_fd,
       0, FALSE, DUPLICATE_SAME_ACCESS))
-    ec.clear();
+    ec = asio::error_code();
   else
     set_error(ec);
 
@@ -91,7 +92,7 @@ uint64_t size(handle_type fd, asio::error_code& ec)
 {
   LARGE_INTEGER size;
   if (::GetFileSizeEx(fd, &size)) {
-    ec.clear();
+    ec = asio::error_code();
     return static_cast<uint64_t>(size.QuadPart);
   }
 
