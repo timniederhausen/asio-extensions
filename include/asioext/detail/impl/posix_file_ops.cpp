@@ -125,89 +125,67 @@ uint64_t seek(handle_type fd, int origin, int64_t offset,
 
 std::size_t readv(handle_type fd, iovec* bufs, int count, asio::error_code& ec)
 {
-  while (true) {
-    const ssize_t r = ::readv(fd, bufs, count);
+  const ssize_t r = ::readv(fd, bufs, count);
 
-    if (r == 0) {
-      ec = asio::error::eof;
-      return 0;
-    }
-
-    if (r != -1) {
-      ec = asio::error_code();
-      return static_cast<std::size_t>(r);
-    }
-
-    const int e = errno;
-    if (e == EINTR)
-      continue;
-
-    set_error(ec, e);
+  // @todo Only return EOF if the buffers have non-zero size?
+  if (r == 0) {
+    ec = asio::error::eof;
     return 0;
   }
+
+  if (r != -1) {
+    ec = asio::error_code();
+    return static_cast<std::size_t>(r);
+  }
+
+  set_error(ec, errno);
+  return 0;
 }
 
 std::size_t writev(handle_type fd, const iovec* bufs, int count,
                    asio::error_code& ec)
 {
-  while (true) {
-    const ssize_t r = ::writev(fd, bufs, count);
-    if (r != -1) {
-      ec = asio::error_code();
-      return static_cast<std::size_t>(r);
-    }
-
-    const int e = errno;
-    if (e == EINTR)
-      continue;
-
-    set_error(ec, e);
-    return 0;
+  const ssize_t r = ::writev(fd, bufs, count);
+  if (r != -1) {
+    ec = asio::error_code();
+    return static_cast<std::size_t>(r);
   }
+
+  set_error(ec, errno);
+  return 0;
 }
 
 std::size_t preadv(handle_type fd, iovec* bufs, int count,
                    off_t offset, asio::error_code& ec)
 {
-  while (true) {
-    const ssize_t r = ::preadv(fd, bufs, count, offset);
+  const ssize_t r = ::preadv(fd, bufs, count, offset);
 
-    if (r == 0) {
-      ec = asio::error::eof;
-      return 0;
-    }
-
-    if (r != -1) {
-      ec = asio::error_code();
-      return static_cast<std::size_t>(r);
-    }
-
-    const int e = errno;
-    if (e == EINTR)
-      continue;
-
-    set_error(ec, e);
+  // @todo Only return EOF if the buffers have non-zero size?
+  if (r == 0) {
+    ec = asio::error::eof;
     return 0;
   }
+
+  if (r != -1) {
+    ec = asio::error_code();
+    return static_cast<std::size_t>(r);
+  }
+
+  set_error(ec, errno);
+  return 0;
 }
 
 std::size_t pwritev(handle_type fd, const iovec* bufs, int count,
                     off_t offset, asio::error_code& ec)
 {
-  while (true) {
-    const ssize_t r = ::pwritev(fd, bufs, count, offset);
-    if (r != -1) {
-      ec = asio::error_code();
-      return static_cast<std::size_t>(r);
-    }
-
-    const int e = errno;
-    if (e == EINTR)
-      continue;
-
-    set_error(ec, e);
-    return 0;
+  const ssize_t r = ::pwritev(fd, bufs, count, offset);
+  if (r != -1) {
+    ec = asio::error_code();
+    return static_cast<std::size_t>(r);
   }
+
+  set_error(ec, errno);
+  return 0;
 }
 
 }

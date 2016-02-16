@@ -23,7 +23,7 @@
 #include <asio/error_code.hpp>
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-#include <boost/filesystem/path.hpp>
+# include <boost/filesystem/path.hpp>
 #endif
 
 #include "asioext/detail/push_options.hpp"
