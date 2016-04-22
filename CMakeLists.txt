@@ -9,6 +9,7 @@ include(CMakeDependentOption)
 
 option(ASIOEXT_BUILD_DOC "Build documentation" ON)
 option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
+option(ASIOEXT_BUILD_SHARED "Build the shared library as well" OFF)
 cmake_dependent_option(ASIOEXT_BUILD_TESTS "Build examples" ON
                        "NOT ASIOEXT_STANDALONE" OFF)
 cmake_dependent_option(ASIOEXT_BUILD_EXAMPLES "Build examples" ON
