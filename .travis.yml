@@ -1,0 +1,35 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+addons:
+  apt:
+    sources:
+      - george-edison55-precise-backports
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.6
+      - boost-latest
+    packages:
+      - gcc-4.8
+      - g++-4.8
+      - clang-3.6
+      - libboost1.55-all-dev
+      - cmake
+      - cmake-data
+
+install:
+  # g++4.8
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  # clang 3.6
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.6"; fi
+
+before_script:
+  - git clone --branch=master https://github.com/chriskohlhoff/asio.git
+  - mkdir build
+  - cd build
+  - cmake -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio ..
+
+script:
+  - make
