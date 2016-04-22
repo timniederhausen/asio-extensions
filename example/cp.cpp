@@ -8,8 +8,9 @@
 #include <asio/write.hpp>
 #include <asio/read.hpp>
 
-#include <cstdio>
+#include <array>
 #include <iostream>
+#include <cstdio>
 
 // While convenient, this method buffers the entire file which might not be
 // possible/feasible for large files.
