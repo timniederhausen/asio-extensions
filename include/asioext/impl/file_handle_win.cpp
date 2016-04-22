@@ -106,7 +106,7 @@ bool file_handle::is_open() const ASIOEXT_NOEXCEPT
 void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (handle_ == INVALID_HANDLE_VALUE) {
-    ec.clear();
+    ec = asio::error_code();
     return;
   }
 
