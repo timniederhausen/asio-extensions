@@ -1,5 +1,7 @@
 # Asio Extensions (_AsioExt_)
 
+[![Build Status](https://travis-ci.org/timniederhausen/asio-extensions.svg?branch=master)](https://travis-ci.org/timniederhausen/asio-extensions)
+
 ## Feature overview
 
 * `file_handle`: A thin and lightweight OS-agnostic wrapper around a native file handle.
