@@ -8,7 +8,12 @@
 #include <asio/write.hpp>
 #include <asio/read.hpp>
 
-#include <array>
+#if !defined(ASIOEXT_STANDALONE)
+# include <boost/array.hpp>
+#else
+# include <array>
+#endif
+
 #include <iostream>
 #include <cstdio>
 
@@ -30,7 +35,11 @@ void copy_file_oneshot(asioext::file_handle& src, asioext::file_handle& dst)
 // This function uses a stack-allocated buffer to copy data from |src| to |dst|
 void copy_file_blocks(asioext::file_handle& src, asioext::file_handle& dst)
 {
+#if !defined(ASIOEXT_STANDALONE)
+  boost::array<char, 2048> buffer;
+#else
   std::array<char, 2048> buffer;
+#endif
 
   for (bool at_end = false; !at_end; ) {
     // We need the actual bytes read here since the last block might be smaller.

@@ -10,5 +10,9 @@ target_link_libraries(asioext.ex.simple asioext.static)
 # cp example tool
 add_executable(asioext.ex.cp cp.cpp)
 set_property(TARGET asioext.ex.cp PROPERTY OUTPUT_NAME cp)
-set_property(TARGET asioext.ex.cp PROPERTY CXX_STANDARD 11)
+
+if (ASIOEXT_STANDALONE)
+	set_property(TARGET asioext.ex.cp PROPERTY CXX_STANDARD 11)
+endif ()
+
 target_link_libraries(asioext.ex.cp asioext.static)
