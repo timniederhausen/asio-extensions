@@ -24,6 +24,7 @@ if (NOT ASIOEXT_STANDALONE)
 		list(APPEND components unit_test_framework)
 	endif ()
 
+	set(Boost_USE_STATIC_LIBS ON)
 	find_package(Boost "1.55.0" COMPONENTS ${components} REQUIRED)
 else ()
 	# Standalone mode requires at least C++11
