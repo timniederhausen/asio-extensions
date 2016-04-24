@@ -6,7 +6,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(file_handle)
+BOOST_AUTO_TEST_SUITE(asioext_file_handle)
 
 BOOST_AUTO_TEST_CASE(empty)
 {
