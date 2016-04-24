@@ -106,6 +106,7 @@ void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
   }
 
   detail::posix_file_ops::close(handle_, ec);
+  handle_ = -1;
 }
 
 void file_handle::assign(const native_handle_type& handle,
