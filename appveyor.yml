@@ -1,0 +1,23 @@
+version: 1.0.{build}
+clone_depth: 15
+
+environment:
+    BOOST_ROOT: C:\Libraries\boost_1_59_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_59_0\lib32-msvc-14.0
+
+    matrix:
+        - ASIOEXT_GENERATOR: "Visual Studio 14 2015"
+
+install:
+    - git clone --branch=master https://github.com/chriskohlhoff/asio.git
+
+before_build:
+    - mkdir build
+    - cd build
+    - cmake "-DBoost_ADDITIONAL_VERSIONS=1.59.0" -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio .. "-G%ASIOEXT_GENERATOR%" ..
+
+build_script:
+    - cmake --build .
+
+test_script:
+    - test/asioext.test.exe
