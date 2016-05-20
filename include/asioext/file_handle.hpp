@@ -263,6 +263,19 @@ public:
   /// the object is reset.
   ASIOEXT_DECL void close(asio::error_code& ec) ASIOEXT_NOEXCEPT;
 
+  /// @brief Take ownership of the contained native handle.
+  ///
+  /// This function transfers ownership of the contained native handle to
+  /// the caller. The file_handle object is reset to an empty state
+  /// (i.e. no file opened).
+  ///
+  /// @return The contained native handle.
+  /// The caller is now responsible to close it.
+  ///
+  /// @warning This function is dangerous. It is highly unlikely that you'll
+  /// ever need to use this.
+  native_handle_type leak() ASIOEXT_NOEXCEPT;
+
   /// @brief Assign an existing native handle to the handle.
   ///
   /// This function opens the handle to hold an existing native handle.

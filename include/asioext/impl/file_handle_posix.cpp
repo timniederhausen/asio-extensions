@@ -107,6 +107,13 @@ void file_handle::close(asio::error_code& ec) ASIOEXT_NOEXCEPT
   handle_ = -1;
 }
 
+file_handle::native_handle_type file_handle::leak() ASIOEXT_NOEXCEPT
+{
+  native_handle_type handle = handle_;
+  handle_ = -1;
+  return handle;
+}
+
 void file_handle::assign(const native_handle_type& handle,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
