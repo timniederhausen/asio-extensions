@@ -22,8 +22,6 @@
 
 #undef _FILE_OFFSET_BITS
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 namespace detail {
@@ -63,8 +61,6 @@ ASIOEXT_DECL std::size_t pwritev(handle_type fd,
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #if defined(ASIOEXT_HEADER_ONLY)
 # include "asioext/detail/impl/posix_file_ops.cpp"

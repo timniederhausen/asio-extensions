@@ -13,12 +13,14 @@
 
 #include <asio/error_code.hpp>
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 namespace detail {
 
+// TODO(tim): We currently only support paths up to 260 characters.
+// Most windows applications won't need/use more since that'd break
+// all other applications that don't use extended-length prefixes.
+// See: https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
 class win_path
 {
 public:
@@ -31,14 +33,12 @@ public:
   { return buffer_; }
 
 private:
-  wchar_t buffer_[kMaxPath + 1];
+  wchar_t buffer_[kMaxPath];
 };
 
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #if defined(ASIOEXT_HEADER_ONLY)
 # include "asioext/detail/impl/win_path.cpp"

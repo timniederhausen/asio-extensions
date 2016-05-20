@@ -11,8 +11,6 @@
 
 #include <windows.h>
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 namespace detail {
@@ -34,7 +32,5 @@ win_path::win_path(const char* s, std::size_t len,
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #endif

@@ -12,8 +12,6 @@
 
 #include <windows.h>
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 namespace detail {
@@ -189,7 +187,5 @@ uint32_t pwrite(handle_type fd,
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #endif

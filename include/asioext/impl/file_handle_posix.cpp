@@ -14,8 +14,6 @@
 
 #include <cstddef> // for size_t
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 file_handle::file_handle() ASIOEXT_NOEXCEPT
@@ -141,7 +139,5 @@ uint64_t file_handle::seek(seek_origin origin, int64_t offset,
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #endif

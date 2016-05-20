@@ -11,8 +11,6 @@
 
 #include <asio/buffer.hpp>
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 // Note: Currently always only the first buffer is used.
@@ -62,7 +60,5 @@ std::size_t file_handle::write_some_at(uint64_t offset,
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #endif

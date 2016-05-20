@@ -16,8 +16,6 @@
 
 #include "asioext/detail/cstdint.hpp"
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 /// @brief Contains option flags for opening files.
@@ -92,8 +90,6 @@ ASIOEXT_DECL bool is_valid(uint32_t flags);
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #if defined(ASIOEXT_HEADER_ONLY)
 # include "asioext/impl/open_flags.cpp"

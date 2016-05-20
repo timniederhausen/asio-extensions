@@ -7,8 +7,6 @@
 
 #include "asioext/open_flags.hpp"
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 namespace open_flags {
@@ -30,7 +28,5 @@ bool is_valid(uint32_t flags)
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #endif

@@ -17,8 +17,6 @@
 #include <sys/stat.h>
 #include <sys/types.h> // for off_t etc.
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 namespace detail {
@@ -192,7 +190,5 @@ std::size_t pwritev(handle_type fd, const iovec* bufs, int count,
 }
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #endif

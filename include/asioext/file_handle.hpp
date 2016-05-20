@@ -26,8 +26,6 @@
 # include <boost/filesystem/path.hpp>
 #endif
 
-#include "asioext/detail/push_options.hpp"
-
 ASIOEXT_NS_BEGIN
 
 /// @brief A thin and lightweight wrapper around a native file handle.
@@ -638,8 +636,6 @@ private:
 };
 
 ASIOEXT_NS_END
-
-#include "asioext/detail/pop_options.hpp"
 
 #include "asioext/impl/file_handle.hpp"
 

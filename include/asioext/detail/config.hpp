@@ -33,7 +33,7 @@
 #endif
 
 #if defined(ASIOEXT_HEADER_ONLY)
-// Define as |inline| so multiple copies of our functions are elided.
+// Define as |inline| so multiple copies of our functions are discarded.
 # define ASIOEXT_DECL inline
 #else
 # if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__CODEGEARC__)
@@ -91,7 +91,7 @@
 #  endif
 #  if defined(__GNUC__)
 #   if ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 3)
-// GCC supports it, but recent versions(?) seem to have massive performance
+// GCC supports it, but recent versions(?) seem to have performance
 // penalties associated with this: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=58770
 //#    define ASIOEXT_HAS_PRAGMA_ONCE 1
 #   endif
