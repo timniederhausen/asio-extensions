@@ -8,5 +8,5 @@ _Boost.Asio_ is planned.
 
 ## List of features
 
-* The @ref asioext::file_handle class which simply wraps the current platform's native file handle
-   and provides support for Asio's `*Stream` concepts on top of it.
+* @ref asioext::file_handle A simple wrapper for native file handles
+   that supports Asio's `*Stream` concepts.

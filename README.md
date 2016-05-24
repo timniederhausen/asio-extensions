@@ -5,7 +5,8 @@
 
 ## Feature overview
 
-* `file_handle`: A thin and lightweight OS-agnostic wrapper around a native file handle.
+* `file_handle`: A thin wrapper around a native file handle that supports
+  Asio's Stream* concepts.
 
 ## Building
 
