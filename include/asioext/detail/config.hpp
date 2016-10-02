@@ -5,7 +5,13 @@
 #ifndef ASIOEXT_DETAIL_CONFIG_HPP
 #define ASIOEXT_DETAIL_CONFIG_HPP
 
-#include <asio/detail/config.hpp>
+#if defined(ASIOEXT_STANDALONE)
+# define ASIOEXT_DISABLE_BOOST_FILESYSTEM 1
+#else
+# include <boost/config.hpp>
+# include <boost/version.hpp>
+# define ASIOEXT_HAS_BOOST_CONFIG 1
+#endif
 
 #if ASIOEXT_IS_DOCUMENTATION
 # define ASIOEXT_SEPARATE_COMPILATION 1
@@ -51,39 +57,100 @@
 # define ASIOEXT_DECL
 #endif
 
-#if defined(ASIOEXT_STANDALONE)
-# define ASIOEXT_DISABLE_BOOST_FILESYSTEM 1
+// ASIOEXT_MSVC: Macro expanding to the MSVC version (i.e. the _MSC_VER value).
+#if !defined(ASIOEXT_MSVC)
+# if defined(ASIOEXT_HAS_BOOST_CONFIG) && defined(BOOST_MSVC)
+#  define ASIOEXT_MSVC BOOST_MSVC
+# elif defined(_MSC_VER) && (defined(__INTELLISENSE__) \
+      || (!defined(__MWERKS__) && !defined(__EDG_VERSION__)))
+#  define ASIOEXT_MSVC _MSC_VER
+# endif
 #endif
 
-#if !defined(ASIOEXT_MSVC) && defined(ASIO_MSVC)
-// ASIO_MSVC contains the compiler version (i.e. the _MSC_VER value)
-# define ASIOEXT_MSVC ASIO_MSVC
+// ASIOEXT_HAS_MOVE: Defined if the compiler supports rvalue references
+// (and ASIOEXT_DISABLE_MOVE isn't defined).
+#if !defined(ASIOEXT_HAS_MOVE) && !defined(ASIOEXT_DISABLE_MOVE)
+# if defined(__clang__)
+#  if __has_feature(__cxx_rvalue_references__)
+#   define ASIOEXT_HAS_MOVE 1
+#  endif
+# endif
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define ASIOEXT_HAS_MOVE 1
+#   endif
+#  endif
+# endif
+# if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1700)
+#  define ASIOEXT_HAS_MOVE 1
+# endif
 #endif
 
-#if !defined(ASIOEXT_HAS_MOVE) && defined(ASIO_HAS_MOVE)
-# define ASIOEXT_HAS_MOVE 1
+// ASIOEXT_HAS_VARIADIC_TEMPLATES: Defined if the compiler supports variadic templates
+// (and ASIOEXT_DISABLE_VARIADIC_TEMPLATES isn't defined).
+#if !defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && !defined(ASIOEXT_DISABLE_VARIADIC_TEMPLATES)
+# if defined(__clang__)
+#  if __has_feature(__cxx_variadic_templates__)
+#   define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
+#  endif
+# endif
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
+#   endif
+#  endif
+# endif
+# if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1800)
+#  define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
+# endif
 #endif
 
-#if !defined(ASIOEXT_MOVE_ARG)
-# define ASIOEXT_MOVE_ARG ASIO_MOVE_ARG
-# define ASIOEXT_MOVE_ARG2 ASIO_MOVE_ARG2
-# define ASIOEXT_MOVE_CAST ASIO_MOVE_CAST
-# define ASIOEXT_MOVE_CAST2 ASIO_MOVE_CAST2
+// ASIOEXT_DELETED: Macro expanding to '= delete' on supported compilers.
+#if !defined(ASIOEXT_DELETED)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define ASIOEXT_DELETED = delete
+#   endif
+#  endif
+# endif
+# if defined(__clang__)
+#  if __has_feature(__cxx_deleted_functions__)
+#   define ASIOEXT_DELETED = delete
+#  endif
+# endif
+# if !defined(ASIOEXT_DELETED)
+#  define ASIOEXT_DELETED
+# endif
 #endif
 
-#if !defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && defined(ASIO_HAS_VARIADIC_TEMPLATES)
-# define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
-#endif
-
-#if !defined(ASIOEXT_DELETED) && defined(ASIO_DELETED)
-# define ASIOEXT_DELETED ASIO_DELETED
-#endif
-
+// ASIOEXT_NOEXCEPT: Macro expanding to 'noexcept' on supported compilers.
 #if !defined(ASIOEXT_NOEXCEPT)
-# define ASIOEXT_NOEXCEPT ASIO_NOEXCEPT
+# if !defined(ASIOEXT_DISABLE_NOEXCEPT)
+#  if (BOOST_VERSION >= 105300)
+#   define ASIOEXT_NOEXCEPT BOOST_NOEXCEPT
+#  elif defined(__clang__)
+#   if __has_feature(__cxx_noexcept__)
+#    define ASIOEXT_NOEXCEPT noexcept(true)
+#   endif
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#      define ASIOEXT_NOEXCEPT noexcept(true)
+#    endif
+#   endif
+#  elif defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1900)
+#    define ASIOEXT_NOEXCEPT noexcept(true)
+#  endif
+# endif
+# if !defined(ASIOEXT_NOEXCEPT)
+#  define ASIOEXT_NOEXCEPT
+# endif
 #endif
 
-// Support for '#pragma once'
+// ASIOEXT_HAS_PRAGMA_ONCE: Defined if the compiler supports '#pragma once'
 #if !defined(ASIOEXT_HAS_PRAGMA_ONCE)
 # if !defined(ASIOEXT_DISABLE_PRAGMA_ONCE)
 #  if defined(__clang__)
@@ -96,14 +163,18 @@
 //#    define ASIOEXT_HAS_PRAGMA_ONCE 1
 #   endif
 #  endif
-#  if defined(ASIOEXT_MSVC) && (_MSC_VER >= 1020)
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1020)
 #   define ASIOEXT_HAS_PRAGMA_ONCE 1
 #  endif
 # endif
 #endif
 
-#if !defined(ASIOEXT_WINDOWS) && defined(ASIO_WINDOWS)
-# define ASIOEXT_WINDOWS 1
+#if !defined(ASIOEXT_WINDOWS)
+# if defined(ASIOEXT_HAS_BOOST_CONFIG) && defined(BOOST_WINDOWS)
+#  define ASIOEXT_WINDOWS 1
+# elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#  define ASIOEXT_WINDOWS 1
+# endif
 #endif
 
 #if !defined(ASIOEXT_HAS_BOOST_FILESYSTEM)

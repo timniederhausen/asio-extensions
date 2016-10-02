@@ -17,6 +17,7 @@ ASIOEXT_NS_BEGIN
 
 namespace detail {
 
+// TODO(tim): We shouldn't depend on asio's internals.
 using asio::detail::throw_error;
 
 }
