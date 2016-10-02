@@ -12,8 +12,7 @@ option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
 option(ASIOEXT_BUILD_SHARED "Build the shared library as well" OFF)
 cmake_dependent_option(ASIOEXT_BUILD_TESTS "Build examples" ON
                        "NOT ASIOEXT_STANDALONE" OFF)
-cmake_dependent_option(ASIOEXT_BUILD_EXAMPLES "Build examples" ON
-                       "NOT ASIOEXT_STANDALONE" OFF)
+option(ASIOEXT_BUILD_EXAMPLES "Build examples" OFF)
 
 find_package(Threads REQUIRED)
 
@@ -37,7 +36,7 @@ if (ASIOEXT_BUILD_DOC)
 	add_subdirectory(doc)
 endif ()
 
-if (ASIOEXT_BUILD_TESTS)
+if (ASIOEXT_BUILD_EXAMPLES)
 	add_subdirectory(example)
 endif ()
 
