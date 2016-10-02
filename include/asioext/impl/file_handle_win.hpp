@@ -28,7 +28,8 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
                                    asio::error_code& ec)
 {
   const asio::mutable_buffer buf = *buffers.begin();
-  return detail::win_file_ops::read(handle_, buf.data(), buf.size(), ec);
+  return detail::win_file_ops::read(handle_, asio::buffer_cast<void*>(buf),
+                                    asio::buffer_size(buf), ec);
 }
 
 template <typename ConstBufferSequence>
@@ -36,7 +37,9 @@ std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
                                     asio::error_code& ec)
 {
   const asio::const_buffer buf = *buffers.begin();
-  return detail::win_file_ops::write(handle_, buf.data(), buf.size(), ec);
+  return detail::win_file_ops::write(handle_,
+                                     asio::buffer_cast<const void*>(buf),
+                                     asio::buffer_size(buf), ec);
 }
 
 template <typename MutableBufferSequence>
@@ -45,7 +48,8 @@ std::size_t file_handle::read_some_at(uint64_t offset,
                                       asio::error_code& ec)
 {
   const asio::mutable_buffer buf = *buffers.begin();
-  return detail::win_file_ops::pread(handle_, buf.data(), buf.size(),
+  return detail::win_file_ops::pread(handle_, asio::buffer_cast<void*>(buf),
+                                     asio::buffer_size(buf),
                                      offset, ec);
 }
 
@@ -55,7 +59,9 @@ std::size_t file_handle::write_some_at(uint64_t offset,
                                        asio::error_code& ec)
 {
   const asio::const_buffer buf = *buffers.begin();
-  return detail::win_file_ops::pwrite(handle_, buf.data(), buf.size(),
+  return detail::win_file_ops::pwrite(handle_,
+                                      asio::buffer_cast<const void*>(buf),
+                                      asio::buffer_size(buf),
                                       offset, ec);
 }
 
