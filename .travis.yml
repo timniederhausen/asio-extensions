@@ -1,23 +1,39 @@
 language: cpp
 
-compiler:
-  - clang
-  - gcc
-
 addons:
   apt:
-    sources:
+    sources: &sources
       - george-edison55-precise-backports
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.6
       - boost-latest
-    packages:
-      - gcc-4.8
-      - g++-4.8
-      - clang-3.6
+      # this is needed for gcc and clang
+      - ubuntu-toolchain-r-test
+    packages: &packages
       - libboost1.55-all-dev
       - cmake
       - cmake-data
+
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+      addons:
+        apt:
+          sources:
+            - *sources
+          packages:
+            - g++-4.8
+            - *packages
+
+    - compiler: clang
+      os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.6
+            - *sources
+          packages:
+            - clang-3.6
+            - *packages
 
 install:
   # g++4.8
