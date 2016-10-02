@@ -9,7 +9,7 @@ environment:
         - ASIOEXT_GENERATOR: "Visual Studio 14 2015"
 
 install:
-    - git clone --branch=master https://github.com/chriskohlhoff/asio.git
+    - git clone --branch=asio-1-10-8 https://github.com/chriskohlhoff/asio.git
 
 before_build:
     - mkdir build

@@ -42,7 +42,7 @@ install:
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.6"; fi
 
 before_script:
-  - git clone --branch=master https://github.com/chriskohlhoff/asio.git
+  - git clone --branch=asio-1-10-8 https://github.com/chriskohlhoff/asio.git
   - mkdir build
   - cd build
   - cmake -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio ..
