@@ -77,6 +77,14 @@ file_handle& file_handle::operator=(file_handle&& other)
 void file_handle::open(const char* filename, uint32_t flags,
                        asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
+  if (handle_ != -1) {
+    detail::posix_file_ops::close(handle_, ec);
+    if (ec) {
+      handle_ = -1;
+      return;
+    }
+  }
+
   handle_ = detail::posix_file_ops::open(filename, flags, ec);
 }
 
@@ -86,6 +94,14 @@ void file_handle::open(const boost::filesystem::path& filename,
                        uint32_t flags,
                        asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
+  if (handle_ != -1) {
+    detail::posix_file_ops::close(handle_, ec);
+    if (ec) {
+      handle_ = -1;
+      return;
+    }
+  }
+
   handle_ = detail::posix_file_ops::open(filename.c_str(), flags, ec);
 }
 
@@ -118,10 +134,8 @@ void file_handle::assign(const native_handle_type& handle,
                          asio::error_code& ec) ASIOEXT_NOEXCEPT
 {
   close(ec);
-  if (ec)
-    return;
-
-  handle_ = handle;
+  if (!ec)
+    handle_ = handle;
 }
 
 file_handle file_handle::duplicate(asio::error_code& ec) ASIOEXT_NOEXCEPT
