@@ -45,6 +45,25 @@ BOOST_AUTO_TEST_CASE(open_succeed)
   BOOST_CHECK(!fh.is_open());
 }
 
+BOOST_AUTO_TEST_CASE(assign)
+{
+  using namespace asioext::open_flags;
+  asioext::file_handle fh, fh2;
+
+  asio::error_code ec;
+  fh.open("test_file_1", access_write | create_always, ec);
+  BOOST_REQUIRE(!ec);
+
+  const asioext::file_handle::native_handle_type h = fh.native_handle();
+  fh2.assign(h, ec);
+  fh.leak();
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK(!fh.is_open());
+  BOOST_CHECK(fh2.is_open());
+  BOOST_REQUIRE_EQUAL(fh2.native_handle(), h);
+}
+
 BOOST_AUTO_TEST_CASE(read_write)
 {
   using namespace asioext::open_flags;
