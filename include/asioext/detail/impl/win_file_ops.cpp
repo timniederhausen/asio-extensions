@@ -26,31 +26,31 @@ handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
     return INVALID_HANDLE_VALUE;
   }
 
-  DWORD creationDisposition = 0;
+  DWORD creation_disposition = 0;
   if (flags & open_flags::create_new)
-    creationDisposition = CREATE_NEW;
+    creation_disposition = CREATE_NEW;
   else if (flags & open_flags::create_always)
-    creationDisposition = CREATE_ALWAYS;
+    creation_disposition = CREATE_ALWAYS;
   else if (flags & open_flags::open_existing)
-    creationDisposition = OPEN_EXISTING;
+    creation_disposition = OPEN_EXISTING;
   else if (flags & open_flags::open_always)
-    creationDisposition = OPEN_ALWAYS;
+    creation_disposition = OPEN_ALWAYS;
   else if (flags & open_flags::truncate_existing)
-    creationDisposition = TRUNCATE_EXISTING;
+    creation_disposition = TRUNCATE_EXISTING;
 
-  DWORD desiredAccess = 0;
+  DWORD desired_access = 0;
   if (flags & open_flags::access_read)
-    desiredAccess |= GENERIC_READ;
+    desired_access |= GENERIC_READ;
   if (flags & open_flags::access_write)
-    desiredAccess |= GENERIC_WRITE;
+    desired_access |= GENERIC_WRITE;
 
   // TODO: Add support for these
-  DWORD shareMode = 0;
-  DWORD flagsAndAttributes = 0;
+  DWORD share_mode = 0;
+  DWORD flags_and_attrs = 0;
 
   handle_type h =
-      ::CreateFileW(filename, desiredAccess, shareMode, nullptr,
-                    creationDisposition, flagsAndAttributes, nullptr);
+      ::CreateFileW(filename, desired_access, share_mode, NULL,
+                    creation_disposition, flags_and_attrs, NULL);
 
   if (h == INVALID_HANDLE_VALUE)
     set_error(ec);
@@ -109,7 +109,7 @@ uint64_t seek(handle_type fd, uint32_t origin, int64_t offset, error_code& ec)
 uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)
 {
   DWORD bytesRead = 0;
-  if (!::ReadFile(fd, buffer, size, &bytesRead, nullptr)) {
+  if (!::ReadFile(fd, buffer, size, &bytesRead, NULL)) {
     set_error(ec);
     return 0;
   }
@@ -126,7 +126,7 @@ uint32_t write(handle_type fd,
                error_code& ec)
 {
   DWORD bytesWritten = 0;
-  if (!::WriteFile(fd, buffer, size, &bytesWritten, nullptr)) {
+  if (!::WriteFile(fd, buffer, size, &bytesWritten, NULL)) {
     set_error(ec);
     return 0;
   }
