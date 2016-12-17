@@ -1,5 +1,5 @@
 version: 1.0.{build}
-clone_depth: 15
+clone_depth: 1
 
 environment:
     BOOST_ROOT: C:\Libraries\boost_1_59_0
@@ -9,7 +9,7 @@ environment:
         - ASIOEXT_GENERATOR: "Visual Studio 14 2015"
 
 install:
-    - git clone --branch=asio-1-10-8 https://github.com/chriskohlhoff/asio.git
+    - git clone --branch=asio-1-10-8 --depth=1 https://github.com/chriskohlhoff/asio.git
 
 before_build:
     - mkdir build
