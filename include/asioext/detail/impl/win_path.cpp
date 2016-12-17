@@ -2,9 +2,6 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_DETAIL_IMPL_WINPATH_CPP
-#define ASIOEXT_DETAIL_IMPL_WINPATH_CPP
-
 #include "asioext/detail/win_path.hpp"
 #include "asioext/detail/error.hpp"
 
@@ -30,5 +27,3 @@ win_path::win_path(const char* s,
 }
 
 ASIOEXT_NS_END
-
-#endif

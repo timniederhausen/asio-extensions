@@ -2,13 +2,10 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_IMPL_SCOPEDFILEHANDLE_POSIX_CPP
-#define ASIOEXT_IMPL_SCOPEDFILEHANDLE_POSIX_CPP
-
-#include "asioext/scoped_file_handle.hpp"
-
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/throw_error.hpp"
+
+#include "asioext/scoped_file_handle.hpp"
 
 ASIOEXT_NS_BEGIN
 
@@ -72,5 +69,3 @@ void scoped_file_handle::open(const boost::filesystem::path& filename,
 #endif
 
 ASIOEXT_NS_END
-
-#endif

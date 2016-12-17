@@ -5,11 +5,11 @@
 #ifndef ASIOEXT_IMPL_FILEHANDLE_WIN_HPP
 #define ASIOEXT_IMPL_FILEHANDLE_WIN_HPP
 
-#include "asioext/file_handle.hpp"
-
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/buffer_sequence_adapter.hpp"
 #include "asioext/detail/buffer.hpp"
+
+#include "asioext/file_handle.hpp"
 
 ASIOEXT_NS_BEGIN
 

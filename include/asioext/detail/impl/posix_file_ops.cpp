@@ -2,13 +2,10 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_DETAIL_IMPL_POSIXFILEOPS_CPP
-#define ASIOEXT_DETAIL_IMPL_POSIXFILEOPS_CPP
-
-#include "asioext/open_flags.hpp"
-
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/error.hpp"
+
+#include "asioext/open_flags.hpp"
 
 #define _FILE_OFFSET_BITS 64
 
@@ -194,5 +191,3 @@ std::size_t pwritev(handle_type fd,
 }
 
 ASIOEXT_NS_END
-
-#endif

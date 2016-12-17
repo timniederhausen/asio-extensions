@@ -2,9 +2,6 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_IMPL_OPENFLAGS_CPP
-#define ASIOEXT_IMPL_OPENFLAGS_CPP
-
 #include "asioext/open_flags.hpp"
 
 ASIOEXT_NS_BEGIN
@@ -28,5 +25,3 @@ bool is_valid(uint32_t flags)
 }
 
 ASIOEXT_NS_END
-
-#endif

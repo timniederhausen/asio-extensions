@@ -2,12 +2,9 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_IMPL_FILEHANDLE_CPP
-#define ASIOEXT_IMPL_FILEHANDLE_CPP
+#include "asioext/detail/throw_error.hpp"
 
 #include "asioext/file_handle.hpp"
-
-#include "asioext/detail/throw_error.hpp"
 
 ASIOEXT_NS_BEGIN
 
@@ -53,5 +50,3 @@ uint64_t file_handle::seek(seek_origin origin, int64_t offset)
 }
 
 ASIOEXT_NS_END
-
-#endif
