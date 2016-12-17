@@ -9,14 +9,13 @@
 
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/buffer_sequence_adapter.hpp"
-
-#include <asio/buffer.hpp>
+#include "asioext/detail/buffer.hpp"
 
 ASIOEXT_NS_BEGIN
 
 template <typename MutableBufferSequence>
 std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
-                                   asio::error_code& ec)
+                                   error_code& ec)
 {
   detail::buffer_sequence_adapter<asio::mutable_buffer,
                                   MutableBufferSequence> bufs(buffers);
@@ -27,7 +26,7 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
 
 template <typename ConstBufferSequence>
 std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
-                                    asio::error_code& ec)
+                                    error_code& ec)
 {
   detail::buffer_sequence_adapter<asio::const_buffer,
                                   ConstBufferSequence> bufs(buffers);
@@ -39,7 +38,7 @@ std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
 template <typename MutableBufferSequence>
 std::size_t file_handle::read_some_at(uint64_t offset,
                                       const MutableBufferSequence& buffers,
-                                      asio::error_code& ec)
+                                      error_code& ec)
 {
   detail::buffer_sequence_adapter<asio::mutable_buffer,
                                   MutableBufferSequence> bufs(buffers);
@@ -52,7 +51,7 @@ std::size_t file_handle::read_some_at(uint64_t offset,
 template <typename ConstBufferSequence>
 std::size_t file_handle::write_some_at(uint64_t offset,
                                        const ConstBufferSequence& buffers,
-                                       asio::error_code& ec)
+                                       error_code& ec)
 {
   detail::buffer_sequence_adapter<asio::const_buffer,
                                   ConstBufferSequence> bufs(buffers);

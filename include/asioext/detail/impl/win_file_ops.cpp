@@ -5,10 +5,10 @@
 #ifndef ASIOEXT_DETAIL_IMPL_WINFILEOPS_CPP
 #define ASIOEXT_DETAIL_IMPL_WINFILEOPS_CPP
 
-#include "asioext/detail/win_file_ops.hpp"
 #include "asioext/open_flags.hpp"
 
-#include <asio/error.hpp>
+#include "asioext/detail/win_file_ops.hpp"
+#include "asioext/detail/error.hpp"
 
 #include <windows.h>
 
@@ -17,13 +17,13 @@ ASIOEXT_NS_BEGIN
 namespace detail {
 namespace win_file_ops {
 
-void set_error(asio::error_code& ec)
+void set_error(error_code& ec)
 {
-  ec = asio::error_code(::GetLastError(),
+  ec = error_code(::GetLastError(),
                         asio::error::get_system_category());
 }
 
-handle_type open(const wchar_t* filename, uint32_t flags, asio::error_code& ec)
+handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
 {
   if (!open_flags::is_valid(flags)) {
     ec = asio::error::invalid_argument;
@@ -59,38 +59,38 @@ handle_type open(const wchar_t* filename, uint32_t flags, asio::error_code& ec)
   if (h == INVALID_HANDLE_VALUE)
     set_error(ec);
   else
-    ec = asio::error_code();
+    ec = error_code();
 
   return h;
 }
 
-void close(handle_type fd, asio::error_code& ec)
+void close(handle_type fd, error_code& ec)
 {
   if (::CloseHandle(fd))
-    ec = asio::error_code();
+    ec = error_code();
   else
     set_error(ec);
 }
 
-handle_type duplicate(handle_type fd, asio::error_code& ec)
+handle_type duplicate(handle_type fd, error_code& ec)
 {
   const handle_type current_process = ::GetCurrentProcess();
   handle_type new_fd = INVALID_HANDLE_VALUE;
 
   if (::DuplicateHandle(current_process, fd, current_process, &new_fd,
       0, FALSE, DUPLICATE_SAME_ACCESS))
-    ec = asio::error_code();
+    ec = error_code();
   else
     set_error(ec);
 
   return new_fd;
 }
 
-uint64_t size(handle_type fd, asio::error_code& ec)
+uint64_t size(handle_type fd, error_code& ec)
 {
   LARGE_INTEGER size;
   if (::GetFileSizeEx(fd, &size)) {
-    ec = asio::error_code();
+    ec = error_code();
     return static_cast<uint64_t>(size.QuadPart);
   }
 
@@ -99,7 +99,7 @@ uint64_t size(handle_type fd, asio::error_code& ec)
 }
 
 uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
-              asio::error_code& ec)
+              error_code& ec)
 {
   LARGE_INTEGER pos, res;
   pos.QuadPart = offset;
@@ -113,7 +113,7 @@ uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
 
 uint32_t read(handle_type fd,
               void* buffer, uint32_t size,
-              asio::error_code& ec)
+              error_code& ec)
 {
   DWORD bytesRead = 0;
   if (!::ReadFile(fd, buffer, size, &bytesRead, nullptr)) {
@@ -129,7 +129,7 @@ uint32_t read(handle_type fd,
 
 uint32_t write(handle_type fd,
                const void* buffer, uint32_t size,
-               asio::error_code& ec)
+               error_code& ec)
 {
   DWORD bytesWritten = 0;
   if (!::WriteFile(fd, buffer, size, &bytesWritten, nullptr)) {
@@ -142,7 +142,7 @@ uint32_t write(handle_type fd,
 
 uint32_t pread(handle_type fd,
                void* buffer, uint32_t size,
-               uint64_t offset, asio::error_code& ec)
+               uint64_t offset, error_code& ec)
 {
   LARGE_INTEGER offset2;
   offset2.QuadPart = offset;
@@ -165,7 +165,7 @@ uint32_t pread(handle_type fd,
 
 uint32_t pwrite(handle_type fd,
                 const void* buffer, uint32_t size,
-                uint64_t offset, asio::error_code& ec)
+                uint64_t offset, error_code& ec)
 {
   LARGE_INTEGER offset2;
   offset2.QuadPart = offset;

@@ -185,4 +185,15 @@
 # endif
 #endif
 
+// ASIOEXT_USE_BOOST_ASIO: Defines whether the standalone or
+// Boost version of Asio is used.
+//
+// Makes asioext::asio an alias for boost::asio.
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+namespace boost { namespace asio {} }
+ASIOEXT_NS_BEGIN
+namespace asio = boost::asio;
+ASIOEXT_NS_END
+#endif
+
 #endif

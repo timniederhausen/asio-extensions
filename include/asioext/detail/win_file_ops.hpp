@@ -8,12 +8,11 @@
 #include "asioext/detail/config.hpp"
 
 #if ASIOEXT_HAS_PRAGMA_ONCE
-#pragma once
+# pragma once
 #endif
 
 #include "asioext/detail/cstdint.hpp"
-
-#include <asio/error_code.hpp>
+#include "asioext/detail/error_code.hpp"
 
 ASIOEXT_NS_BEGIN
 
@@ -24,36 +23,36 @@ namespace win_file_ops {
 // http://stackoverflow.com/questions/4121173/how-do-i-forward-declare-handle-win32
 typedef void* handle_type;
 
-ASIOEXT_DECL void set_error(asio::error_code& ec);
+ASIOEXT_DECL void set_error(error_code& ec);
 
 ASIOEXT_DECL handle_type open(const wchar_t* filename,
                               uint32_t flags,
-                              asio::error_code& ec);
+                              error_code& ec);
 
-ASIOEXT_DECL void close(handle_type fd, asio::error_code& ec);
+ASIOEXT_DECL void close(handle_type fd, error_code& ec);
 
-ASIOEXT_DECL handle_type duplicate(handle_type fd, asio::error_code& ec);
+ASIOEXT_DECL handle_type duplicate(handle_type fd, error_code& ec);
 
-ASIOEXT_DECL uint64_t size(handle_type fd, asio::error_code& ec);
+ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
-                           asio::error_code& ec);
+                           error_code& ec);
 
 ASIOEXT_DECL uint32_t read(handle_type fd,
                            void* buffer, uint32_t size,
-                           asio::error_code& ec);
+                           error_code& ec);
 
 ASIOEXT_DECL uint32_t write(handle_type fd,
                             const void* buffer, uint32_t size,
-                            asio::error_code& ec);
+                            error_code& ec);
 
 ASIOEXT_DECL uint32_t pread(handle_type fd,
                             void* buffer, uint32_t size,
-                            uint64_t offset, asio::error_code& ec);
+                            uint64_t offset, error_code& ec);
 
 ASIOEXT_DECL uint32_t pwrite(handle_type fd,
                              const void* buffer, uint32_t size,
-                             uint64_t offset, asio::error_code& ec);
+                             uint64_t offset, error_code& ec);
 
 }
 }

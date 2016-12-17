@@ -11,7 +11,7 @@
 #include "asioext/detail/config.hpp"
 
 #if ASIOEXT_HAS_PRAGMA_ONCE
-#pragma once
+# pragma once
 #endif
 
 #if defined(ASIOEXT_WINDOWS)
@@ -20,7 +20,7 @@
 # include "asioext/detail/posix_file_ops.hpp"
 #endif
 
-#include <asio/error_code.hpp>
+#include "asioext/detail/error_code.hpp"
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>
@@ -128,17 +128,17 @@ public:
   ///
   /// @see open_flags
   ASIOEXT_DECL file_handle(const char* filename, uint32_t flags,
-                           asio::error_code& ec) ASIOEXT_NOEXCEPT;
+                           error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc file_handle(const char*,uint32_t)
   ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
                            uint32_t flags);
 
-  /// @copydoc file_handle(const char*,uint32_t,asio::error_code&)
+  /// @copydoc file_handle(const char*,uint32_t,error_code&)
   ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
                            uint32_t flags,
-                           asio::error_code& ec) ASIOEXT_NOEXCEPT;
+                           error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #ifdef ASIOEXT_HAS_MOVE
@@ -232,17 +232,17 @@ public:
   ///
   /// @see open_flags
   ASIOEXT_DECL void open(const char* filename, uint32_t flags,
-                         asio::error_code& ec) ASIOEXT_NOEXCEPT;
+                         error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc open(const char*,uint32_t)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags);
 
-  /// @copydoc open(const char*,uint32_t,asio::error_code&)
+  /// @copydoc open(const char*,uint32_t,error_code&)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags,
-                         asio::error_code& ec) ASIOEXT_NOEXCEPT;
+                         error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
   /// Determine whether the handle is open.
@@ -261,7 +261,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  ASIOEXT_DECL void close(asio::error_code& ec) ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL void close(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Take ownership of the contained native handle.
   ///
@@ -296,7 +296,7 @@ public:
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
   ASIOEXT_DECL void assign(const native_handle_type& handle,
-                           asio::error_code& ec) ASIOEXT_NOEXCEPT;
+                           error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Duplicate the given file_handle.
   ///
@@ -325,7 +325,7 @@ public:
   /// @note This is provided as a function instead of a
   /// copy-contructor/assignment-operator since copying a file_handle is a
   /// non-trivial operation which is rarely needed.
-  file_handle duplicate(asio::error_code& ec) ASIOEXT_NOEXCEPT;
+  file_handle duplicate(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -349,7 +349,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  ASIOEXT_DECL uint64_t size(asio::error_code& ec) ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Get the current file position.
   ///
@@ -370,7 +370,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  ASIOEXT_DECL uint64_t position(asio::error_code& ec) ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL uint64_t position(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Change the read/write position.
   ///
@@ -402,7 +402,7 @@ public:
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
   ASIOEXT_DECL uint64_t seek(seek_origin origin, int64_t offset,
-                             asio::error_code& ec) ASIOEXT_NOEXCEPT;
+                             error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -459,7 +459,7 @@ public:
   /// completes.
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers,
-                        asio::error_code& ec);
+                        error_code& ec);
 
   /// @}
 
@@ -513,7 +513,7 @@ public:
   /// all data is written before the blocking operation completes.
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-                         asio::error_code& ec);
+                         error_code& ec);
 
   /// @}
 
@@ -576,7 +576,7 @@ public:
   template <typename MutableBufferSequence>
   std::size_t read_some_at(uint64_t offset,
                            const MutableBufferSequence& buffers,
-                           asio::error_code& ec);
+                           error_code& ec);
 
   /// @}
 
@@ -636,7 +636,7 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some_at(uint64_t offset,
                             const ConstBufferSequence& buffers,
-                            asio::error_code& ec);
+                            error_code& ec);
 
   /// @}
 

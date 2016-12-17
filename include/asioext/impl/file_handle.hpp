@@ -7,16 +7,15 @@
 
 #include "asioext/file_handle.hpp"
 
+#include "asioext/detail/buffer.hpp"
 #include "asioext/detail/throw_error.hpp"
-
-#include <asio/buffer.hpp>
 
 ASIOEXT_NS_BEGIN
 
 template <typename MutableBufferSequence>
 std::size_t file_handle::read_some(const MutableBufferSequence& buffers)
 {
-  asio::error_code ec;
+  error_code ec;
   std::size_t s = read_some(buffers, ec);
   detail::throw_error(ec);
   return s;
@@ -25,7 +24,7 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers)
 template <typename ConstBufferSequence>
 std::size_t file_handle::write_some(const ConstBufferSequence& buffers)
 {
-  asio::error_code ec;
+  error_code ec;
   std::size_t s = write_some(buffers, ec);
   detail::throw_error(ec);
   return s;
@@ -35,7 +34,7 @@ template <typename MutableBufferSequence>
 std::size_t file_handle::read_some_at(uint64_t offset,
                                       const MutableBufferSequence& buffers)
 {
-  asio::error_code ec;
+  error_code ec;
   std::size_t s = read_some_at(offset, buffers, ec);
   detail::throw_error(ec);
   return s;
@@ -45,7 +44,7 @@ template <typename ConstBufferSequence>
 std::size_t file_handle::write_some_at(uint64_t offset,
                                        const ConstBufferSequence& buffers)
 {
-  asio::error_code ec;
+  error_code ec;
   std::size_t s = write_some_at(offset, buffers, ec);
   detail::throw_error(ec);
   return s;

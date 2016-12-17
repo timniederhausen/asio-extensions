@@ -6,8 +6,7 @@
 #define ASIOEXT_DETAIL_IMPL_WINPATH_CPP
 
 #include "asioext/detail/win_path.hpp"
-
-#include <asio/error.hpp>
+#include "asioext/detail/error.hpp"
 
 #include <windows.h>
 
@@ -16,7 +15,7 @@ ASIOEXT_NS_BEGIN
 namespace detail {
 
 win_path::win_path(const char* s, std::size_t len,
-                   asio::error_code& ec) ASIOEXT_NOEXCEPT
+                   error_code& ec) ASIOEXT_NOEXCEPT
 {
   int new_length = ::MultiByteToWideChar(CP_UTF8, 0,
                                          s, len,

@@ -5,10 +5,10 @@
 #ifndef ASIOEXT_DETAIL_IMPL_POSIXFILEOPS_CPP
 #define ASIOEXT_DETAIL_IMPL_POSIXFILEOPS_CPP
 
-#include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/open_flags.hpp"
 
-#include <asio/error.hpp>
+#include "asioext/detail/posix_file_ops.hpp"
+#include "asioext/detail/error.hpp"
 
 #define _FILE_OFFSET_BITS 64
 
@@ -22,12 +22,12 @@ ASIOEXT_NS_BEGIN
 namespace detail {
 namespace posix_file_ops {
 
-void set_error(asio::error_code& ec, int e)
+void set_error(error_code& ec, int e)
 {
-  ec = asio::error_code(e, asio::error::get_system_category());
+  ec = error_code(e, asio::error::get_system_category());
 }
 
-handle_type open(const char* path, uint32_t flags, asio::error_code& ec)
+handle_type open(const char* path, uint32_t flags, error_code& ec)
 {
   int native_flags = 0;
 
@@ -56,7 +56,7 @@ handle_type open(const char* path, uint32_t flags, asio::error_code& ec)
   while (true) {
     handle_type fd = ::open(path, native_flags, mode);
     if (fd != -1) {
-      ec = asio::error_code();
+      ec = error_code();
       return fd;
     }
 
@@ -69,7 +69,7 @@ handle_type open(const char* path, uint32_t flags, asio::error_code& ec)
   }
 }
 
-void close(handle_type fd, asio::error_code& ec)
+void close(handle_type fd, error_code& ec)
 {
   // By the time close() returns, the fd is already gone
   // and could be re-used by another thread. Retrying the call would then
@@ -78,16 +78,16 @@ void close(handle_type fd, asio::error_code& ec)
   const int r = ::close(fd);
 
   if (r != -1)
-    ec = asio::error_code();
+    ec = error_code();
   else
     set_error(ec, errno);
 }
 
-handle_type duplicate(handle_type fd, asio::error_code& ec)
+handle_type duplicate(handle_type fd, error_code& ec)
 {
   const int new_fd = ::dup(fd);
   if (new_fd != -1) {
-    ec = asio::error_code();
+    ec = error_code();
     return new_fd;
   }
 
@@ -95,7 +95,7 @@ handle_type duplicate(handle_type fd, asio::error_code& ec)
   return -1;
 }
 
-uint64_t size(handle_type fd, asio::error_code& ec)
+uint64_t size(handle_type fd, error_code& ec)
 {
   struct stat st;
   if (fstat(fd, &st) != 0) {
@@ -107,13 +107,13 @@ uint64_t size(handle_type fd, asio::error_code& ec)
 }
 
 uint64_t seek(handle_type fd, int origin, int64_t offset,
-              asio::error_code& ec)
+              error_code& ec)
 {
   const off_t res = ::lseek(fd, static_cast<off_t>(offset),
                             static_cast<int>(origin));
 
   if (res != -1) {
-    ec = asio::error_code();
+    ec = error_code();
     return static_cast<uint64_t>(res);
   }
 
@@ -121,7 +121,7 @@ uint64_t seek(handle_type fd, int origin, int64_t offset,
   return 0;
 }
 
-std::size_t readv(handle_type fd, iovec* bufs, int count, asio::error_code& ec)
+std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
 {
   const ssize_t r = ::readv(fd, bufs, count);
 
@@ -132,7 +132,7 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, asio::error_code& ec)
   }
 
   if (r != -1) {
-    ec = asio::error_code();
+    ec = error_code();
     return static_cast<std::size_t>(r);
   }
 
@@ -141,11 +141,11 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, asio::error_code& ec)
 }
 
 std::size_t writev(handle_type fd, const iovec* bufs, int count,
-                   asio::error_code& ec)
+                   error_code& ec)
 {
   const ssize_t r = ::writev(fd, bufs, count);
   if (r != -1) {
-    ec = asio::error_code();
+    ec = error_code();
     return static_cast<std::size_t>(r);
   }
 
@@ -154,7 +154,7 @@ std::size_t writev(handle_type fd, const iovec* bufs, int count,
 }
 
 std::size_t preadv(handle_type fd, iovec* bufs, int count,
-                   off_t offset, asio::error_code& ec)
+                   off_t offset, error_code& ec)
 {
   const ssize_t r = ::preadv(fd, bufs, count, offset);
 
@@ -165,7 +165,7 @@ std::size_t preadv(handle_type fd, iovec* bufs, int count,
   }
 
   if (r != -1) {
-    ec = asio::error_code();
+    ec = error_code();
     return static_cast<std::size_t>(r);
   }
 
@@ -174,11 +174,11 @@ std::size_t preadv(handle_type fd, iovec* bufs, int count,
 }
 
 std::size_t pwritev(handle_type fd, const iovec* bufs, int count,
-                    off_t offset, asio::error_code& ec)
+                    off_t offset, error_code& ec)
 {
   const ssize_t r = ::pwritev(fd, bufs, count, offset);
   if (r != -1) {
-    ec = asio::error_code();
+    ec = error_code();
     return static_cast<std::size_t>(r);
   }
 

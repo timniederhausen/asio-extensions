@@ -8,10 +8,14 @@
 #include "asioext/detail/config.hpp"
 
 #if ASIOEXT_HAS_PRAGMA_ONCE
-#pragma once
+# pragma once
 #endif
 
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+#include <boost/asio/detail/throw_error.hpp>
+#else
 #include <asio/detail/throw_error.hpp>
+#endif
 
 ASIOEXT_NS_BEGIN
 

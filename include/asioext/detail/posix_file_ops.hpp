@@ -8,12 +8,11 @@
 #include "asioext/detail/config.hpp"
 
 #if ASIOEXT_HAS_PRAGMA_ONCE
-#pragma once
+# pragma once
 #endif
 
 #include "asioext/detail/cstdint.hpp"
-
-#include <asio/error_code.hpp>
+#include "asioext/detail/error_code.hpp"
 
 #define _FILE_OFFSET_BITS 64
 
@@ -29,33 +28,33 @@ namespace posix_file_ops {
 
 typedef int handle_type;
 
-ASIOEXT_DECL void set_error(asio::error_code& ec, int e);
+ASIOEXT_DECL void set_error(error_code& ec, int e);
 
 ASIOEXT_DECL handle_type open(const char* path, uint32_t flags,
-                              asio::error_code& ec);
+                              error_code& ec);
 
-ASIOEXT_DECL void close(handle_type fd, asio::error_code& ec);
+ASIOEXT_DECL void close(handle_type fd, error_code& ec);
 
-ASIOEXT_DECL handle_type duplicate(handle_type fd, asio::error_code& ec);
+ASIOEXT_DECL handle_type duplicate(handle_type fd, error_code& ec);
 
-ASIOEXT_DECL uint64_t size(handle_type fd, asio::error_code& ec);
+ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL uint64_t seek(handle_type fd, int origin, int64_t offset,
-                           asio::error_code& ec);
+                           error_code& ec);
 
 ASIOEXT_DECL std::size_t readv(handle_type fd, iovec* bufs, int count,
-                               asio::error_code& ec);
+                               error_code& ec);
 
 ASIOEXT_DECL std::size_t writev(handle_type fd,
                                 const iovec* bufs, int count,
-                                asio::error_code& ec);
+                                error_code& ec);
 
 ASIOEXT_DECL std::size_t preadv(handle_type fd, iovec* bufs, int count,
-                                uint64_t offset, asio::error_code& ec);
+                                uint64_t offset, error_code& ec);
 
 ASIOEXT_DECL std::size_t pwritev(handle_type fd,
                                  const iovec* bufs, int count,
-                                 uint64_t offset, asio::error_code& ec);
+                                 uint64_t offset, error_code& ec);
 
 }
 }

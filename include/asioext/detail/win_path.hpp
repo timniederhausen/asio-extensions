@@ -8,10 +8,10 @@
 #include "asioext/detail/config.hpp"
 
 #if ASIOEXT_HAS_PRAGMA_ONCE
-#pragma once
+# pragma once
 #endif
 
-#include <asio/error_code.hpp>
+#include "asioext/detail/error_code.hpp"
 
 ASIOEXT_NS_BEGIN
 
@@ -27,7 +27,7 @@ public:
   static const std::size_t kMaxPath = 260;
 
   win_path(const char* s, std::size_t len,
-           asio::error_code& ec) ASIOEXT_NOEXCEPT;
+           error_code& ec) ASIOEXT_NOEXCEPT;
 
   const wchar_t* c_str() const ASIOEXT_NOEXCEPT
   { return buffer_; }
