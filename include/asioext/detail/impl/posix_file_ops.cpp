@@ -26,6 +26,11 @@ void set_error(error_code& ec, int e)
 
 handle_type open(const char* path, uint32_t flags, error_code& ec)
 {
+  if (!open_flags::is_valid(flags)) {
+    ec = asio::error::invalid_argument;
+    return -1;
+  }
+
   int native_flags = 0;
 
   if (flags & open_flags::create_new)
