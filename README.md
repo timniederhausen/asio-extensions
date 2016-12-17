@@ -15,7 +15,8 @@ To use the Boost version, #define ``ASIOEXT_USE_BOOST_ASIO``.
 ## Building
 
 AsioExt requires at least a C++03-compliant compiler.
-Not all AsioExt features are usable from C++03 though (e.g. movable `file_handle` objects).
+Not all AsioExt features are usable from C++03 though
+(e.g. movable `scoped_file_handle` objects).
 These features are enabled based on the C++11/C++14 support of the used compiler.
 
 Currently, AsioExt is being tested with the following compilers:
@@ -45,9 +46,9 @@ However, it is also possible to build the AsioExt library as a separate compilat
 int main(int argc, const char* argv[])
 {
   try {
-    asioext::file_handle file("myfile.txt",
-                              asioext::open_flags::access_write |
-                              asioext::open_flags::create_always);
+    asioext::scoped_file_handle file("myfile.txt",
+                                     asioext::open_flags::access_write |
+                                     asioext::open_flags::create_always);
 
     const std::string content = "Hello world";
     asio::write(file, asio::buffer(content));

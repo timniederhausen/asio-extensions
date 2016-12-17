@@ -44,6 +44,9 @@ ASIOEXT_NS_BEGIN
 /// @par Thread Safety:
 /// @e Distinct @e objects: Safe.@n
 /// @e Shared @e objects: Unsafe.
+///
+/// @note This is a low-level component. Most of the time scoped_file_handle
+/// is a better fit.
 class file_handle
 {
 public:

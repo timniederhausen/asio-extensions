@@ -18,11 +18,13 @@
 
 ASIOEXT_NS_BEGIN
 
+/// @ingroup files
 /// @brief Contains option flags for opening files.
 ///
 /// This namespace contains various flags for opening files.
 namespace open_flags {
 
+/// @ingroup files
 /// File access mode flags.
 enum access_mode
 {
@@ -39,6 +41,7 @@ enum access_mode
   access_rw = access_read | access_write,
 };
 
+/// @ingroup files
 /// @brief File creation-mode flags.
 ///
 /// These flags specify the action that should be taken on a file.
@@ -64,7 +67,8 @@ enum creation_mode
   truncate_existing = 1 << 6,
 };
 
-/// @brief File creation attributes
+/// @ingroup files
+/// @brief File creation attributes.
 ///
 /// These flags specify the attributes that should be set on a newly
 /// created file.
@@ -81,6 +85,7 @@ enum creation_attributes
   attribute_executable = 1 << 8,
 };
 
+/// @ingroup files
 /// @brief Check whether a set of flags is valid.
 ///
 /// This function checks whether the given @c flags are valid, i.e.

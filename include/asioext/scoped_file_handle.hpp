@@ -46,6 +46,16 @@ ASIOEXT_NS_BEGIN
 ///
 /// @note If copying a handle (which is a costly operation) is really necessary,
 /// the @ref duplicate function can be used.
+///
+/// @par Example
+/// @code
+/// asioext::scoped_file_handle file("myfile.txt",
+///                                  asioext::open_flags::access_write |
+///                                  asioext::open_flags::create_always);
+///
+/// const std::string content = "Hello world";
+/// asio::write(file, asio::buffer(content));
+/// @endcode
 class scoped_file_handle
 {
 public:
