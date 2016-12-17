@@ -26,11 +26,12 @@ class win_path
 public:
   static const std::size_t kMaxPath = 260;
 
-  win_path(const char* s, std::size_t len,
-           error_code& ec) ASIOEXT_NOEXCEPT;
+  win_path(const char* s, std::size_t len, error_code& ec) ASIOEXT_NOEXCEPT;
 
   const wchar_t* c_str() const ASIOEXT_NOEXCEPT
-  { return buffer_; }
+  {
+    return buffer_;
+  }
 
 private:
   wchar_t buffer_[kMaxPath];

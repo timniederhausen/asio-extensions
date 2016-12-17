@@ -22,20 +22,18 @@
 
 #include "asioext/detail/error_code.hpp"
 
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-# include <boost/filesystem/path.hpp>
-#endif
-
 ASIOEXT_NS_BEGIN
 
+/// @ingroup files
 /// @brief A thin and lightweight wrapper around a native file handle.
 ///
 /// The file_handle class provides uniform access to
 /// native OS file handles, wrapping the relevant OS APIs in portable
 /// methods.
 ///
-/// file_handle objects cannot be copied, but are move-constructible/
-/// move-assignable if a compiler with C++11 support is used.
+/// file_handle doesn't assume ownership of the contained handle.
+/// If handle management is desired as well, take a look at the
+/// @c scoped_file_handle class.
 ///
 /// file_handle models the following asio concepts:
 /// * SyncRandomAccessReadDevice
@@ -46,9 +44,6 @@ ASIOEXT_NS_BEGIN
 /// @par Thread Safety:
 /// @e Distinct @e objects: Safe.@n
 /// @e Shared @e objects: Unsafe.
-///
-/// @note If copying a handle (which is a costly operation) is really necessary,
-/// the @ref duplicate function can be used.
 class file_handle
 {
 public:
@@ -88,80 +83,18 @@ public:
 
   /// Destroy a file_handle.
   ///
-  /// This destructor attempts to close the currently owned file handle.
-  /// Failures are silently ignored.
+  /// This destructor does nothing. Any contained handle will
+  /// <b>not</b> be closed.
   ASIOEXT_DECL ~file_handle();
 
   /// @brief Construct a file_handle using a native handle.
   ///
-  /// This constructor takes ownership of the given native file handle.
+  /// This constructor <b>doesn't</b> take ownership of the given native
+  /// file handle.
   ///
   /// @param handle The native file handle which shall be assigned to this
   /// file_handle object.
   ASIOEXT_DECL file_handle(const native_handle_type& handle) ASIOEXT_NOEXCEPT;
-
-  /// @brief Open a file and construct a file_handle.
-  ///
-  /// This constructor opens a new handle to the given file.
-  ///
-  /// @param filename The path of the file to open.
-  ///
-  /// @param flags Flags used to open the file.
-  /// For a detailed reference, see @ref open_flags.
-  ///
-  /// @throws asio::system_error Thrown on failure.
-  ///
-  /// @see open_flags
-  ASIOEXT_DECL file_handle(const char* filename, uint32_t flags);
-
-  /// @brief Open a file and construct a file_handle.
-  ///
-  /// This constructor opens a new handle to the given file.
-  ///
-  /// @param filename The path of the file to open.
-  ///
-  /// @param flags Flags used to open the file.
-  /// For a detailed reference, see @ref open_flags.
-  ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
-  ///
-  /// @see open_flags
-  ASIOEXT_DECL file_handle(const char* filename, uint32_t flags,
-                           error_code& ec) ASIOEXT_NOEXCEPT;
-
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc file_handle(const char*,uint32_t)
-  ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
-                           uint32_t flags);
-
-  /// @copydoc file_handle(const char*,uint32_t,error_code&)
-  ASIOEXT_DECL file_handle(const boost::filesystem::path& filename,
-                           uint32_t flags,
-                           error_code& ec) ASIOEXT_NOEXCEPT;
-#endif
-
-#ifdef ASIOEXT_HAS_MOVE
-  /// @brief Move-construct a file_handle from another.
-  ///
-  /// This constructor moves a handle from one object to another.
-  ///
-  /// @param other The other file_handle object from which the move will occur.
-  ///
-  /// @note Following the move, the moved-from object is in the same state as if
-  /// constructed using the @c file_handle() constructor.
-  ASIOEXT_DECL file_handle(file_handle&& other) ASIOEXT_NOEXCEPT;
-
-  /// @brief Move-assign a file_handle from another.
-  ///
-  /// This assignment operator moves a handle from one object to another.
-  ///
-  /// @param other The other file_handle object from which the move will occur.
-  ///
-  /// @note Following the move, the moved-from object is in the same state as if
-  /// constructed using the @c file_handle() constructor.
-  ASIOEXT_DECL file_handle& operator=(file_handle&& other);
-#endif
 
   /// @brief Get a reference to the lowest layer.
   ///
@@ -202,130 +135,31 @@ public:
   /// @name Handle-management functions
   /// @{
 
-  /// @brief Open a file and assign its handle to this file_handle.
-  ///
-  /// This function opens the handle to hold a new handle to a file.
-  /// Any previously held handle is closed.
-  ///
-  /// @param filename The path of the file to open.
-  ///
-  /// @param flags Flags used to open the file.
-  /// For a detailed reference, see @ref open_flags.
-  ///
-  /// @throws asio::system_error Thrown on failure.
-  ///
-  /// @see open_flags
-  ASIOEXT_DECL void open(const char* filename, uint32_t flags);
-
-  /// @brief Open a file and assign its handle to this file_handle.
-  ///
-  /// This function opens the handle to hold a new handle to a file.
-  /// Any previously held handle is closed.
-  ///
-  /// @param filename The path of the file to open.
-  ///
-  /// @param flags Flags used to open the file.
-  /// For a detailed reference, see @ref open_flags.
-  ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
-  ///
-  /// @see open_flags
-  ASIOEXT_DECL void open(const char* filename, uint32_t flags,
-                         error_code& ec) ASIOEXT_NOEXCEPT;
-
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,uint32_t)
-  ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint32_t flags);
-
-  /// @copydoc open(const char*,uint32_t,error_code&)
-  ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint32_t flags,
-                         error_code& ec) ASIOEXT_NOEXCEPT;
-#endif
-
   /// Determine whether the handle is open.
   ASIOEXT_DECL bool is_open() const ASIOEXT_NOEXCEPT;
 
   /// @brief Close the handle.
   ///
-  /// This function is used to close the handle.
+  /// This function closes the contained handle. Does nothing if the object
+  /// contains no handle.
   ///
   /// @throws asio::system_error Thrown on failure.
   ASIOEXT_DECL void close();
 
   /// @brief Close the handle.
   ///
-  /// This function is used to close the handle.
+  /// This function closes the contained handle. Does nothing if the object
+  /// contains no handle.
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
   ASIOEXT_DECL void close(error_code& ec) ASIOEXT_NOEXCEPT;
 
-  /// @brief Take ownership of the contained native handle.
+  /// @brief Clear the handle.
   ///
-  /// This function transfers ownership of the contained native handle to
-  /// the caller. The file_handle object is reset to an empty state
-  /// (i.e. no file opened).
-  ///
-  /// @return The contained native handle.
-  /// The caller is now responsible to close it.
-  ///
-  /// @warning This function is dangerous. It is highly unlikely that you'll
-  /// ever need to use this.
-  native_handle_type leak() ASIOEXT_NOEXCEPT;
-
-  /// @brief Assign an existing native handle to the handle.
-  ///
-  /// This function opens the handle to hold an existing native handle.
-  /// Any previously held handle is closed.
-  ///
-  /// @param handle A native handle.
-  ///
-  /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL void assign(const native_handle_type& handle);
-
-  /// @brief Assign an existing native handle to the file_handle.
-  ///
-  /// This function opens the handle to hold an existing native handle.
-  /// Any previously held handle will be closed.
-  ///
-  /// @param handle A native handle.
-  ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
-  ASIOEXT_DECL void assign(const native_handle_type& handle,
-                           error_code& ec) ASIOEXT_NOEXCEPT;
-
-  /// @brief Duplicate the given file_handle.
-  ///
-  /// This function duplicates the native handle and returns a new file_handle
-  /// object.
-  ///
-  /// @return A new file_handle referring to the same file as this file_handle.
-  ///
-  /// @throws asio::system_error Thrown on failure.
-  ///
-  /// @note This is provided as a function instead of a
-  /// copy-contructor/assignment-operator since copying a file_handle is a
-  /// non-trivial operation which is rarely needed.
-  file_handle duplicate();
-
-  /// @brief Duplicate the given file_handle.
-  ///
-  /// This function duplicates the native handle and returns a new file_handle
-  /// object.
-  ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
-  ///
-  /// @return A new file_handle referring to the same file as this file_handle.
-  ///
-  /// @note This is provided as a function instead of a
-  /// copy-contructor/assignment-operator since copying a file_handle is a
-  /// non-trivial operation which is rarely needed.
-  file_handle duplicate(error_code& ec) ASIOEXT_NOEXCEPT;
+  /// This function resets the contained handle to an empty state.
+  /// The previous handle <b>is not</b> closed.
+  ASIOEXT_DECL void clear() ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -401,7 +235,8 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  ASIOEXT_DECL uint64_t seek(seek_origin origin, int64_t offset,
+  ASIOEXT_DECL uint64_t seek(seek_origin origin,
+                             int64_t offset,
                              error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
@@ -429,7 +264,8 @@ public:
   /// completes.
   ///
   /// @par Example
-  /// To read into a single data buffer use the @c asio::buffer function as follows:
+  /// To read into a single data buffer use the @c asio::buffer function as
+  /// follows:
   /// @code
   /// fh.read_some(asio::buffer(data, size));
   /// @endcode
@@ -458,8 +294,7 @@ public:
   /// that the requested amount of data is read before the blocking operation
   /// completes.
   template <typename MutableBufferSequence>
-  std::size_t read_some(const MutableBufferSequence& buffers,
-                        error_code& ec);
+  std::size_t read_some(const MutableBufferSequence& buffers, error_code& ec);
 
   /// @}
 
@@ -509,11 +344,10 @@ public:
   /// @returns The number of bytes written. Returns 0 if an error occurred.
   ///
   /// @note The write_some operation may not transmit all of the data to the
-  /// peer. Consider using the @c asio::write function if you need to ensure that
-  /// all data is written before the blocking operation completes.
+  /// peer. Consider using the @c asio::write function if you need to ensure
+  /// that all data is written before the blocking operation completes.
   template <typename ConstBufferSequence>
-  std::size_t write_some(const ConstBufferSequence& buffers,
-                         error_code& ec);
+  std::size_t write_some(const ConstBufferSequence& buffers, error_code& ec);
 
   /// @}
 
@@ -542,7 +376,8 @@ public:
   /// completes.
   ///
   /// @par Example
-  /// To read into a single data buffer use the @c asio::buffer function as follows:
+  /// To read into a single data buffer use the @c asio::buffer function as
+  /// follows:
   /// @code
   /// handle.read_some_at(42, asio::buffer(data, size));
   /// @endcode
@@ -641,10 +476,6 @@ public:
   /// @}
 
 private:
-  // Prevent copying
-  file_handle(const file_handle&) ASIOEXT_DELETED;
-  file_handle& operator=(const file_handle&) ASIOEXT_DELETED;
-
   native_handle_type handle_;
 };
 
@@ -659,6 +490,7 @@ ASIOEXT_NS_END
 #endif
 
 #if defined(ASIOEXT_HEADER_ONLY)
+# include "asioext/impl/file_handle.cpp"
 # if defined(ASIOEXT_WINDOWS)
 #  include "asioext/impl/file_handle_win.cpp"
 # else

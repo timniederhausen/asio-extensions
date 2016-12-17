@@ -2,7 +2,7 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <asioext/file_handle.hpp>
+#include <asioext/scoped_file_handle.hpp>
 #include <asioext/open_flags.hpp>
 
 #include <asio/write.hpp>
@@ -13,7 +13,8 @@ int main(int argc, const char* argv[])
 {
   try {
     using namespace asioext::open_flags;
-    asioext::file_handle file("myfile.txt", access_write | create_always);
+    asioext::scoped_file_handle file("myfile.txt",
+                                     access_write | create_always);
 
     const std::string content = "Hello world";
     asio::write(file, asio::buffer(content));

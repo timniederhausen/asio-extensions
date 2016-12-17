@@ -35,24 +35,32 @@ ASIOEXT_DECL handle_type duplicate(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
 
-ASIOEXT_DECL uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
+ASIOEXT_DECL uint64_t seek(handle_type fd,
+                           uint32_t origin,
+                           int64_t offset,
                            error_code& ec);
 
 ASIOEXT_DECL uint32_t read(handle_type fd,
-                           void* buffer, uint32_t size,
+                           void* buffer,
+                           uint32_t size,
                            error_code& ec);
 
 ASIOEXT_DECL uint32_t write(handle_type fd,
-                            const void* buffer, uint32_t size,
+                            const void* buffer,
+                            uint32_t size,
                             error_code& ec);
 
 ASIOEXT_DECL uint32_t pread(handle_type fd,
-                            void* buffer, uint32_t size,
-                            uint64_t offset, error_code& ec);
+                            void* buffer,
+                            uint32_t size,
+                            uint64_t offset,
+                            error_code& ec);
 
 ASIOEXT_DECL uint32_t pwrite(handle_type fd,
-                             const void* buffer, uint32_t size,
-                             uint64_t offset, error_code& ec);
+                             const void* buffer,
+                             uint32_t size,
+                             uint64_t offset,
+                             error_code& ec);
 
 }
 }

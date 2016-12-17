@@ -8,7 +8,6 @@ set(asioext_source_files asioext.cpp)
 add_library(asioext.asio STATIC ${asio_source_files})
 set_property(TARGET asioext.asio PROPERTY OUTPUT_NAME asio_static)
 target_include_directories(asioext.asio PUBLIC ${ASIOEXT_ASIO_ROOT}/include)
-target_compile_definitions(asioext.asio PUBLIC ASIO_SEPARATE_COMPILATION)
 target_link_libraries(asioext.asio Threads::Threads)
 
 if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
@@ -22,6 +21,13 @@ else ()
 	target_include_directories(asioext.asio PUBLIC ${Boost_INCLUDE_DIRS})
 	target_compile_definitions(asioext.asio PUBLIC BOOST_ALL_NO_LIB)
 	target_link_libraries(asioext.asio ${Boost_LIBRARIES})
+endif ()
+
+if (ASIOEXT_USE_BOOST_ASIO)
+	target_compile_definitions(asioext.asio PUBLIC ASIOEXT_USE_BOOST_ASIO
+		BOOST_ASIO_SEPARATE_COMPILATION)
+else ()
+	target_compile_definitions(asioext.asio PUBLIC ASIO_SEPARATE_COMPILATION)
 endif ()
 
 if (WIN32)

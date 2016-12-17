@@ -19,50 +19,13 @@ file_handle::file_handle(const native_handle_type& handle) ASIOEXT_NOEXCEPT
 
 file_handle::~file_handle()
 {
-  error_code ec;
-  close(ec);
-  // error is swallowed
 }
-
-void file_handle::open(const char* filename, uint32_t flags)
-{
-  error_code ec;
-  open(filename, flags, ec);
-  detail::throw_error(ec);
-}
-
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-
-void file_handle::open(const boost::filesystem::path& filename,
-                       uint32_t flags)
-{
-  error_code ec;
-  open(filename, flags, ec);
-  detail::throw_error(ec);
-}
-
-#endif
 
 void file_handle::close()
 {
   error_code ec;
   close(ec);
   detail::throw_error(ec);
-}
-
-void file_handle::assign(const native_handle_type& handle)
-{
-  error_code ec;
-  assign(handle, ec);
-  detail::throw_error(ec);
-}
-
-file_handle file_handle::duplicate()
-{
-  error_code ec;
-  file_handle h = duplicate(ec);
-  detail::throw_error(ec);
-  return h;
 }
 
 uint64_t file_handle::size()

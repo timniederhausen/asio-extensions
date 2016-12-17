@@ -2,8 +2,8 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_IMPL_FILEHANDLE_WIN_CPP
-#define ASIOEXT_IMPL_FILEHANDLE_WIN_CPP
+#ifndef ASIOEXT_IMPL_FILEHANDLE_POSIX_CPP
+#define ASIOEXT_IMPL_FILEHANDLE_POSIX_CPP
 
 #include "asioext/file_handle.hpp"
 
@@ -19,91 +19,6 @@ file_handle::file_handle() ASIOEXT_NOEXCEPT
 {
   // ctor
 }
-
-file_handle::file_handle(const char* filename, uint32_t flags)
-  : handle_(-1)
-{
-  open(filename, flags);
-}
-
-file_handle::file_handle(const char* filename, uint32_t flags,
-                         error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(-1)
-{
-  open(filename, flags, ec);
-}
-
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-
-file_handle::file_handle(const boost::filesystem::path& filename,
-                         uint32_t flags)
-  : handle_(-1)
-{
-  open(filename, flags);
-}
-
-file_handle::file_handle(const boost::filesystem::path& filename,
-                         uint32_t flags,
-                         error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(-1)
-{
-  open(filename, flags, ec);
-}
-
-#endif
-
-#ifdef ASIOEXT_HAS_MOVE
-
-file_handle::file_handle(file_handle&& other) ASIOEXT_NOEXCEPT
-  : handle_(other.handle_)
-{
-  other.handle_ = -1;
-}
-
-file_handle& file_handle::operator=(file_handle&& other)
-{
-  if (handle_ != -1)
-    close();
-
-  handle_ = other.handle_;
-  other.handle_ = -1;
-  return *this;
-}
-
-#endif
-
-void file_handle::open(const char* filename, uint32_t flags,
-                       error_code& ec) ASIOEXT_NOEXCEPT
-{
-  if (handle_ != -1) {
-    detail::posix_file_ops::close(handle_, ec);
-    if (ec) {
-      handle_ = -1;
-      return;
-    }
-  }
-
-  handle_ = detail::posix_file_ops::open(filename, flags, ec);
-}
-
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-
-void file_handle::open(const boost::filesystem::path& filename,
-                       uint32_t flags,
-                       error_code& ec) ASIOEXT_NOEXCEPT
-{
-  if (handle_ != -1) {
-    detail::posix_file_ops::close(handle_, ec);
-    if (ec) {
-      handle_ = -1;
-      return;
-    }
-  }
-
-  handle_ = detail::posix_file_ops::open(filename.c_str(), flags, ec);
-}
-
-#endif
 
 bool file_handle::is_open() const ASIOEXT_NOEXCEPT
 {
@@ -121,24 +36,9 @@ void file_handle::close(error_code& ec) ASIOEXT_NOEXCEPT
   handle_ = -1;
 }
 
-file_handle::native_handle_type file_handle::leak() ASIOEXT_NOEXCEPT
+void file_handle::clear() ASIOEXT_NOEXCEPT
 {
-  native_handle_type handle = handle_;
   handle_ = -1;
-  return handle;
-}
-
-void file_handle::assign(const native_handle_type& handle,
-                         error_code& ec) ASIOEXT_NOEXCEPT
-{
-  close(ec);
-  if (!ec)
-    handle_ = handle;
-}
-
-file_handle file_handle::duplicate(error_code& ec) ASIOEXT_NOEXCEPT
-{
-  return detail::posix_file_ops::duplicate(handle_, ec);
 }
 
 uint64_t file_handle::size(error_code& ec) ASIOEXT_NOEXCEPT
@@ -151,7 +51,8 @@ uint64_t file_handle::position(error_code& ec) ASIOEXT_NOEXCEPT
   return seek(from_current, 0, ec);
 }
 
-uint64_t file_handle::seek(seek_origin origin, int64_t offset,
+uint64_t file_handle::seek(seek_origin origin,
+                           int64_t offset,
                            error_code& ec) ASIOEXT_NOEXCEPT
 {
   return detail::posix_file_ops::seek(handle_, origin, offset, ec);

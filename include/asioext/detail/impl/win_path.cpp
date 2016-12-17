@@ -14,12 +14,11 @@ ASIOEXT_NS_BEGIN
 
 namespace detail {
 
-win_path::win_path(const char* s, std::size_t len,
+win_path::win_path(const char* s,
+                   std::size_t len,
                    error_code& ec) ASIOEXT_NOEXCEPT
 {
-  int new_length = ::MultiByteToWideChar(CP_UTF8, 0,
-                                         s, len,
-                                         buffer_, kMaxPath);
+  int new_length = ::MultiByteToWideChar(CP_UTF8, 0, s, len, buffer_, kMaxPath);
   if (new_length == 0) {
     ec.assign(::GetLastError(), asio::error::get_system_category());
     return;

@@ -24,8 +24,31 @@ matrix:
             - g++-4.8
             - *packages
 
+    - compiler: gcc
+      os: linux
+      env: CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
+      addons:
+        apt:
+          sources:
+            - *sources
+          packages:
+            - g++-4.8
+            - *packages
+
     - compiler: clang
       os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.6
+            - *sources
+          packages:
+            - clang-3.6
+            - *packages
+
+    - compiler: clang
+      os: linux
+      env: CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
       addons:
         apt:
           sources:

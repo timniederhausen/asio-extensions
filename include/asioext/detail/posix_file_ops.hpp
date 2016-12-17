@@ -30,8 +30,7 @@ typedef int handle_type;
 
 ASIOEXT_DECL void set_error(error_code& ec, int e);
 
-ASIOEXT_DECL handle_type open(const char* path, uint32_t flags,
-                              error_code& ec);
+ASIOEXT_DECL handle_type open(const char* path, uint32_t flags, error_code& ec);
 
 ASIOEXT_DECL void close(handle_type fd, error_code& ec);
 
@@ -39,22 +38,32 @@ ASIOEXT_DECL handle_type duplicate(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
 
-ASIOEXT_DECL uint64_t seek(handle_type fd, int origin, int64_t offset,
+ASIOEXT_DECL uint64_t seek(handle_type fd,
+                           int origin,
+                           int64_t offset,
                            error_code& ec);
 
-ASIOEXT_DECL std::size_t readv(handle_type fd, iovec* bufs, int count,
+ASIOEXT_DECL std::size_t readv(handle_type fd,
+                               iovec* bufs,
+                               int count,
                                error_code& ec);
 
 ASIOEXT_DECL std::size_t writev(handle_type fd,
-                                const iovec* bufs, int count,
+                                const iovec* bufs,
+                                int count,
                                 error_code& ec);
 
-ASIOEXT_DECL std::size_t preadv(handle_type fd, iovec* bufs, int count,
-                                uint64_t offset, error_code& ec);
+ASIOEXT_DECL std::size_t preadv(handle_type fd,
+                                iovec* bufs,
+                                int count,
+                                uint64_t offset,
+                                error_code& ec);
 
 ASIOEXT_DECL std::size_t pwritev(handle_type fd,
-                                 const iovec* bufs, int count,
-                                 uint64_t offset, error_code& ec);
+                                 const iovec* bufs,
+                                 int count,
+                                 uint64_t offset,
+                                 error_code& ec);
 
 }
 }

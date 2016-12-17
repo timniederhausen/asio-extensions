@@ -19,8 +19,7 @@ namespace win_file_ops {
 
 void set_error(error_code& ec)
 {
-  ec = error_code(::GetLastError(),
-                        asio::error::get_system_category());
+  ec = error_code(::GetLastError(), asio::error::get_system_category());
 }
 
 handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
@@ -52,9 +51,9 @@ handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
   DWORD shareMode = 0;
   DWORD flagsAndAttributes = 0;
 
-  handle_type h = ::CreateFileW(filename, desiredAccess, shareMode,
-                                nullptr, creationDisposition,
-                                flagsAndAttributes, nullptr);
+  handle_type h =
+      ::CreateFileW(filename, desiredAccess, shareMode, nullptr,
+                    creationDisposition, flagsAndAttributes, nullptr);
 
   if (h == INVALID_HANDLE_VALUE)
     set_error(ec);
@@ -77,8 +76,8 @@ handle_type duplicate(handle_type fd, error_code& ec)
   const handle_type current_process = ::GetCurrentProcess();
   handle_type new_fd = INVALID_HANDLE_VALUE;
 
-  if (::DuplicateHandle(current_process, fd, current_process, &new_fd,
-      0, FALSE, DUPLICATE_SAME_ACCESS))
+  if (::DuplicateHandle(current_process, fd, current_process, &new_fd, 0, FALSE,
+                        DUPLICATE_SAME_ACCESS))
     ec = error_code();
   else
     set_error(ec);
@@ -98,8 +97,7 @@ uint64_t size(handle_type fd, error_code& ec)
   return 0;
 }
 
-uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
-              error_code& ec)
+uint64_t seek(handle_type fd, uint32_t origin, int64_t offset, error_code& ec)
 {
   LARGE_INTEGER pos, res;
   pos.QuadPart = offset;
@@ -111,9 +109,7 @@ uint64_t seek(handle_type fd, uint32_t origin, int64_t offset,
   return 0;
 }
 
-uint32_t read(handle_type fd,
-              void* buffer, uint32_t size,
-              error_code& ec)
+uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)
 {
   DWORD bytesRead = 0;
   if (!::ReadFile(fd, buffer, size, &bytesRead, nullptr)) {
@@ -128,7 +124,8 @@ uint32_t read(handle_type fd,
 }
 
 uint32_t write(handle_type fd,
-               const void* buffer, uint32_t size,
+               const void* buffer,
+               uint32_t size,
                error_code& ec)
 {
   DWORD bytesWritten = 0;
@@ -141,8 +138,10 @@ uint32_t write(handle_type fd,
 }
 
 uint32_t pread(handle_type fd,
-               void* buffer, uint32_t size,
-               uint64_t offset, error_code& ec)
+               void* buffer,
+               uint32_t size,
+               uint64_t offset,
+               error_code& ec)
 {
   LARGE_INTEGER offset2;
   offset2.QuadPart = offset;
@@ -164,8 +163,10 @@ uint32_t pread(handle_type fd,
 }
 
 uint32_t pwrite(handle_type fd,
-                const void* buffer, uint32_t size,
-                uint64_t offset, error_code& ec)
+                const void* buffer,
+                uint32_t size,
+                uint64_t offset,
+                error_code& ec)
 {
   LARGE_INTEGER offset2;
   offset2.QuadPart = offset;

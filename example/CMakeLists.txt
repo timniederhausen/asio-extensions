@@ -8,11 +8,16 @@ set_property(TARGET asioext.ex.simple PROPERTY OUTPUT_NAME simple)
 target_link_libraries(asioext.ex.simple asioext.static)
 
 # cp example tool
-add_executable(asioext.ex.cp cp.cpp)
-set_property(TARGET asioext.ex.cp PROPERTY OUTPUT_NAME cp)
-
 if (ASIOEXT_STANDALONE)
+	add_executable(asioext.ex.cp cp.cpp)
+	set_property(TARGET asioext.ex.cp PROPERTY OUTPUT_NAME cp)
 	set_property(TARGET asioext.ex.cp PROPERTY CXX_STANDARD 11)
+	target_link_libraries(asioext.ex.cp asioext.static)
 endif ()
 
-target_link_libraries(asioext.ex.cp asioext.static)
+# cp_boost example tool
+if (ASIOEXT_USE_BOOST_ASIO)
+	add_executable(asioext.ex.cp_boost cp_boost.cpp)
+	set_property(TARGET asioext.ex.cp_boost PROPERTY OUTPUT_NAME cp2)
+	target_link_libraries(asioext.ex.cp_boost asioext.static)
+endif ()

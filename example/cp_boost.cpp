@@ -2,15 +2,23 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This examples requires ASIOEXT_USE_BOOST_ASIO to be set.
+// Either set it on the command-line or #define it before #including any
+// AsioExt headers.
+
 #include <asioext/scoped_file_handle.hpp>
+#include <asioext/file_handle.hpp>
 #include <asioext/open_flags.hpp>
 
-#include <asio/write.hpp>
-#include <asio/read.hpp>
+#include <boost/asio/write.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/array.hpp>
 
-#include <array>
 #include <iostream>
 #include <cstdio>
+
+namespace asio = boost::asio;
 
 // General-purpose stream copying from |src| to |dst|.
 // This doesn't use src.size() deliberately, so we can support special
@@ -19,29 +27,30 @@ void copy_file_aux(asioext::file_handle src, asioext::file_handle dst)
 {
   static const std::size_t kBufferSize = 16 * 1024;
 
-  std::array<char, kBufferSize> buffer;
+  boost::array<char, kBufferSize> buffer;
   for (bool at_end = false; !at_end; ) {
-    std::error_code ec;
+    boost::system::error_code ec;
     const std::size_t actual = asio::read(src, asio::buffer(buffer), ec);
 
     if (ec) {
       if (ec == asio::error::eof)
         at_end = true;
       else
-        throw std::system_error(ec);
+        throw boost::system::system_error(ec);
     }
 
     asio::write(dst, asio::buffer(buffer.data(), actual));
   }
 }
 
-bool copy_file(const std::string& src_path, const std::string& dst_path)
+bool copy_file(const boost::filesystem::path& src_path,
+               const boost::filesystem::path& dst_path)
 {
   // Exercise for the reader: Add support for '-' (i.e. stdout/stdin)
   asioext::scoped_file_handle src;
 
   try {
-    src.open(src_path.c_str(),
+    src.open(src_path,
              asioext::open_flags::access_read |
              asioext::open_flags::open_existing);
   } catch (std::exception& e) {
@@ -53,7 +62,7 @@ bool copy_file(const std::string& src_path, const std::string& dst_path)
   asioext::scoped_file_handle dst;
 
   try {
-    dst.open(dst_path.c_str(),
+    dst.open(dst_path,
              asioext::open_flags::access_write |
              asioext::open_flags::create_always);
   } catch (std::exception& e) {
@@ -79,8 +88,8 @@ int main(int argc, const char* argv[])
     return 1;
   }
 
-  const std::string src_path{argv[1]};
-  const std::string dst_path{argv[2]};
+  const boost::filesystem::path src_path(argv[1]);
+  const boost::filesystem::path dst_path(argv[2]);
 
   std::cerr << "cp " << src_path << " to " << dst_path << '\n';
   return copy_file(src_path, dst_path) ? 0 : 1;

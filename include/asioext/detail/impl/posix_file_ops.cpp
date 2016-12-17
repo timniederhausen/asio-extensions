@@ -35,7 +35,7 @@ handle_type open(const char* path, uint32_t flags, error_code& ec)
     native_flags = O_CREAT | O_EXCL;
   else if (flags & open_flags::create_always)
     native_flags = O_CREAT | O_TRUNC;
-  //else if (flags & open_flags::open_existing)
+  // else if (flags & open_flags::open_existing)
   //  native_flags = 0;
   else if (flags & open_flags::open_always)
     native_flags = O_CREAT;
@@ -51,7 +51,7 @@ handle_type open(const char* path, uint32_t flags, error_code& ec)
 
   int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
   if (flags & open_flags::attribute_executable)
-      mode |= S_IXGRP | S_IXOTH | S_IXUSR;
+    mode |= S_IXGRP | S_IXOTH | S_IXUSR;
 
   while (true) {
     handle_type fd = ::open(path, native_flags, mode);
@@ -106,11 +106,10 @@ uint64_t size(handle_type fd, error_code& ec)
   return st.st_size;
 }
 
-uint64_t seek(handle_type fd, int origin, int64_t offset,
-              error_code& ec)
+uint64_t seek(handle_type fd, int origin, int64_t offset, error_code& ec)
 {
-  const off_t res = ::lseek(fd, static_cast<off_t>(offset),
-                            static_cast<int>(origin));
+  const off_t res =
+      ::lseek(fd, static_cast<off_t>(offset), static_cast<int>(origin));
 
   if (res != -1) {
     ec = error_code();
@@ -140,8 +139,7 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
   return 0;
 }
 
-std::size_t writev(handle_type fd, const iovec* bufs, int count,
-                   error_code& ec)
+std::size_t writev(handle_type fd, const iovec* bufs, int count, error_code& ec)
 {
   const ssize_t r = ::writev(fd, bufs, count);
   if (r != -1) {
@@ -153,8 +151,11 @@ std::size_t writev(handle_type fd, const iovec* bufs, int count,
   return 0;
 }
 
-std::size_t preadv(handle_type fd, iovec* bufs, int count,
-                   off_t offset, error_code& ec)
+std::size_t preadv(handle_type fd,
+                   iovec* bufs,
+                   int count,
+                   off_t offset,
+                   error_code& ec)
 {
   const ssize_t r = ::preadv(fd, bufs, count, offset);
 
@@ -173,8 +174,11 @@ std::size_t preadv(handle_type fd, iovec* bufs, int count,
   return 0;
 }
 
-std::size_t pwritev(handle_type fd, const iovec* bufs, int count,
-                    off_t offset, error_code& ec)
+std::size_t pwritev(handle_type fd,
+                    const iovec* bufs,
+                    int count,
+                    off_t offset,
+                    error_code& ec)
 {
   const ssize_t r = ::pwritev(fd, bufs, count, offset);
   if (r != -1) {
