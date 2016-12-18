@@ -1,0 +1,90 @@
+declare_args() {
+  # AsioExt can be built as a header only library or a separate compilation.
+  # Enabling this adds the ASIOEXT_SEPARATE_COMPILATION define.
+  asioext_header_only = true
+
+  # Use the Boost variant of Asio.
+  asioext_use_boost_asio = true
+
+  # Enable Boost.Filesystem path support.
+  asioext_use_boost_fs = false
+
+  # Build without external dependencies.
+  asioext_standalone = false
+}
+
+config("asioext_config") {
+  include_dirs = [ "include" ]
+
+  if (asioext_use_boost_asio) {
+    defines = [ "ASIOEXT_USE_BOOST_ASIO" ]
+  }
+}
+
+config("asioext_lib_config") {
+  defines = [ "ASIOEXT_SEPARATE_COMPILATION" ]
+}
+
+source_set("asioext_lib") {
+  sources = [
+    "include/asioext/impl/file_handle.cpp",
+    "include/asioext/impl/open_flags.cpp",
+    "include/asioext/impl/scoped_file_handle.cpp",
+  ]
+
+  if (is_win) {
+    sources += [
+      "include/asioext/detail/impl/win_file_ops.cpp",
+      "include/asioext/detail/impl/win_path.cpp",
+      "include/asioext/impl/file_handle_win.cpp",
+      "include/asioext/impl/scoped_file_handle_win.cpp",
+    ]
+  } else {
+    sources += [
+      "include/asioext/detail/impl/posix_file_ops.cpp",
+      "include/asioext/impl/file_handle_posix.cpp",
+      "include/asioext/impl/scoped_file_handle_posix.cpp",
+    ]
+  }
+
+  public_configs = [
+    ":asioext_config",
+    ":asioext_lib_config",
+  ]
+  public_deps = []
+
+  assert(!asioext_standalone || !asioext_use_boost_fs,
+         "Cannot use asioext_standalone with asioext_use_boost_fs")
+
+  if (asioext_use_boost_fs) {
+    public_deps += [ "$external/boost/libs/filesystem" ]
+  }
+
+  if (asioext_use_boost_asio) {
+    public_deps += [ "$external/boost/libs/asio" ]
+  }
+}
+
+group("asioext") {
+  if (asioext_header_only) {
+    public_configs = [ ":asioext_config" ]
+  } else {
+    public_deps = [
+      ":asioext_lib",
+    ]
+  }
+}
+
+executable("asioext_unittests") {
+  testonly = true
+
+  sources = [
+    "test/main.cpp",
+    "test/scoped_file_handle.cpp",
+  ]
+
+  deps = [
+    ":asioext",
+    "$external/boost/libs/test:unit_test_framework",
+  ]
+}
