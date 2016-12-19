@@ -6,6 +6,7 @@
 
 #include "asioext/impl/file_handle.cpp"
 #include "asioext/impl/scoped_file_handle.cpp"
+#include "asioext/impl/open.cpp"
 #include "asioext/impl/open_flags.cpp"
 
 #if defined(ASIOEXT_WINDOWS)

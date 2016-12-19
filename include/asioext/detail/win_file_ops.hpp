@@ -23,7 +23,15 @@ namespace win_file_ops {
 // http://stackoverflow.com/questions/4121173/how-do-i-forward-declare-handle-win32
 typedef void* handle_type;
 
+struct create_file_args;
+
 ASIOEXT_DECL void set_error(error_code& ec);
+
+ASIOEXT_DECL bool parse_open_flags(create_file_args& args, uint32_t flags);
+
+ASIOEXT_DECL handle_type open(const char* filename,
+                              uint32_t flags,
+                              error_code& ec);
 
 ASIOEXT_DECL handle_type open(const wchar_t* filename,
                               uint32_t flags,

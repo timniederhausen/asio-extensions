@@ -14,43 +14,79 @@ ASIOEXT_NS_BEGIN
 namespace detail {
 namespace win_file_ops {
 
+struct create_file_args
+{
+  DWORD creation_disposition;
+  DWORD desired_access;
+  DWORD share_mode;
+  DWORD flags_and_attrs;
+};
+
 void set_error(error_code& ec)
 {
   ec = error_code(::GetLastError(), asio::error::get_system_category());
 }
 
-handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
+bool parse_open_flags(create_file_args& args, uint32_t flags)
 {
-  if (!open_flags::is_valid(flags)) {
+  if (!open_flags::is_valid(flags))
+    return false;
+
+  args.creation_disposition = 0;
+  if (flags & open_flags::create_new)
+    args.creation_disposition = CREATE_NEW;
+  else if (flags & open_flags::create_always)
+    args.creation_disposition = CREATE_ALWAYS;
+  else if (flags & open_flags::open_existing)
+    args.creation_disposition = OPEN_EXISTING;
+  else if (flags & open_flags::open_always)
+    args.creation_disposition = OPEN_ALWAYS;
+  else if (flags & open_flags::truncate_existing)
+    args.creation_disposition = TRUNCATE_EXISTING;
+
+  args.desired_access = 0;
+  if (flags & open_flags::access_read)
+    args.desired_access |= GENERIC_READ;
+  if (flags & open_flags::access_write)
+    args.desired_access |= GENERIC_WRITE;
+
+  // TODO: Add support for these
+  args.share_mode = 0;
+  args.flags_and_attrs = 0;
+  return true;
+}
+
+handle_type open(const char* filename, uint32_t flags, error_code& ec)
+{
+  create_file_args args;
+  if (!parse_open_flags(args, flags)) {
     ec = asio::error::invalid_argument;
     return INVALID_HANDLE_VALUE;
   }
 
-  DWORD creation_disposition = 0;
-  if (flags & open_flags::create_new)
-    creation_disposition = CREATE_NEW;
-  else if (flags & open_flags::create_always)
-    creation_disposition = CREATE_ALWAYS;
-  else if (flags & open_flags::open_existing)
-    creation_disposition = OPEN_EXISTING;
-  else if (flags & open_flags::open_always)
-    creation_disposition = OPEN_ALWAYS;
-  else if (flags & open_flags::truncate_existing)
-    creation_disposition = TRUNCATE_EXISTING;
+  handle_type h =
+      ::CreateFileA(filename, args.desired_access, args.share_mode, NULL,
+                    args.creation_disposition, args.flags_and_attrs, NULL);
 
-  DWORD desired_access = 0;
-  if (flags & open_flags::access_read)
-    desired_access |= GENERIC_READ;
-  if (flags & open_flags::access_write)
-    desired_access |= GENERIC_WRITE;
+  if (h == INVALID_HANDLE_VALUE)
+    set_error(ec);
+  else
+    ec = error_code();
 
-  // TODO: Add support for these
-  DWORD share_mode = 0;
-  DWORD flags_and_attrs = 0;
+  return h;
+}
+
+handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
+{
+  create_file_args args;
+  if (!parse_open_flags(args, flags)) {
+    ec = asio::error::invalid_argument;
+    return INVALID_HANDLE_VALUE;
+  }
 
   handle_type h =
-      ::CreateFileW(filename, desired_access, share_mode, NULL,
-                    creation_disposition, flags_and_attrs, NULL);
+      ::CreateFileW(filename, args.desired_access, args.share_mode, NULL,
+                    args.creation_disposition, args.flags_and_attrs, NULL);
 
   if (h == INVALID_HANDLE_VALUE)
     set_error(ec);

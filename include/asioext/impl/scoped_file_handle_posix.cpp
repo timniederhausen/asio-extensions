@@ -40,32 +40,4 @@ scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
 
 #endif
 
-void scoped_file_handle::open(const char* filename,
-                              uint32_t flags,
-                              error_code& ec) ASIOEXT_NOEXCEPT
-{
-  if (handle_.is_open()) {
-    handle_.close(ec);
-    if (ec) return;
-  }
-
-  handle_ = detail::posix_file_ops::open(filename, flags, ec);
-}
-
-#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-
-void scoped_file_handle::open(const boost::filesystem::path& filename,
-                              uint32_t flags,
-                              error_code& ec) ASIOEXT_NOEXCEPT
-{
-  if (handle_.is_open()) {
-    handle_.close(ec);
-    if (ec) return;
-  }
-
-  handle_ = detail::posix_file_ops::open(filename.c_str(), flags, ec);
-}
-
-#endif
-
 ASIOEXT_NS_END

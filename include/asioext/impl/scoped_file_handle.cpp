@@ -5,6 +5,7 @@
 #include "asioext/detail/throw_error.hpp"
 
 #include "asioext/scoped_file_handle.hpp"
+#include "asioext/open.hpp"
 
 ASIOEXT_NS_BEGIN
 
@@ -54,6 +55,18 @@ void scoped_file_handle::open(const char* filename, uint32_t flags)
   detail::throw_error(ec);
 }
 
+void scoped_file_handle::open(const char* filename,
+                              uint32_t flags,
+                              error_code& ec) ASIOEXT_NOEXCEPT
+{
+  if (handle_.is_open()) {
+    handle_.close(ec);
+    if (ec) return;
+  }
+
+  handle_ = asioext::open(filename, flags, ec);
+}
+
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 void scoped_file_handle::open(const boost::filesystem::path& filename,
@@ -62,6 +75,18 @@ void scoped_file_handle::open(const boost::filesystem::path& filename,
   error_code ec;
   open(filename, flags, ec);
   detail::throw_error(ec);
+}
+
+void scoped_file_handle::open(const boost::filesystem::path& filename,
+                              uint32_t flags,
+                              error_code& ec) ASIOEXT_NOEXCEPT
+{
+  if (handle_.is_open()) {
+    handle_.close(ec);
+    if (ec) return;
+  }
+
+  handle_ = asioext::open(filename, flags, ec);
 }
 
 #endif

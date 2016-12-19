@@ -189,8 +189,7 @@ public:
 
   /// @brief Open a file and assign its handle to this scoped_file_handle.
   ///
-  /// This function opens the handle to hold a new handle to a file.
-  /// Any previously held handle is closed.
+  /// For details, see @ref open(const char*,uint32_t)
   ///
   /// @param filename The path of the file to open.
   ///
@@ -204,8 +203,7 @@ public:
 
   /// @brief Open a file and assign its handle to this scoped_file_handle.
   ///
-  /// This function opens the handle to hold a new handle to a file.
-  /// Any previously held handle is closed.
+  /// For details, see @ref open(const char*,uint32_t,error_code&)
   ///
   /// @param filename The path of the file to open.
   ///
@@ -222,10 +220,14 @@ public:
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc open(const char*,uint32_t)
+  ///
+  /// @note Only available if ASIOEXT_HAS_BOOST_FILESYSTEM is defined.
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags);
 
   /// @copydoc open(const char*,uint32_t,error_code&)
+  ///
+  /// @note Only available if ASIOEXT_HAS_BOOST_FILESYSTEM is defined.
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags,
                          error_code& ec) ASIOEXT_NOEXCEPT;
@@ -260,7 +262,7 @@ public:
   ///
   /// @warning This function is dangerous. It is highly unlikely that you'll
   /// ever need to use this.
-  file_handle leak() ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL file_handle leak() ASIOEXT_NOEXCEPT;
 
   /// @brief Replace the managed file_handle.
   ///
