@@ -33,22 +33,11 @@ ASIOEXT_NS_BEGIN
 /// By default, this library just passes the unmodified filename it receives
 /// to OS APIs.
 ///
-/// This can be changed by defining @ref ASIOEXT_WINDOWS_USE_UTF8_FILENAMES, in
-/// which case AsioExt will assume that all <tt>const char*</tt> filenames
-/// passed to open() are UTF-8 encoded.
-/// AsioExt will then convert them to UTF-16 and call the appropriate
+/// On Windows this can be changed by defining
+/// @ref ASIOEXT_WINDOWS_USE_UTF8_FILENAMES, in which case AsioExt will assume
+/// that all <tt>const char*</tt> filenames passed to e.g. open() are UTF-8
+/// encoded. AsioExt will then convert them to UTF-16 and call the appropriate
 /// wide character version of the API instead.
-
-#if defined(ASIOEXT_IS_DOCUMENTATION)
-
-/// @ingroup filenames
-/// @brief If set, const char* filenames are assumed to be UTF-8 on Windows.
-///
-/// This macro defines whether <tt>const char*</tt> filenames are encoded
-/// in the system ANSI code page (if unset) or UTF-8 (if set).
-#define ASIOEXT_WINDOWS_USE_UTF8_FILENAMES
-
-#endif
 
 /// @ingroup files
 /// @defgroup open open() family of functions
@@ -112,7 +101,7 @@ ASIOEXT_DECL file_handle open(const char* filename, uint32_t flags);
 ASIOEXT_DECL file_handle open(const char* filename, uint32_t flags,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 
-#if defined(ASIOEXT_WINDOWS)
+#if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
 /// @copydoc open(const char*,uint32_t)
 ///
 /// @note Only available on Windows.
