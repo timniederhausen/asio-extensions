@@ -71,7 +71,11 @@ file_handle open(const boost::filesystem::path& filename, uint32_t flags)
 file_handle open(const boost::filesystem::path& filename, uint32_t flags,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
+#if defined(ASIOEXT_WINDOWS)
   return detail::win_file_ops::open(filename.c_str(), flags, ec);
+#else
+  return detail::posix_file_ops::open(filename.c_str(), flags, ec);
+#endif
 }
 #endif
 
