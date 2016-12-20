@@ -11,6 +11,7 @@
 
 #include <cerrno>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h> // for off_t etc.
 
@@ -95,6 +96,21 @@ handle_type duplicate(handle_type fd, error_code& ec)
 
   set_error(ec, errno);
   return -1;
+}
+
+handle_type get_stdin(error_code& ec)
+{
+  return STDIN_FILENO;
+}
+
+handle_type get_stdout(error_code& ec)
+{
+  return STDOUT_FILENO;
+}
+
+handle_type get_stderr(error_code& ec)
+{
+  return STDERR_FILENO;
 }
 
 uint64_t size(handle_type fd, error_code& ec)

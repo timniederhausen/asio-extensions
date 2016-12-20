@@ -36,6 +36,10 @@ ASIOEXT_DECL void close(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL handle_type duplicate(handle_type fd, error_code& ec);
 
+ASIOEXT_DECL handle_type get_stdin(error_code& ec);
+ASIOEXT_DECL handle_type get_stdout(error_code& ec);
+ASIOEXT_DECL handle_type get_stderr(error_code& ec);
+
 ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL uint64_t seek(handle_type fd,

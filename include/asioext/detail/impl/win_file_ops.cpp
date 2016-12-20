@@ -84,14 +84,14 @@ handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
     return INVALID_HANDLE_VALUE;
   }
 
-  handle_type h =
+  const handle_type h =
       ::CreateFileW(filename, args.desired_access, args.share_mode, NULL,
                     args.creation_disposition, args.flags_and_attrs, NULL);
 
-  if (h == INVALID_HANDLE_VALUE)
-    set_error(ec);
-  else
+  if (h != INVALID_HANDLE_VALUE)
     ec = error_code();
+  else
+    set_error(ec);
 
   return h;
 }
@@ -116,6 +116,39 @@ handle_type duplicate(handle_type fd, error_code& ec)
     set_error(ec);
 
   return new_fd;
+}
+
+handle_type get_stdin(error_code& ec)
+{
+  const handle_type h = ::GetStdHandle(STD_INPUT_HANDLE);
+  if (h != INVALID_HANDLE_VALUE)
+    ec = error_code();
+  else
+    set_error(ec);
+
+  return h;
+}
+
+handle_type get_stdout(error_code& ec)
+{
+  const handle_type h = ::GetStdHandle(STD_OUTPUT_HANDLE);
+  if (h != INVALID_HANDLE_VALUE)
+    ec = error_code();
+  else
+    set_error(ec);
+
+  return h;
+}
+
+handle_type get_stderr(error_code& ec)
+{
+  const handle_type h = ::GetStdHandle(STD_ERROR_HANDLE);
+  if (h != INVALID_HANDLE_VALUE)
+    ec = error_code();
+  else
+    set_error(ec);
+
+  return h;
 }
 
 uint64_t size(handle_type fd, error_code& ec)
