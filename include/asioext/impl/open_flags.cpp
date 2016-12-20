@@ -19,6 +19,16 @@ bool is_valid(uint32_t flags)
   if (creation_modes > 1)
     return false;
 
+  const uint32_t unsupported_flags =
+#if defined(ASIOEXT_WINDOWS)
+    attribute_executable;
+#else
+    attribute_hidden;
+#endif
+
+  if (flags & unsupported_flags)
+    return false;
+
   return true;
 }
 

@@ -4,6 +4,7 @@
 
 add_executable(asioext.test
 	scoped_file_handle.cpp
+	open_flags.cpp
 	main.cpp
 )
 

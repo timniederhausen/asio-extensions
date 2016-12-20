@@ -83,6 +83,7 @@ executable("asioext_unittests") {
   sources = [
     "test/main.cpp",
     "test/scoped_file_handle.cpp",
+    "test/open_flags.cpp",
   ]
 
   deps = [

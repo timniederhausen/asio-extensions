@@ -19,12 +19,20 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
+/// @defgroup openflags open() flags
+/// Options for opening files.
+/// open() converts these to their platform's native equivalent (if possible).
+/// Flags that are only available on certain platforms are marked as such.
+
+/// @ingroup openflags
 /// @brief Contains option flags for opening files.
 ///
 /// This namespace contains various flags for opening files.
 namespace open_flags {
 
-/// @ingroup files
+/// @ingroup openflags
+/// @{
+
 /// File access mode flags.
 enum access_mode
 {
@@ -41,7 +49,6 @@ enum access_mode
   access_rw = access_read | access_write,
 };
 
-/// @ingroup files
 /// @brief File creation-mode flags.
 ///
 /// These flags specify the action that should be taken on a file.
@@ -67,7 +74,6 @@ enum creation_mode
   truncate_existing = 1 << 6,
 };
 
-/// @ingroup files
 /// @brief File creation attributes.
 ///
 /// These flags specify the attributes that should be set on a newly
@@ -79,18 +85,19 @@ enum creation_attributes
   /// @note Only supported on Windows.
   attribute_hidden = 1 << 7,
 
-  /// The file is executable
+  /// The file is executable.
   ///
   /// @note Not supported on Windows.
   attribute_executable = 1 << 8,
 };
 
-/// @ingroup files
 /// @brief Check whether a set of flags is valid.
 ///
 /// This function checks whether the given @c flags are valid, i.e.
-/// no mutually exclusive flags have been specified.
+/// no mutually exclusive or unsupported flags have been specified.
 ASIOEXT_DECL bool is_valid(uint32_t flags);
+
+/// @}
 
 }
 

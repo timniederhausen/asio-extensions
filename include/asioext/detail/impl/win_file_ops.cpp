@@ -50,9 +50,12 @@ bool parse_open_flags(create_file_args& args, uint32_t flags)
   if (flags & open_flags::access_write)
     args.desired_access |= GENERIC_WRITE;
 
-  // TODO: Add support for these
-  args.share_mode = 0;
   args.flags_and_attrs = 0;
+  if (flags & open_flags::attribute_hidden)
+    args.flags_and_attrs |= FILE_ATTRIBUTE_HIDDEN;
+
+  // TODO: Add support.
+  args.share_mode = 0;
   return true;
 }
 
