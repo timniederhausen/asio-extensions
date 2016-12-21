@@ -32,7 +32,7 @@ handle_type open(const char* path, uint32_t flags, error_code& ec)
     return -1;
   }
 
-  int native_flags = 0;
+  int native_flags = O_CLOEXEC;
 
   if (flags & open_flags::create_new)
     native_flags = O_CREAT | O_EXCL;
