@@ -112,6 +112,20 @@ public:
                                   uint32_t flags,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 
+#if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
+  /// @copydoc scoped_file_handle(const char*,uint32_t)
+  ///
+  /// @note Only available on Windows.
+  ASIOEXT_DECL scoped_file_handle(const wchar_t* filename, uint32_t flags);
+
+  /// @copydoc scoped_file_handle(const char*,uint32_t,error_code&)
+  ///
+  /// @note Only available on Windows.
+  ASIOEXT_DECL scoped_file_handle(const wchar_t* filename,
+                                  uint32_t flags,
+                                  error_code& ec) ASIOEXT_NOEXCEPT;
+#endif
+
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc scoped_file_handle(const char*,uint32_t)
   ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
@@ -217,6 +231,20 @@ public:
   ASIOEXT_DECL void open(const char* filename,
                          uint32_t flags,
                          error_code& ec) ASIOEXT_NOEXCEPT;
+
+#if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
+  /// @copydoc open(const char*,uint32_t)
+  ///
+  /// @note Only available on Windows.
+  ASIOEXT_DECL void open(const wchar_t* filename, uint32_t flags);
+
+  /// @copydoc open(const char*,uint32_t,error_code&)
+  ///
+  /// @note Only available on Windows.
+  ASIOEXT_DECL void open(const wchar_t* filename,
+                         uint32_t flags,
+                         error_code& ec) ASIOEXT_NOEXCEPT;
+#endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc open(const char*,uint32_t)

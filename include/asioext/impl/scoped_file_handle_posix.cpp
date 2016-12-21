@@ -9,11 +9,6 @@
 
 ASIOEXT_NS_BEGIN
 
-scoped_file_handle::scoped_file_handle(const char* filename, uint32_t flags)
-{
-  open(filename, flags);
-}
-
 scoped_file_handle::scoped_file_handle(const char* filename,
                                        uint32_t flags,
                                        error_code& ec) ASIOEXT_NOEXCEPT
@@ -23,12 +18,6 @@ scoped_file_handle::scoped_file_handle(const char* filename,
 }
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-
-scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
-                                       uint32_t flags)
-{
-  open(filename, flags);
-}
 
 scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
                                        uint32_t flags,

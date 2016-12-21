@@ -21,6 +21,23 @@ scoped_file_handle::scoped_file_handle(file_handle handle) ASIOEXT_NOEXCEPT
   // ctor
 }
 
+scoped_file_handle::scoped_file_handle(const char* filename, uint32_t flags)
+  : handle_(asioext::open(filename, flags))
+{
+  // ctor
+}
+
+#if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
+
+scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
+                                       uint32_t flags)
+  : handle_(asioext::open(filename, flags))
+{
+  // ctor
+}
+
+#endif
+
 scoped_file_handle::~scoped_file_handle()
 {
   error_code ec;

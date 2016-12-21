@@ -25,6 +25,26 @@ BOOST_AUTO_TEST_CASE(empty)
   BOOST_CHECK_NO_THROW(fh.close());
 }
 
+BOOST_AUTO_TEST_CASE(constructor)
+{
+  using namespace asioext::open_flags;
+  asioext::error_code ec;
+  asioext::scoped_file_handle f1("nosuchfile",
+                                 access_read | open_existing, ec);
+  BOOST_REQUIRE(!!ec);
+  asioext::scoped_file_handle f2("test_file_1",
+                                 access_write | open_always, ec);
+  BOOST_REQUIRE(!ec);
+#if defined(ASIOEXT_WINDOWS)
+  asioext::scoped_file_handle f3(L"nosuchfile",
+                                 access_read | open_existing, ec);
+  BOOST_REQUIRE(!!ec);
+  asioext::scoped_file_handle f4(L"test_file_2",
+                                 access_write | open_always, ec);
+  BOOST_REQUIRE(!ec);
+#endif
+}
+
 BOOST_AUTO_TEST_CASE(open_fail)
 {
   using namespace asioext::open_flags;
@@ -35,8 +55,15 @@ BOOST_AUTO_TEST_CASE(open_fail)
 
   BOOST_REQUIRE(!!ec);
   BOOST_CHECK(!fh.is_open());
-
   BOOST_CHECK_NO_THROW(fh.close());
+
+#if defined(ASIOEXT_WINDOWS)
+  fh.open(L"nosuchfile", access_read | open_existing, ec);
+
+  BOOST_REQUIRE(!!ec);
+  BOOST_CHECK(!fh.is_open());
+  BOOST_CHECK_NO_THROW(fh.close());
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(open_succeed)
