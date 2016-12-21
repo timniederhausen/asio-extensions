@@ -28,8 +28,8 @@ config("asioext_lib_config") {
 source_set("asioext_lib") {
   sources = [
     "include/asioext/impl/file_handle.cpp",
-    "include/asioext/impl/open_flags.cpp",
     "include/asioext/impl/open.cpp",
+    "include/asioext/impl/open_flags.cpp",
     "include/asioext/impl/scoped_file_handle.cpp",
     "include/asioext/impl/standard_streams.cpp",
   ]
@@ -82,8 +82,9 @@ executable("asioext_unittests") {
 
   sources = [
     "test/main.cpp",
-    "test/scoped_file_handle.cpp",
     "test/open_flags.cpp",
+    "test/read_file.cpp",
+    "test/scoped_file_handle.cpp",
   ]
 
   deps = [

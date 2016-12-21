@@ -8,6 +8,7 @@
 #include "asioext/impl/scoped_file_handle.cpp"
 #include "asioext/impl/open.cpp"
 #include "asioext/impl/open_flags.cpp"
+#include "asioext/impl/read_file.cpp"
 #include "asioext/impl/standard_streams.cpp"
 
 #if defined(ASIOEXT_WINDOWS)
