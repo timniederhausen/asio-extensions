@@ -27,23 +27,42 @@ config("asioext_lib_config") {
 
 source_set("asioext_lib") {
   sources = [
+    "include/asioext/asioext.hpp",
+    "include/asioext/detail/buffer.hpp",
+    "include/asioext/detail/buffer_sequence_adapter.hpp",
+    "include/asioext/detail/config.hpp",
+    "include/asioext/detail/cstdint.hpp",
+    "include/asioext/detail/error.hpp",
+    "include/asioext/detail/error_code.hpp",
+    "include/asioext/detail/throw_error.hpp",
+    "include/asioext/file_handle.hpp",
     "include/asioext/impl/file_handle.cpp",
+    "include/asioext/impl/file_handle.hpp",
     "include/asioext/impl/open.cpp",
     "include/asioext/impl/open_flags.cpp",
+    "include/asioext/impl/read_file.cpp",
     "include/asioext/impl/scoped_file_handle.cpp",
     "include/asioext/impl/standard_streams.cpp",
+    "include/asioext/open.hpp",
+    "include/asioext/open_flags.hpp",
+    "include/asioext/read_file.hpp",
+    "include/asioext/scoped_file_handle.hpp",
+    "include/asioext/standard_streams.hpp",
   ]
 
   if (is_win) {
     sources += [
       "include/asioext/detail/impl/win_file_ops.cpp",
       "include/asioext/detail/impl/win_path.cpp",
+      "include/asioext/detail/win_file_ops.hpp",
+      "include/asioext/detail/win_path.hpp",
       "include/asioext/impl/file_handle_win.cpp",
       "include/asioext/impl/scoped_file_handle_win.cpp",
     ]
   } else {
     sources += [
       "include/asioext/detail/impl/posix_file_ops.cpp",
+      "include/asioext/detail/posix_file_ops.hpp",
       "include/asioext/impl/file_handle_posix.cpp",
       "include/asioext/impl/scoped_file_handle_posix.cpp",
     ]
