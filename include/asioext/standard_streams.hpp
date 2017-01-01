@@ -29,14 +29,14 @@ ASIOEXT_NS_BEGIN
 // NOTE: These names are prefixed with get_ so they don't conflict with
 // the global stdin, etc. which might be implemented as macros.
 
-file_handle get_stdin();
-file_handle get_stdin(error_code& ec);
+ASIOEXT_DECL file_handle get_stdin();
+ASIOEXT_DECL file_handle get_stdin(error_code& ec);
 
-file_handle get_stdout();
-file_handle get_stdout(error_code& ec);
+ASIOEXT_DECL file_handle get_stdout();
+ASIOEXT_DECL file_handle get_stdout(error_code& ec);
 
-file_handle get_stderr();
-file_handle get_stderr(error_code& ec);
+ASIOEXT_DECL file_handle get_stderr();
+ASIOEXT_DECL file_handle get_stderr(error_code& ec);
 
 /// @}
 
