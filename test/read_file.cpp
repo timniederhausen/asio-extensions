@@ -40,6 +40,12 @@ BOOST_AUTO_TEST_CASE(empty)
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK_EQUAL(0, str.size());
+
+  std::vector<char> vec;
+  asioext::read_file("test_file_1", vec, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(0, vec.size());
 }
 
 BOOST_AUTO_TEST_CASE(read_file_char)
@@ -57,6 +63,37 @@ BOOST_AUTO_TEST_CASE(read_file_char)
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK_EQUAL(12, str.size());
+
+  std::vector<char> vec;
+  asioext::read_file("test_file_2", vec, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(12, vec.size());
 }
+
+#if defined(ASIOEXT_WINDOWS)
+BOOST_AUTO_TEST_CASE(read_file_wchar)
+{
+  write_test_file();
+
+  std::string str;
+  asioext::error_code ec;
+  asioext::read_file(L"test_file_2", str, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(12, str.size());
+
+  asioext::read_file(L"test_file_2", str, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(12, str.size());
+
+  std::vector<char> vec;
+  asioext::read_file(L"test_file_2", vec, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(12, vec.size());
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()

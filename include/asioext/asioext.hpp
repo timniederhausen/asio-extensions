@@ -16,6 +16,12 @@
 #pragma once
 #endif
 
+/// @defgroup concepts Concepts
+/// Type requirements.
+
+/// @defgroup traits Type traits
+/// Type traits provided by this library.
+
 /// @defgroup files Files
 /// Classes and functions for working with files.
 
