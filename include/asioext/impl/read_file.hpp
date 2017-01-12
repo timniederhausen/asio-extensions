@@ -23,18 +23,18 @@
 
 ASIOEXT_NS_BEGIN
 
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(const char* filename, Container& c)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(const char* filename, CharContainer& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec);
 }
 
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(const char* filename, Container& c, error_code& ec)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(const char* filename, CharContainer& c, error_code& ec)
 {
   scoped_file_handle file(filename, open_flags::access_read |
                                     open_flags::open_existing,
@@ -44,18 +44,18 @@ typename enable_if<is_char_container<Container>::value>::type
 }
 
 #if defined(ASIOEXT_WINDOWS)
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(const wchar_t* filename, Container& c)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(const wchar_t* filename, CharContainer& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec);
 }
 
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(const wchar_t* filename, Container& c, error_code& ec)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(const wchar_t* filename, CharContainer& c, error_code& ec)
 {
   scoped_file_handle file(filename, open_flags::access_read |
                                     open_flags::open_existing,
@@ -66,19 +66,19 @@ typename enable_if<is_char_container<Container>::value>::type
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(const boost::filesystem::path& filename, Container& c)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(const boost::filesystem::path& filename, CharContainer& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec);
 }
 
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
     read_file(const boost::filesystem::path& filename,
-              Container& c, error_code& ec)
+              CharContainer& c, error_code& ec)
 {
   scoped_file_handle file(filename, open_flags::access_read |
                                     open_flags::open_existing,
@@ -88,30 +88,30 @@ typename enable_if<is_char_container<Container>::value>::type
 }
 #endif
 
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(file_handle file, Container& c)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(file_handle file, CharContainer& c)
 {
   error_code ec;
   read_file(file, c, ec);
   detail::throw_error(ec);
 }
 
-template <class Container>
-typename enable_if<is_char_container<Container>::value>::type
-    read_file(file_handle file, Container& c, error_code& ec)
+template <class CharContainer>
+typename enable_if<is_char_container<CharContainer>::value>::type
+    read_file(file_handle file, CharContainer& c, error_code& ec)
 {
   const uint64_t size = file.size(ec);
   if (ec) return;
 
-  if (size > std::numeric_limits<typename Container::size_type>::max() ||
+  if (size > std::numeric_limits<typename CharContainer::size_type>::max() ||
       size > c.max_size()) {
     ec = asio::error::message_size;
     return;
   }
 
   if (size != 0) {
-    c.resize(static_cast<typename Container::size_type>(size));
+    c.resize(static_cast<typename CharContainer::size_type>(size));
     asio::read(file, asio::buffer(&c[0], c.size()), ec);
   } else {
     c.clear();

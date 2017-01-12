@@ -44,13 +44,13 @@ ASIOEXT_NS_BEGIN
 ///  @ref concept-CharContainer requirements.
 ///
 /// @throws asio::system_error Thrown on failure.
-template <class Container>
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(const char* filename, Container& c);
+    read_file(const char* filename, CharContainer& c);
 
 /// Read a file into a string.
 ///
@@ -65,57 +65,57 @@ typename enable_if<is_char_container<Container>::value>::type
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
-template <class Container>
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(const char* filename, Container& c, error_code& ec);
+    read_file(const char* filename, CharContainer& c, error_code& ec);
 
 #if defined(ASIOEXT_WINDOWS)  || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc read_file(const char*,Container&)
+/// @copydoc read_file(const char*,CharContainer&)
 ///
 /// @note Only available on Windows.
-template <class Container>
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(const wchar_t* filename, Container& c);
+    read_file(const wchar_t* filename, CharContainer& c);
 
-/// @copydoc read_file(const char*,Container&,error_code&)
+/// @copydoc read_file(const char*,CharContainer&,error_code&)
 ///
 /// @note Only available on Windows.
-template <class Container>
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(const wchar_t* filename, Container& c, error_code& ec);
+    read_file(const wchar_t* filename, CharContainer& c, error_code& ec);
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc read_file(const char*,Container&)
-template <class Container>
+/// @copydoc read_file(const char*,CharContainer&)
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(const boost::filesystem::path& filename, Container& c);
+    read_file(const boost::filesystem::path& filename, CharContainer& c);
 
-/// @copydoc read_file(const char*,Container&,error_code&)
-template <class Container>
+/// @copydoc read_file(const char*,CharContainer&,error_code&)
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
     read_file(const boost::filesystem::path& filename,
-              Container& c, error_code& ec);
+              CharContainer& c, error_code& ec);
 #endif
 
 class file_handle;
@@ -134,13 +134,13 @@ class file_handle;
 ///  @ref concept-CharContainer requirements.
 ///
 /// @throws asio::system_error Thrown on failure.
-template <class Container>
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(file_handle file, Container& c);
+    read_file(file_handle file, CharContainer& c);
 
 /// Read a file into a string.
 ///
@@ -157,13 +157,13 @@ typename enable_if<is_char_container<Container>::value>::type
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
-template <class Container>
+template <class CharContainer>
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 void
 #else
-typename enable_if<is_char_container<Container>::value>::type
+typename enable_if<is_char_container<CharContainer>::value>::type
 #endif
-    read_file(file_handle file, Container& c, error_code& ec);
+    read_file(file_handle file, CharContainer& c, error_code& ec);
 
 // TODO(tim): Add support for asio's dynamic buffers,
 // once they are released.
