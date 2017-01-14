@@ -14,18 +14,18 @@ declare_args() {
 }
 
 config("asioext_config") {
+  defines = []
   include_dirs = [ "include" ]
 
   if (asioext_use_boost_asio) {
-    defines = [ "ASIOEXT_USE_BOOST_ASIO" ]
+    defines += [ "ASIOEXT_USE_BOOST_ASIO" ]
+  }
+  if (!asioext_header_only) {
+    defines += [ "ASIOEXT_SEPARATE_COMPILATION" ]
   }
 }
 
-config("asioext_lib_config") {
-  defines = [ "ASIOEXT_SEPARATE_COMPILATION" ]
-}
-
-source_set("asioext_lib") {
+source_set("asioext") {
   sources = [
     "include/asioext/asioext.hpp",
     "include/asioext/detail/buffer.hpp",
@@ -36,13 +36,8 @@ source_set("asioext_lib") {
     "include/asioext/detail/error_code.hpp",
     "include/asioext/detail/throw_error.hpp",
     "include/asioext/file_handle.hpp",
-    "include/asioext/impl/file_handle.cpp",
     "include/asioext/impl/file_handle.hpp",
-    "include/asioext/impl/open.cpp",
-    "include/asioext/impl/open_flags.cpp",
-    "include/asioext/impl/read_file.cpp",
-    "include/asioext/impl/scoped_file_handle.cpp",
-    "include/asioext/impl/standard_streams.cpp",
+    "include/asioext/impl/read_file.hpp",
     "include/asioext/open.hpp",
     "include/asioext/open_flags.hpp",
     "include/asioext/read_file.hpp",
@@ -50,28 +45,42 @@ source_set("asioext_lib") {
     "include/asioext/standard_streams.hpp",
   ]
 
-  if (is_win) {
+  if (!asioext_header_only) {
     sources += [
-      "include/asioext/detail/impl/win_file_ops.cpp",
-      "include/asioext/detail/impl/win_path.cpp",
-      "include/asioext/detail/win_file_ops.hpp",
-      "include/asioext/detail/win_path.hpp",
-      "include/asioext/impl/file_handle_win.cpp",
-      "include/asioext/impl/scoped_file_handle_win.cpp",
-    ]
-  } else {
-    sources += [
-      "include/asioext/detail/impl/posix_file_ops.cpp",
-      "include/asioext/detail/posix_file_ops.hpp",
-      "include/asioext/impl/file_handle_posix.cpp",
-      "include/asioext/impl/scoped_file_handle_posix.cpp",
+      "include/asioext/impl/file_handle.cpp",
+      "include/asioext/impl/open.cpp",
+      "include/asioext/impl/open_flags.cpp",
+      "include/asioext/impl/scoped_file_handle.cpp",
+      "include/asioext/impl/standard_streams.cpp",
     ]
   }
 
-  public_configs = [
-    ":asioext_config",
-    ":asioext_lib_config",
-  ]
+  if (is_win) {
+    sources += [
+      "include/asioext/detail/win_file_ops.hpp",
+      "include/asioext/detail/win_path.hpp",
+    ]
+
+    if (!asioext_header_only) {
+      sources += [
+        "include/asioext/detail/impl/win_file_ops.cpp",
+        "include/asioext/detail/impl/win_path.cpp",
+        "include/asioext/impl/file_handle_win.cpp",
+        "include/asioext/impl/scoped_file_handle_win.cpp",
+      ]
+    }
+  } else {
+    sources += [ "include/asioext/detail/posix_file_ops.hpp" ]
+    if (!asioext_header_only) {
+      sources += [
+        "include/asioext/detail/impl/posix_file_ops.cpp",
+        "include/asioext/impl/file_handle_posix.cpp",
+        "include/asioext/impl/scoped_file_handle_posix.cpp",
+      ]
+    }
+  }
+
+  public_configs = [ ":asioext_config" ]
   public_deps = []
 
   assert(!asioext_standalone || !asioext_use_boost_fs,
@@ -83,16 +92,6 @@ source_set("asioext_lib") {
 
   if (asioext_use_boost_asio) {
     public_deps += [ "$external/boost/libs/asio" ]
-  }
-}
-
-group("asioext") {
-  if (asioext_header_only) {
-    public_configs = [ ":asioext_config" ]
-  } else {
-    public_deps = [
-      ":asioext_lib",
-    ]
   }
 }
 
@@ -108,6 +107,7 @@ executable("asioext_unittests") {
 
   deps = [
     ":asioext",
+    "$external/boost/libs/filesystem",
     "$external/boost/libs/test:unit_test_framework",
   ]
 }
