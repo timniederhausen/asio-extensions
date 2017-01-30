@@ -186,7 +186,7 @@ uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)
     return 0;
   }
 
-  if (bytesRead == 0)
+  if (bytesRead == 0 && size != 0)
     ec = asio::error::eof;
 
   return bytesRead;
