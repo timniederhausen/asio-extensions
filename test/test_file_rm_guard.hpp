@@ -3,8 +3,8 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at
 /// http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_TEST_TESTFILEWRITER_HPP
-#define ASIOEXT_TEST_TESTFILEWRITER_HPP
+#ifndef ASIOEXT_TEST_TESTFILERMGUARD_HPP
+#define ASIOEXT_TEST_TESTFILERMGUARD_HPP
 
 #include "asioext/detail/config.hpp"
 
@@ -12,34 +12,21 @@
 # pragma once
 #endif
 
-#include "asioext/scoped_file_handle.hpp"
-#include "asioext/open_flags.hpp"
-
 #include <boost/filesystem.hpp>
-
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/write.hpp>
-#else
-# include <asio/write.hpp>
-#endif
 
 #include <iostream>
 
 ASIOEXT_NS_BEGIN
 
-struct test_file_writer
+struct test_file_rm_guard
 {
-  test_file_writer(const char* filename,
-                   const void* data, std::size_t size)
+  test_file_rm_guard(boost::filesystem::path filename)
     : filename_(filename)
   {
-    scoped_file_handle fh(filename_, open_flags::access_write |
-                                     open_flags::create_always);
-    if (size != 0)
-      asio::write(fh, asio::buffer(data, size));
+    // ctor
   }
 
-  ~test_file_writer()
+  ~test_file_rm_guard()
   {
     boost::system::error_code ec;
     boost::filesystem::remove(filename_, ec);

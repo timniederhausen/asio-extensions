@@ -1,3 +1,5 @@
+#include "test_file_rm_guard.hpp"
+
 #include "asioext/scoped_file_handle.hpp"
 #include "asioext/open_flags.hpp"
 
@@ -11,42 +13,58 @@
 
 #include <boost/test/unit_test.hpp>
 
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-namespace asio = asioext::asio;
-#endif
+ASIOEXT_NS_BEGIN
 
 BOOST_AUTO_TEST_SUITE(asioext_scoped_file_handle)
+
+// BOOST_AUTO_TEST_SUITE() gives us a unique NS, so we don't need to
+// prefix our variables.
+
+static const char* empty_filename = "asioext_scopedfilehandle_empty";
+static const wchar_t* empty_filenamew = L"asioext_scopedfilehandle_empty2";
+
+static const char* test_filename = "asioext_scopedfilehandle_test";
+static const wchar_t* test_filenamew = L"asioext_scopedfilehandle_test";
+static const char test_data[] = "hello world!";
+static const std::size_t test_data_size = sizeof(test_data) - 1;
 
 BOOST_AUTO_TEST_CASE(empty)
 {
   asioext::scoped_file_handle fh;
   BOOST_CHECK(!fh.is_open());
-
   BOOST_CHECK_NO_THROW(fh.close());
 }
 
 BOOST_AUTO_TEST_CASE(constructor)
 {
+  test_file_rm_guard rguard1(empty_filename);
+
   using namespace asioext::open_flags;
   asioext::error_code ec;
   asioext::scoped_file_handle f1("nosuchfile",
                                  access_read | open_existing, ec);
-  BOOST_REQUIRE(!!ec);
-  asioext::scoped_file_handle f2("test_file_1",
+  BOOST_REQUIRE(ec);
+  asioext::scoped_file_handle f2(empty_filename,
                                  access_write | open_always, ec);
   BOOST_REQUIRE(!ec);
 #if defined(ASIOEXT_WINDOWS)
+  test_file_rm_guard rguard2(empty_filenamew);
   asioext::scoped_file_handle f3(L"nosuchfile",
                                  access_read | open_existing, ec);
-  BOOST_REQUIRE(!!ec);
-  asioext::scoped_file_handle f4(L"test_file_2",
+  BOOST_REQUIRE(ec);
+  asioext::scoped_file_handle f4(empty_filenamew,
                                  access_write | open_always, ec);
   BOOST_REQUIRE(!ec);
 #endif
 }
 
-BOOST_AUTO_TEST_CASE(open_fail)
+BOOST_AUTO_TEST_CASE(open)
 {
+  test_file_rm_guard rguard1(empty_filename);
+#if defined(ASIOEXT_WINDOWS)
+  test_file_rm_guard rguard2(empty_filenamew);
+#endif
+
   using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
@@ -64,30 +82,31 @@ BOOST_AUTO_TEST_CASE(open_fail)
   BOOST_CHECK(!fh.is_open());
   BOOST_CHECK_NO_THROW(fh.close());
 #endif
-}
 
-BOOST_AUTO_TEST_CASE(open_succeed)
-{
-  using namespace asioext::open_flags;
-  asioext::scoped_file_handle fh;
-
-  asioext::error_code ec;
-  fh.open("test_file_1", access_write | open_always, ec);
+  fh.open(empty_filename, access_write | open_always, ec);
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK(fh.is_open());
 
   BOOST_CHECK_NO_THROW(fh.close());
   BOOST_CHECK(!fh.is_open());
+
+#if defined(ASIOEXT_WINDOWS)
+  fh.open(empty_filenamew, access_write | open_always, ec);
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK(fh.is_open());
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(leak_reset)
 {
+  test_file_rm_guard rguard1(empty_filename);
+
   using namespace asioext::open_flags;
   asioext::scoped_file_handle fh, fh2;
 
   asioext::error_code ec;
-  fh.open("test_file_1", access_write | create_always, ec);
+  fh.open(empty_filename, access_write | create_always, ec);
   BOOST_REQUIRE(!ec);
 
   asioext::file_handle h = fh.get();
@@ -102,55 +121,61 @@ BOOST_AUTO_TEST_CASE(leak_reset)
 
 BOOST_AUTO_TEST_CASE(read_write)
 {
+  test_file_rm_guard rguard1(test_filename);
+
   using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open("test_file_1", access_write | create_always, ec);
+  fh.open(test_filename, access_write | create_always, ec);
   BOOST_REQUIRE(!ec);
 
-  const char data[] = "hello world!";
-  const std::size_t data_size = sizeof(data) - 1;
-
-  BOOST_REQUIRE_EQUAL(0, asio::write(fh, asio::buffer(data, 0)));
-  BOOST_REQUIRE_EQUAL(data_size, asio::write(fh, asio::buffer(data, data_size)));
+  BOOST_REQUIRE_EQUAL(0, asio::write(fh, asio::buffer(test_data, 0)));
+  BOOST_REQUIRE_EQUAL(test_data_size,
+                      asio::write(fh, asio::buffer(test_data,
+                                                   test_data_size)));
 
   BOOST_REQUIRE_NO_THROW(fh.close());
 
-  fh.open("test_file_1", access_read | open_existing, ec);
+  fh.open(test_filename, access_read | open_existing, ec);
   BOOST_REQUIRE(!ec);
 
   char buffer[128];
-
-  BOOST_REQUIRE_EQUAL(data_size, asio::read(fh, asio::buffer(buffer, data_size)));
-  BOOST_REQUIRE_EQUAL(0, std::memcmp(data, buffer, data_size));
+  BOOST_REQUIRE_EQUAL(0,
+                      asio::read(fh, asio::buffer(buffer, 0)));
+  BOOST_REQUIRE_EQUAL(test_data_size,
+                      asio::read(fh, asio::buffer(buffer, test_data_size)));
+  BOOST_REQUIRE_EQUAL(0, std::memcmp(test_data, buffer, test_data_size));
 }
 
 BOOST_AUTO_TEST_CASE(position_and_size)
 {
+  test_file_rm_guard rguard1(test_filename);
+
   using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open("test_file_1", access_write | create_always, ec);
+  fh.open(test_filename, access_write | create_always, ec);
   BOOST_REQUIRE(!ec);
 
-  const char data[] = "hello world!";
-  const std::size_t data_size = sizeof(data) - 1;
-
   BOOST_REQUIRE_EQUAL(0, fh.position());
-  BOOST_REQUIRE_EQUAL(data_size, asio::write(fh, asio::buffer(data, data_size)));
-  BOOST_REQUIRE_EQUAL(data_size, fh.position());
-  BOOST_REQUIRE_EQUAL(data_size, fh.size());
+  BOOST_REQUIRE_EQUAL(test_data_size,
+                      asio::write(fh, asio::buffer(test_data,
+                                                   test_data_size)));
+  BOOST_REQUIRE_EQUAL(test_data_size, fh.position());
+  BOOST_REQUIRE_EQUAL(test_data_size, fh.size());
 }
 
 BOOST_AUTO_TEST_CASE(seek)
 {
+  test_file_rm_guard rguard1(test_filename);
+
   using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open("test_file_1", access_write | create_always, ec);
+  fh.open(test_filename, access_write | create_always, ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::file_handle::from_current, 0));
@@ -168,3 +193,5 @@ BOOST_AUTO_TEST_CASE(seek)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+ASIOEXT_NS_END

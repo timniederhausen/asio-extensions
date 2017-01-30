@@ -2,9 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-namespace asio = asioext::asio;
-#endif
+ASIOEXT_NS_BEGIN
 
 BOOST_AUTO_TEST_SUITE(asioext_open_flags)
 
@@ -31,3 +29,5 @@ BOOST_AUTO_TEST_CASE(platform_dependent)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+ASIOEXT_NS_END

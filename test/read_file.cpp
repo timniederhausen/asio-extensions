@@ -6,10 +6,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/mpl/list.hpp>
 
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-namespace asio = asioext::asio;
-#endif
-
 ASIOEXT_NS_BEGIN
 
 BOOST_AUTO_TEST_SUITE(asioext_read_file)
@@ -17,7 +13,7 @@ BOOST_AUTO_TEST_SUITE(asioext_read_file)
 // BOOST_AUTO_TEST_SUITE() gives us a unique NS, so we don't need to
 // prefix our variables.
 
-static const char* empty_filename = "asioext_read_file_empty";
+static const char* empty_filename = "asioext_readfile_empty";
 
 static const char* test_filename = "asioext_readfile_test";
 static const wchar_t* test_filenamew = L"asioext_readfile_test";
@@ -82,7 +78,18 @@ BOOST_AUTO_TEST_CASE(empty)
   BOOST_CHECK_EQUAL(0, vec.size());
 }
 
-BOOST_AUTO_TEST_CASE(read_file)
+BOOST_AUTO_TEST_CASE(nonexistent)
+{
+  std::string str;
+  asioext::error_code ec;
+
+  asioext::read_file("nosuchfile", str, ec);
+
+  BOOST_REQUIRE(ec);
+  BOOST_CHECK_EQUAL(0, str.size());
+}
+
+BOOST_AUTO_TEST_CASE(read_file_string)
 {
   write_test_file();
 
