@@ -142,18 +142,22 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
 {
   const ssize_t r = ::readv(fd, bufs, count);
 
-  // @todo Only return EOF if the buffers have non-zero size?
-  if (r == 0) {
-    ec = asio::error::eof;
+  if (r != 0) {
+    if (r != -1) {
+      ec = error_code();
+      return static_cast<std::size_t>(r);
+    }
+    set_error(ec, errno);
     return 0;
   }
 
-  if (r != -1) {
-    ec = error_code();
-    return static_cast<std::size_t>(r);
+  for (int i = 0; i != count; ++i) {
+    if (bufs[i].iov_len != 0) {
+      ec = asio::error::eof;
+      return 0;
+    }
   }
-
-  set_error(ec, errno);
+  ec = error_code();
   return 0;
 }
 
@@ -177,18 +181,22 @@ std::size_t preadv(handle_type fd,
 {
   const ssize_t r = ::preadv(fd, bufs, count, offset);
 
-  // @todo Only return EOF if the buffers have non-zero size?
-  if (r == 0) {
-    ec = asio::error::eof;
+  if (r != 0) {
+    if (r != -1) {
+      ec = error_code();
+      return static_cast<std::size_t>(r);
+    }
+    set_error(ec, errno);
     return 0;
   }
 
-  if (r != -1) {
-    ec = error_code();
-    return static_cast<std::size_t>(r);
+  for (int i = 0; i != count; ++i) {
+    if (bufs[i].iov_len != 0) {
+      ec = asio::error::eof;
+      return 0;
+    }
   }
-
-  set_error(ec, errno);
+  ec = error_code();
   return 0;
 }
 
