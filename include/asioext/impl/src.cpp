@@ -4,11 +4,13 @@
 
 #include "asioext/detail/config.hpp"
 
+#include "asioext/impl/cancellation_token.cpp"
 #include "asioext/impl/file_handle.cpp"
 #include "asioext/impl/scoped_file_handle.cpp"
 #include "asioext/impl/open.cpp"
 #include "asioext/impl/open_flags.cpp"
 #include "asioext/impl/standard_streams.cpp"
+#include "asioext/impl/thread_pool_file_service.cpp"
 
 #if defined(ASIOEXT_WINDOWS)
 # include "asioext/impl/file_handle_win.cpp"

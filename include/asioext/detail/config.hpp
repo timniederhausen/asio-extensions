@@ -13,6 +13,12 @@
 # define ASIOEXT_HAS_BOOST_CONFIG 1
 #endif
 
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# include <boost/asio/detail/config.hpp>
+#else
+# include <asio/detail/config.hpp>
+#endif
+
 #if ASIOEXT_IS_DOCUMENTATION
 # define ASIOEXT_SEPARATE_COMPILATION 1
 // When generating the API documentation, we simply assume that all C++
@@ -64,6 +70,18 @@
 # elif defined(_MSC_VER) && (defined(__INTELLISENSE__) \
       || (!defined(__MWERKS__) && !defined(__EDG_VERSION__)))
 #  define ASIOEXT_MSVC _MSC_VER
+# endif
+#endif
+
+// ASIOEXT_HAS_CLANG_LIBCXX: Defined if Clang is used with libc++.
+#if defined(__clang__)
+# if (__cplusplus >= 201103)
+#  if __has_include(<__config>)
+#   include <__config>
+#   if defined(_LIBCPP_VERSION)
+#    define ASIOEXT_HAS_CLANG_LIBCXX 1
+#   endif
+#  endif
 # endif
 #endif
 
@@ -169,6 +187,29 @@
 #  endif
 #  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1700)
 #   define ASIOEXT_HAS_STD_TYPE_TRAITS 1
+#  endif
+# endif
+#endif
+
+// Standard library support for shared_ptr and weak_ptr.
+#if !defined(ASIOEXT_HAS_STD_SHARED_PTR)
+# if !defined(ASIOEXT_DISABLE_STD_SHARED_PTR)
+#  if defined(__clang__)
+#   if defined(ASIOEXT_HAS_CLANG_LIBCXX)
+#    define ASIOEXT_HAS_STD_SHARED_PTR 1
+#   elif (__cplusplus >= 201103)
+#    define ASIOEXT_HAS_STD_SHARED_PTR 1
+#   endif
+#  endif
+#  if defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIOEXT_HAS_STD_SHARED_PTR 1
+#    endif
+#   endif
+#  endif
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1600)
+#   define ASIOEXT_HAS_STD_SHARED_PTR 1
 #  endif
 # endif
 #endif

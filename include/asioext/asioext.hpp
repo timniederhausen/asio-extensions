@@ -25,6 +25,13 @@
 /// @defgroup files Files
 /// Classes and functions for working with files.
 
+/// @defgroup service Service utilities
+/// Utility classes and functions for the implementation of
+/// custom I/O objects and/or services.
+///
+/// @note Unless you're writing a custom service, there is probably
+/// little of interest in this group.
+
 /// AsioExt's main namespace.
 namespace asioext {
 }

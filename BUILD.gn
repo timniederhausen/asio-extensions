@@ -28,30 +28,45 @@ config("asioext_config") {
 source_set("asioext") {
   sources = [
     "include/asioext/asioext.hpp",
+    "include/asioext/basic_file.hpp",
+    "include/asioext/composed_operation.hpp",
+    "include/asioext/detail/asio_version.hpp",
+    "include/asioext/detail/async_result.hpp",
     "include/asioext/detail/buffer.hpp",
     "include/asioext/detail/buffer_sequence_adapter.hpp",
     "include/asioext/detail/config.hpp",
     "include/asioext/detail/cstdint.hpp",
     "include/asioext/detail/error.hpp",
     "include/asioext/detail/error_code.hpp",
+    "include/asioext/detail/handler_type.hpp",
+    "include/asioext/detail/move_support.hpp",
+    "include/asioext/detail/mutex.hpp",
+    "include/asioext/detail/service_base.hpp",
+    "include/asioext/detail/thread.hpp",
+    "include/asioext/detail/thread_group.hpp",
     "include/asioext/detail/throw_error.hpp",
+    "include/asioext/detail/work.hpp",
     "include/asioext/file_handle.hpp",
     "include/asioext/impl/file_handle.hpp",
     "include/asioext/impl/read_file.hpp",
+    "include/asioext/impl/thread_pool_file_service.hpp",
     "include/asioext/open.hpp",
     "include/asioext/open_flags.hpp",
     "include/asioext/read_file.hpp",
     "include/asioext/scoped_file_handle.hpp",
     "include/asioext/standard_streams.hpp",
+    "include/asioext/thread_pool_file_service.hpp",
   ]
 
   if (!asioext_header_only) {
     sources += [
+      "include/asioext/impl/cancellation_token.cpp",
       "include/asioext/impl/file_handle.cpp",
       "include/asioext/impl/open.cpp",
       "include/asioext/impl/open_flags.cpp",
       "include/asioext/impl/scoped_file_handle.cpp",
       "include/asioext/impl/standard_streams.cpp",
+      "include/asioext/impl/thread_pool_file_service.cpp",
     ]
   }
 
@@ -92,6 +107,8 @@ source_set("asioext") {
 
   if (asioext_use_boost_asio) {
     public_deps += [ "$external/boost/libs/asio" ]
+  } else {
+    public_deps += [ "$external/asio" ]
   }
 }
 
@@ -99,6 +116,7 @@ executable("asioext_unittests") {
   testonly = true
 
   sources = [
+    "test/basic_file.cpp",
     "test/main.cpp",
     "test/open_flags.cpp",
     "test/read_file.cpp",
