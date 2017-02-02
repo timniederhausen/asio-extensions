@@ -302,6 +302,7 @@ struct cancel_handler
 {
   cancel_handler(asioext::basic_file<FileService>& file)
     : file_(file)
+    , work_(file.get_io_service())
   {
     // ctor
   }
@@ -320,6 +321,7 @@ struct cancel_handler
   }
 
   asioext::basic_file<FileService>& file_;
+  asio::io_service::work work_;
 };
 
 BOOST_AUTO_TEST_CASE(async_read_write_cancel)
