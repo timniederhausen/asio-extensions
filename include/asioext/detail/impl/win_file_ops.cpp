@@ -29,29 +29,29 @@ void set_error(error_code& ec)
 
 bool parse_open_flags(create_file_args& args, uint32_t flags)
 {
-  if (!open_flags::is_valid(flags))
+  if (!are_open_flags_valid(flags))
     return false;
 
   args.creation_disposition = 0;
-  if (flags & open_flags::create_new)
+  if (flags & create_new)
     args.creation_disposition = CREATE_NEW;
-  else if (flags & open_flags::create_always)
+  else if (flags & create_always)
     args.creation_disposition = CREATE_ALWAYS;
-  else if (flags & open_flags::open_existing)
+  else if (flags & open_existing)
     args.creation_disposition = OPEN_EXISTING;
-  else if (flags & open_flags::open_always)
+  else if (flags & open_always)
     args.creation_disposition = OPEN_ALWAYS;
-  else if (flags & open_flags::truncate_existing)
+  else if (flags & truncate_existing)
     args.creation_disposition = TRUNCATE_EXISTING;
 
   args.desired_access = 0;
-  if (flags & open_flags::access_read)
+  if (flags & access_read)
     args.desired_access |= GENERIC_READ;
-  if (flags & open_flags::access_write)
+  if (flags & access_write)
     args.desired_access |= GENERIC_WRITE;
 
   args.flags_and_attrs = 0;
-  if (flags & open_flags::attribute_hidden)
+  if (flags & attribute_hidden)
     args.flags_and_attrs |= FILE_ATTRIBUTE_HIDDEN;
 
   // TODO: Add support.

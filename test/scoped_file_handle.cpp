@@ -39,7 +39,6 @@ BOOST_AUTO_TEST_CASE(constructor)
 {
   test_file_rm_guard rguard1(empty_filename);
 
-  using namespace asioext::open_flags;
   asioext::error_code ec;
   asioext::scoped_file_handle f1("nosuchfile",
                                  access_read | open_existing, ec);
@@ -65,7 +64,6 @@ BOOST_AUTO_TEST_CASE(open)
   test_file_rm_guard rguard2(empty_filenamew);
 #endif
 
-  using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
@@ -102,7 +100,6 @@ BOOST_AUTO_TEST_CASE(leak_reset)
 {
   test_file_rm_guard rguard1(empty_filename);
 
-  using namespace asioext::open_flags;
   asioext::scoped_file_handle fh, fh2;
 
   asioext::error_code ec;
@@ -123,7 +120,6 @@ BOOST_AUTO_TEST_CASE(read_write)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
@@ -152,7 +148,6 @@ BOOST_AUTO_TEST_CASE(position_and_size)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
@@ -171,7 +166,6 @@ BOOST_AUTO_TEST_CASE(seek)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;

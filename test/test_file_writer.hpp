@@ -33,8 +33,8 @@ struct test_file_writer
                    const void* data, std::size_t size)
     : filename_(filename)
   {
-    scoped_file_handle fh(filename_, open_flags::access_write |
-                                     open_flags::create_always);
+    scoped_file_handle fh(filename_, access_write |
+                                     create_always);
     if (size != 0)
       asio::write(fh, asio::buffer(data, size));
   }

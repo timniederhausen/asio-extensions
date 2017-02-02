@@ -27,33 +27,33 @@ void set_error(error_code& ec, int e)
 
 handle_type open(const char* path, uint32_t flags, error_code& ec)
 {
-  if (!open_flags::is_valid(flags)) {
+  if (!are_open_flags_valid(flags)) {
     ec = asio::error::invalid_argument;
     return -1;
   }
 
   int native_flags = O_CLOEXEC;
 
-  if (flags & open_flags::create_new)
+  if (flags & create_new)
     native_flags = O_CREAT | O_EXCL;
-  else if (flags & open_flags::create_always)
+  else if (flags & create_always)
     native_flags = O_CREAT | O_TRUNC;
-  // else if (flags & open_flags::open_existing)
+  // else if (flags & open_existing)
   //  native_flags = 0;
-  else if (flags & open_flags::open_always)
+  else if (flags & open_always)
     native_flags = O_CREAT;
-  else if (flags & open_flags::truncate_existing)
+  else if (flags & truncate_existing)
     native_flags = O_TRUNC;
 
-  const uint32_t rw_flags = flags & open_flags::access_rw;
+  const uint32_t rw_flags = flags & access_read_write;
   switch (rw_flags) {
-    case open_flags::access_rw: native_flags |= O_RDWR; break;
-    case open_flags::access_read: native_flags |= O_RDONLY; break;
-    case open_flags::access_write: native_flags |= O_WRONLY; break;
+    case access_read_write: native_flags |= O_RDWR; break;
+    case access_read: native_flags |= O_RDONLY; break;
+    case access_write: native_flags |= O_WRONLY; break;
   }
 
   int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-  if (flags & open_flags::attribute_executable)
+  if (flags & attribute_executable)
     mode |= S_IXGRP | S_IXOTH | S_IXUSR;
 
   while (true) {

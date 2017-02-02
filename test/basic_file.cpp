@@ -44,7 +44,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructor, FileService, service_types)
 {
   test_file_rm_guard rguard1(empty_filename);
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
   asioext::error_code ec;
   asioext::basic_file<FileService> f1(io_service, "nosuchfile",
@@ -71,7 +70,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
   test_file_rm_guard rguard2(empty_filenamew);
 #endif
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
   asioext::basic_file<FileService> file(io_service);
 
@@ -109,7 +107,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_write, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
   asioext::basic_file<FileService> file(io_service);
 
@@ -137,7 +134,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(position_and_size, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
   asioext::basic_file<FileService> file(io_service);
 
@@ -157,7 +153,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(seek, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
   asioext::basic_file<FileService> file(io_service);
 
@@ -256,7 +251,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
   asioext::basic_file<FileService> file(io_service);
 
@@ -330,7 +324,6 @@ BOOST_AUTO_TEST_CASE(async_read_write_cancel)
 
   test_file_rm_guard rguard1(test_filename);
 
-  using namespace asioext::open_flags;
   asio::io_service io_service;
 
   FileService* svc = new FileService(io_service, 1);

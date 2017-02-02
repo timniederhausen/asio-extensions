@@ -6,9 +6,7 @@
 
 ASIOEXT_NS_BEGIN
 
-namespace open_flags {
-
-bool is_valid(uint32_t flags)
+bool are_open_flags_valid(uint32_t flags)
 {
   int creation_modes = !!(flags & create_new) +
                        !!(flags & create_always) +
@@ -30,8 +28,6 @@ bool is_valid(uint32_t flags)
     return false;
 
   return true;
-}
-
 }
 
 ASIOEXT_NS_END
