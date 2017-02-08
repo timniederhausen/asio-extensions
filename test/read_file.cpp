@@ -76,6 +76,15 @@ BOOST_AUTO_TEST_CASE(empty)
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK_EQUAL(0, vec.size());
+
+  // MutableBufferSequence
+
+  char buffer[1];
+  asioext::read_file(empty_filename, asio::buffer(buffer, 0), ec);
+  BOOST_REQUIRE(!ec);
+
+  asioext::read_file(empty_filename, asio::buffer(buffer, 1), ec);
+  BOOST_CHECK_EQUAL(ec, asio::error::eof);
 }
 
 BOOST_AUTO_TEST_CASE(nonexistent)
@@ -87,6 +96,12 @@ BOOST_AUTO_TEST_CASE(nonexistent)
 
   BOOST_REQUIRE(ec);
   BOOST_CHECK_EQUAL(0, str.size());
+
+  // MutableBufferSequence
+
+  char buffer[1];
+  asioext::read_file("nosuchfile", asio::buffer(buffer, 0), ec);
+  BOOST_REQUIRE(ec);
 }
 
 BOOST_AUTO_TEST_CASE(read_file_string)
@@ -131,6 +146,21 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_file_vector, T, char_types)
   BOOST_CHECK(compare_with_test_data(vec));
 }
 
+BOOST_AUTO_TEST_CASE(read_file_buffer)
+{
+  write_test_file();
+
+  char buffer[test_data_size + 1] = {'\0'};
+  asioext::error_code ec;
+
+  asioext::read_file(test_filename,
+                     asio::buffer(buffer, test_data_size),
+                     ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(test_data, buffer);
+}
+
 #if defined(ASIOEXT_WINDOWS)
 BOOST_AUTO_TEST_CASE(read_file_wide_filename)
 {
@@ -140,18 +170,53 @@ BOOST_AUTO_TEST_CASE(read_file_wide_filename)
   asioext::error_code ec;
 
   // read a file into an empty string.
-  asioext::read_file(test_filename, str, ec);
+  asioext::read_file(test_filenamew, str, ec);
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK_EQUAL(test_data_size, str.size());
   BOOST_CHECK_EQUAL(test_data, str);
 
   // re-use the already filled string object to read a file.
-  asioext::read_file(test_filename, str, ec);
+  asioext::read_file(test_filenamew, str, ec);
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK_EQUAL(test_data_size, str.size());
   BOOST_CHECK_EQUAL(test_data, str);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(read_file_vector_wide_filename, T, char_types)
+{
+  write_test_file();
+
+  asioext::error_code ec;
+  std::vector<T> vec;
+
+  // read a file into an empty vector.
+  asioext::read_file(test_filenamew, vec, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK(compare_with_test_data(vec));
+
+  // re-use the already filled vector object to read a file.
+  asioext::read_file(test_filenamew, vec, ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK(compare_with_test_data(vec));
+}
+
+BOOST_AUTO_TEST_CASE(read_file_buffer_wide_filename)
+{
+  write_test_file();
+
+  char buffer[test_data_size + 1] = {'\0'};
+  asioext::error_code ec;
+
+  asioext::read_file(test_filenamew,
+                     asio::buffer(buffer, test_data_size),
+                     ec);
+
+  BOOST_REQUIRE(!ec);
+  BOOST_CHECK_EQUAL(test_data, buffer);
 }
 #endif
 
