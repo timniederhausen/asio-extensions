@@ -50,11 +50,18 @@ ASIOEXT_NS_BEGIN
 /// @par Example
 /// @code
 /// asioext::scoped_file_handle file("myfile.txt",
-///                                  asioext::open_flags::access_write |
-///                                  asioext::open_flags::create_always);
+///                                  asioext::access_read_write |
+///                                  asioext::create_always);
 ///
+/// // Write a string
 /// const std::string content = "Hello world";
 /// asio::write(file, asio::buffer(content));
+///
+/// // Read it back
+/// // Note that we could avoid seek() by using write_at/read_t!
+/// file.seek(file_handle::from_begin, 0);
+/// std::string content_returned(content.size());
+/// asio::read(file, asio::buffer(content));
 /// @endcode
 class scoped_file_handle
 {
@@ -86,6 +93,7 @@ public:
   /// This constructor opens a new handle to the given file.
   ///
   /// @param filename The path of the file to open.
+  /// See @ref filenames for details.
   ///
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
@@ -100,6 +108,7 @@ public:
   /// This constructor opens a new handle to the given file.
   ///
   /// @param filename The path of the file to open.
+  /// See @ref filenames for details.
   ///
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
@@ -128,10 +137,16 @@ public:
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc scoped_file_handle(const char*,uint32_t)
+  ///
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
                                   uint32_t flags);
 
   /// @copydoc scoped_file_handle(const char*,uint32_t,error_code&)
+  ///
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
                                   uint32_t flags,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
@@ -203,9 +218,13 @@ public:
 
   /// @brief Open a file and assign its handle to this scoped_file_handle.
   ///
+  /// This function closes any currently held handle and attempts to open
+  /// a handle to the specified file.
+  ///
   /// For details, see @ref open(const char*,uint32_t)
   ///
   /// @param filename The path of the file to open.
+  /// See @ref filenames for details.
   ///
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
@@ -217,9 +236,13 @@ public:
 
   /// @brief Open a file and assign its handle to this scoped_file_handle.
   ///
-  /// For details, see @ref open(const char*,uint32_t,error_code&)
+  /// This function closes any currently held handle and attempts to open
+  /// a handle to the specified file.
+  ///
+  /// For details, see @ref open(const char*,uint32_t)
   ///
   /// @param filename The path of the file to open.
+  /// See @ref filenames for details.
   ///
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
@@ -249,13 +272,15 @@ public:
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// @copydoc open(const char*,uint32_t)
   ///
-  /// @note Only available if ASIOEXT_HAS_BOOST_FILESYSTEM is defined.
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags);
 
   /// @copydoc open(const char*,uint32_t,error_code&)
   ///
-  /// @note Only available if ASIOEXT_HAS_BOOST_FILESYSTEM is defined.
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          uint32_t flags,
                          error_code& ec) ASIOEXT_NOEXCEPT;

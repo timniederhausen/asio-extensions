@@ -11,19 +11,32 @@
 ///
 /// @{
 
-/// @brief Assume that AsioExt has been built in a seperate CU.
+/// @brief Use Boost.Asio instead of standalone Asio.
 ///
-/// A separate compilation unit must
+/// If defined, AsioExt will use Boost.Asio headers and types.
+#define ASIOEXT_USE_BOOST_ASIO
+
+/// @brief Build/Use AsioExt in a seperate compilation unit.
+///
+/// This flag **must** be defined when building and consuming  the library.
+///
+/// Additionally, one compilation unit must
 /// <code>\#include &lt;asioext/impl/src.cpp&gt;</code>.
 #define ASIOEXT_SEPARATE_COMPILATION
 
-/// @brief Assume that AsioExt has been built as a shared library.
+/// @brief Build/Use AsioExt as a shared library.
 ///
-/// On Windows, AsioExt will declare functions with
-/// <code>__declspec(dllimport)</code>.
+/// This flag **must** be defined when building and consuming the library.
+///
+/// Additionally, the shared library must have one CU that contains the
+/// following line:
+/// <code>\#include &lt;asioext/impl/src.cpp&gt;</code>.
+///
+/// @note On Windows, AsioExt will declare functions with
+/// <code>__declspec(dllimport/dllexport)</code>.
 #define ASIOEXT_DYN_LINK
 
-/// @brief On Windows assume <code>const char*</code> filenames
+/// @brief On Windows, assume <code>const char*</code> filenames
 /// are UTF-8 encoded.
 ///
 /// This macro defines whether <tt>const char*</tt> filenames are encoded
@@ -36,25 +49,25 @@
 /// and the used version has a compatible Boost.Filesystem version.
 #define ASIOEXT_DISABLE_BOOST_FILESYSTEM
 
-/// @brief Forcefully disable C++11 rvalue reference support.
+/// @brief Disable C++11 rvalue reference support.
 ///
 /// Disable the use of rvalue references, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_MOVE
 
-/// @brief Forcefully disable C++11 variadic template support.
+/// @brief Disable C++11 variadic template support.
 ///
 /// Disable the use of variadic templates, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_VARIADIC_TEMPLATES
 
-/// @brief Forcefully disable C++11 @c noexcept support.
+/// @brief Disable C++11 @c noexcept support.
 ///
 /// Disable the use of @c noexcept, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_NOEXCEPT
 
-/// @brief Forcefully disable <code>\#pragma once</code> support.
+/// @brief Disable <code>\#pragma once</code> support.
 ///
 /// Disable the use of <code>\#pragma once</code>, regardless of
 /// compiler support.

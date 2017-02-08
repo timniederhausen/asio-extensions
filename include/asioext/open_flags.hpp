@@ -19,7 +19,7 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// @defgroup openflags open() flags
+/// @defgroup open_flags open() flags
 /// Options for opening files.
 /// open() converts these to their platform's native equivalent (if possible).
 /// Flags that are only available on certain platforms are marked as such.

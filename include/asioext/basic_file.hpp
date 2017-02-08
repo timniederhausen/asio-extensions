@@ -48,6 +48,8 @@ ASIOEXT_NS_BEGIN
 /// * SyncRandomAccessWriteDevice
 /// * SyncReadStream
 /// * SyncWriteStream
+/// * AsyncReadStream
+/// * AsyncWriteStream
 /// * AsyncRandomAccessReadDevice
 /// * AsyncRandomAccessWriteDevice
 ///

@@ -27,7 +27,7 @@ ASIOEXT_NS_BEGIN
 /// @{
 
 // NOTE: These names are prefixed with get_ so they don't conflict with
-// the global stdin, etc. which might be implemented as macros.
+// `stdin` etc. which might be implemented as macros.
 
 ASIOEXT_DECL file_handle get_stdin();
 ASIOEXT_DECL file_handle get_stdin(error_code& ec);

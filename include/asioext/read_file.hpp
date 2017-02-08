@@ -28,7 +28,7 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// @defgroup readfile read_file() family of functions
+/// @defgroup read_file read_file() family of functions
 /// Reads the entire contents of a file into memory.
 ///
 ///@{

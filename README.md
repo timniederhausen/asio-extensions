@@ -5,11 +5,16 @@
 
 ## Feature overview
 
-* `file_handle`: A thin wrapper around a native file handle that supports
-  Asio's Stream* concepts.
-* Utility functions for reading/writing files
+* Wrappers around native file handles with support for asio's `*Stream` concepts.
+  (`asioext::file_handle` and `asioext::scoped_file_handle`).
+* Asynchronous file I/O (`asioext::basic_file`).
+  Currently only a thread(-pool) service is implemented
+  (`asioext::thread_pool_file_service`).
+* Utilities for reading/writing files:
+  * `asioext::read_file`
+* Utilities for service/custom I/O object writers.
 
-AsioExt is compatible with standalone Asio, as well as the Boost variant.
+AsioExt is compatible with standalone Asio, as well as the Boost version.
 To use the Boost version, #define ``ASIOEXT_USE_BOOST_ASIO``.
 
 ## Building
@@ -47,15 +52,15 @@ int main(int argc, const char* argv[])
 {
   try {
     asioext::scoped_file_handle file("myfile.txt",
-                                     asioext::open_flags::access_write |
-                                     asioext::open_flags::create_always);
+                                     asioext::access_write |
+                                     asioext::create_always);
 
     const std::string content = "Hello world";
     asio::write(file, asio::buffer(content));
     return 0;
   } catch (std::exception& e) {
     // Exceptions are used for error reporting here.
-    // All functions also offer a non-throwing overload,
+    // All throwing functions also offer a non-throwing overload,
     // which takes an asio::error_code& instead.
     std::cerr << "error: " << e.what() << std::endl;
     return 1;

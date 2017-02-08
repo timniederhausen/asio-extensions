@@ -117,13 +117,15 @@ ASIOEXT_DECL file_handle open(const wchar_t* filename, uint32_t flags,
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 /// @copydoc open(const char*,uint32_t)
 ///
-/// @note Only available if ASIOEXT_HAS_BOOST_FILESYSTEM is defined.
+/// @note Only available if using Boost.Filesystem
+/// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
                               uint32_t flags);
 
 /// @copydoc open(const char*,uint32_t,error_code&)
 ///
-/// @note Only available if ASIOEXT_HAS_BOOST_FILESYSTEM is defined.
+/// @note Only available if using Boost.Filesystem
+/// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
                               uint32_t flags,
                               error_code& ec) ASIOEXT_NOEXCEPT;
