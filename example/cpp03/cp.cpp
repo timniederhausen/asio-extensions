@@ -2,7 +2,7 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This examples requires ASIOEXT_USE_BOOST_ASIO to be set.
+// This examples requires ASIOEXT_USE_BOOST_ASIO to be defined.
 // Either set it on the command-line or #define it before #including any
 // AsioExt headers.
 
@@ -28,13 +28,15 @@ void copy_file_aux(asioext::file_handle src, asioext::file_handle dst)
   static const std::size_t kBufferSize = 16 * 1024;
 
   boost::array<char, kBufferSize> buffer;
-  for (bool at_end = false; !at_end; ) {
+  while (true) {
     boost::system::error_code ec;
     const std::size_t actual = asio::read(src, asio::buffer(buffer), ec);
 
+    // Handle the expected errors here. (We could also use the throwing version
+    // and catch & re-throw here, but this'd be overkill.)
     if (ec) {
       if (ec == asio::error::eof)
-        at_end = true;
+        break;
       else
         throw boost::system::system_error(ec);
     }
@@ -50,9 +52,7 @@ bool copy_file(const boost::filesystem::path& src_path,
   asioext::scoped_file_handle src;
 
   try {
-    src.open(src_path,
-             asioext::open_flags::access_read |
-             asioext::open_flags::open_existing);
+    src.open(src_path, asioext::access_read | asioext::open_existing);
   } catch (std::exception& e) {
     std::cerr << "error: Failed to open " << src_path << " with: "
         << e.what() << '\n';
@@ -62,9 +62,7 @@ bool copy_file(const boost::filesystem::path& src_path,
   asioext::scoped_file_handle dst;
 
   try {
-    dst.open(dst_path,
-             asioext::open_flags::access_write |
-             asioext::open_flags::create_always);
+    dst.open(dst_path, asioext::access_write | asioext::create_always);
   } catch (std::exception& e) {
     std::cerr << "error: Failed to open " << dst_path << " with: "
         << e.what() << '\n';

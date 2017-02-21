@@ -12,9 +12,9 @@
 int main(int argc, const char* argv[])
 {
   try {
-    using namespace asioext::open_flags;
     asioext::scoped_file_handle file("myfile.txt",
-                                     access_write | create_always);
+                                     asioext::access_write |
+                                     asioext::create_always);
 
     const std::string content = "Hello world";
     asio::write(file, asio::buffer(content));

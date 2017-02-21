@@ -1,0 +1,35 @@
+executable("simple") {
+  output_name = "simple_cpp11"
+
+  sources = [
+    "simple.cpp",
+  ]
+
+  deps = [
+    "../..:asioext",
+  ]
+}
+
+executable("cp") {
+  output_name = "cp_cpp11"
+
+  sources = [
+    "cp.cpp",
+  ]
+
+  deps = [
+    "../..:asioext",
+  ]
+}
+
+executable("tee") {
+  output_name = "tee_cpp11"
+
+  sources = [
+    "tee.cpp",
+  ]
+
+  deps = [
+    "../..:asioext",
+  ]
+}

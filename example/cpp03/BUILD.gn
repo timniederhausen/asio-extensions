@@ -1,0 +1,27 @@
+executable("cp") {
+  output_name = "cp_cpp03"
+
+  sources = [
+    "cp.cpp",
+  ]
+
+  deps = [
+    "$external/boost/libs/filesystem",
+    "$external/boost/libs/system",
+    "../..:asioext",
+  ]
+}
+
+executable("tee") {
+  output_name = "tee_cpp03"
+
+  sources = [
+    "tee.cpp",
+  ]
+
+  deps = [
+    "$external/boost/libs/filesystem",
+    "$external/boost/libs/system",
+    "../..:asioext",
+  ]
+}
