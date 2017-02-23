@@ -53,7 +53,7 @@ static boost::test_tools::predicate_result compare_with_test_data(const C& c)
 
     boost::test_tools::predicate_result res(false);
     res.message() << "Mismatch at " << i;
-    res.message() << " [" << test_data[i] << "!=" << c[i] << "]";
+    res.message() << " [" << test_data[i] << " != " << c[i] << "]";
     return res;
   }
 

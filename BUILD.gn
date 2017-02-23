@@ -121,6 +121,7 @@ executable("asioext_unittests") {
     "test/open_flags.cpp",
     "test/read_file.cpp",
     "test/scoped_file_handle.cpp",
+    "test/write_file.cpp",
   ]
 
   deps = [

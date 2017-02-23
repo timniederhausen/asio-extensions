@@ -4,10 +4,11 @@
 
 add_executable(asioext.test
 	basic_file.cpp
-	scoped_file_handle.cpp
+	main.cpp
 	open_flags.cpp
 	read_file.cpp
-	main.cpp
+	scoped_file_handle.cpp
+	write_file.cpp
 )
 
 target_link_libraries(asioext.test asioext.static)

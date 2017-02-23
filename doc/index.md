@@ -12,4 +12,5 @@ high- and low-level features asio currently doesn't offer.
   (@ref asioext::thread_pool_file_service).
 * Utilities for reading/writing files:
   * @ref read_file
+  * @ref write_file
 * Utilities for service/custom I/O object writers (@ref service).

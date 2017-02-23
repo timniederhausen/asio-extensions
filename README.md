@@ -12,6 +12,7 @@
   (`asioext::thread_pool_file_service`).
 * Utilities for reading/writing files:
   * `asioext::read_file`
+  * `asioext::write_file`
 * Utilities for service/custom I/O object writers.
 
 AsioExt is compatible with standalone Asio, as well as the Boost version.
