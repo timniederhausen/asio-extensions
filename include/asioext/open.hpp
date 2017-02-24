@@ -43,10 +43,6 @@ ASIOEXT_NS_BEGIN
 /// @defgroup open open() family of functions
 /// These functions open handles to files.
 ///
-/// @par Implementation Detail
-/// On Windows, @c CreateFileA and @c CreateFileW will be used,
-/// on Unix systems @c open.
-///
 /// @{
 
 /// @brief Open a file and return its handle.

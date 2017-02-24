@@ -10,6 +10,10 @@
 ///
 /// @section Windows
 ///
+/// @subsection File Handles
+///
+/// @c CreateFileA and @c CreateFileW are used to open file handles.
+///
 /// @subsection Filenames
 ///
 /// If @ref ASIOEXT_WINDOWS_USE_UTF8_FILENAMES is defined, a `const char*`
@@ -20,6 +24,10 @@
 /// At most one buffer may be transferred in a single operation.
 ///
 /// @section POSIX
+///
+/// @subsection posix_file_handles File Handles
+///
+/// @c open is used to open file handles.
 ///
 /// @subsection posix_file_io File I/O
 ///

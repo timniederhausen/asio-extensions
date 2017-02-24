@@ -28,6 +28,20 @@ ASIOEXT_NS_BEGIN
 /// @defgroup write_file write_file() family of functions
 /// Writes a sequence of buffers to a file.
 ///
+/// @par Example
+/// @code
+/// const std::string d1("Hallo Welt!\n");
+/// const char d2[] = "Hello World!\n";
+/// const std::vector<char> d3{'H', 'i', '\n'};
+/// const std::array<asio::const_buffer, 3> bufs1 = {
+///   asio::buffer(d1),
+///   asio::buffer(d2, std::size(d2) - 1), // term. NUL
+///   asio::buffer(d3)
+/// };
+/// asioext::write_file("test.txt", bufs1);
+/// // test.txt now contains three lines: Hallo Welt!, Hello World, Hi
+/// @endcode
+///
 ///@{
 
 #if !defined(ASIOEXT_IS_DOCUMENTATION)

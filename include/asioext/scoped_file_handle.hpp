@@ -59,7 +59,7 @@ ASIOEXT_NS_BEGIN
 ///
 /// // Read it back
 /// // Note that we could avoid seek() by using write_at/read_t!
-/// file.seek(file_handle::from_begin, 0);
+/// file.seek(asioext::file_handle::from_begin, 0);
 /// std::string content_returned(content.size());
 /// asio::read(file, asio::buffer(content));
 /// @endcode

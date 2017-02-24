@@ -63,7 +63,7 @@ public:
   /// The operating system's native file handle type.
   typedef typename FileService::native_handle_type native_handle_type;
 
-  /// A file_handle is always the lowest layer.
+  /// A basic_file is always the lowest layer.
   typedef basic_file lowest_layer_type;
 
   /// @brief Construct an unopened file.
@@ -435,7 +435,7 @@ public:
   /// @brief Change the read/write position.
   ///
   /// This function repositions the current read/write position of this
-  /// file_handle by @c offset, relative to the origin specified
+  /// basic_file by @c offset, relative to the origin specified
   /// by @c origin.
   ///
   /// @param origin The origin of @c offset.
@@ -457,7 +457,7 @@ public:
   /// @brief Change the read/write position.
   ///
   /// This function repositions the current read/write position of this
-  /// file_handle by @c offset, relative to the origin specified
+  /// basic_file by @c offset, relative to the origin specified
   /// by @c origin.
   ///
   /// @param origin The origin of @c offset.
@@ -483,7 +483,7 @@ public:
   /// @brief Read some data from the file.
   ///
   /// This function is used to read data from the file, starting at the
-  /// file_handle's current file position. The function call will
+  /// basic_file's current file position. The function call will
   /// block until one or more bytes of data has been read successfully,
   /// or until an error occurs.
   ///
@@ -521,7 +521,7 @@ public:
   /// @brief Read some data from the file.
   ///
   /// This function is used to read data from the file, starting at the
-  /// file_handle's current file position. The function call will
+  /// basic_file's current file position. The function call will
   /// block until one or more bytes of data has been read successfully,
   /// or until an error occurs.
   ///
@@ -551,7 +551,7 @@ public:
   /// @brief Write some data to the file.
   ///
   /// This function is used to write data to the file, starting at the
-  /// file_handle's current file position. The function call will
+  /// basic_file's current file position. The function call will
   /// block until one or more bytes of the data has been written
   /// successfully, or until an error occurs.
   ///
@@ -586,7 +586,7 @@ public:
   /// @brief Write some data to the file.
   ///
   /// This function is used to write data to the file, starting at the
-  /// file_handle's current file position. The function call will
+  /// basic_file's current file position. The function call will
   /// block until one or more bytes of the data has been written
   /// successfully, or until an error occurs.
   ///

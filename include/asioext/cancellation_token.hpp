@@ -40,7 +40,7 @@ public:
   /// the move will occur.
   ///
   /// @note Following the move, the moved-from object is in the same state as if
-  /// constructed using the @c cancellation_token_source() constructor.
+  /// destroy() had been called on it.
   ASIOEXT_DECL cancellation_token_source(
       cancellation_token_source&& other) ASIOEXT_NOEXCEPT;
 
@@ -52,7 +52,7 @@ public:
   /// the move will occur.
   ///
   /// @note Following the move, the moved-from object is in the same state as if
-  /// constructed using the @c cancellation_token_source() constructor.
+  /// destroy() had been called on it.
   ASIOEXT_DECL cancellation_token_source& operator=(
       cancellation_token_source&& other);
 #endif
@@ -72,6 +72,8 @@ public:
   ///
   /// All new tokens created from this source will start
   /// in the cancelled state.
+  ///
+  /// @see reset()
   ASIOEXT_DECL void destroy();
 
   /// @brief Reset a destroyed token source.
@@ -81,6 +83,8 @@ public:
   ///
   /// After a call to this function, the object's state is as if
   /// just constructed.
+  ///
+  /// @see destroy()
   ASIOEXT_DECL void reset();
 
 private:
