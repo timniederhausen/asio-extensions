@@ -95,6 +95,8 @@ source_set("asioext") {
     }
   }
 
+  defines = [ "ASIOEXT_SOURCE" ]
+
   public_configs = [ ":asioext_config" ]
   public_deps = []
 
@@ -106,7 +108,10 @@ source_set("asioext") {
   }
 
   if (asioext_use_boost_asio) {
-    public_deps += [ "$external/boost/libs/asio" ]
+    public_deps += [
+      "$external/boost/libs/asio",
+      "$external/boost/libs/system",
+    ]
   } else {
     public_deps += [ "$external/asio" ]
   }
