@@ -17,6 +17,7 @@ endif ()
 
 if (ASIOEXT_STANDALONE)
 	target_compile_definitions(asioext.asio PUBLIC ASIO_STANDALONE)
+	set_property(TARGET asioext.asio PROPERTY CXX_STANDARD 11)
 else ()
 	target_include_directories(asioext.asio PUBLIC ${Boost_INCLUDE_DIRS})
 	target_compile_definitions(asioext.asio PUBLIC BOOST_ALL_NO_LIB)
@@ -42,6 +43,7 @@ target_link_libraries(asioext.static PUBLIC asioext.asio)
 
 if (ASIOEXT_STANDALONE)
 	target_compile_definitions(asioext.static PUBLIC ASIOEXT_STANDALONE)
+	set_property(TARGET asioext.static PROPERTY CXX_STANDARD 11)
 endif ()
 
 if (ASIOEXT_BUILD_SHARED)
@@ -53,5 +55,6 @@ if (ASIOEXT_BUILD_SHARED)
 
 	if (ASIOEXT_STANDALONE)
 		target_compile_definitions(asioext.shared PUBLIC ASIOEXT_STANDALONE)
+		set_property(TARGET asioext.shared PROPERTY CXX_STANDARD 11)
 	endif ()
 endif ()
