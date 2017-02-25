@@ -5,6 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/mpl/list.hpp>
+#include <boost/array.hpp>
 
 ASIOEXT_NS_BEGIN
 
@@ -75,13 +76,13 @@ BOOST_AUTO_TEST_CASE(two_buffers)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  const asio::const_buffer buffers[] = {
+  const boost::array<asio::const_buffer, 2> buffers = {
     asio::const_buffer(test_data, test_data_size),
     asio::const_buffer(test_data, test_data_size),
   };
 
-  asioext::write_file(test_filename, asio::buffer(buffers));
-  BOOST_CHECK(compare_written(test_filename, asio::buffer(buffers)));
+  asioext::write_file(test_filename, buffers);
+  BOOST_CHECK(compare_written(test_filename, buffers));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
