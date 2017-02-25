@@ -33,3 +33,15 @@ executable("tee") {
     "../..:asioext",
   ]
 }
+
+executable("tee_async") {
+  output_name = "tee_async_cpp11"
+
+  sources = [
+    "tee_async.cpp",
+  ]
+
+  deps = [
+    "../..:asioext",
+  ]
+}

@@ -17,3 +17,8 @@ add_executable(asioext.ex.cpp11.tee tee.cpp)
 set_property(TARGET asioext.ex.cpp11.tee PROPERTY OUTPUT_NAME tee)
 set_property(TARGET asioext.ex.cpp11.tee PROPERTY CXX_STANDARD 11)
 target_link_libraries(asioext.ex.cpp11.tee asioext.static)
+
+add_executable(asioext.ex.cpp11.tee_async tee.cpp)
+set_property(TARGET asioext.ex.cpp11.tee_async PROPERTY OUTPUT_NAME tee_async)
+set_property(TARGET asioext.ex.cpp11.tee_async PROPERTY CXX_STANDARD 11)
+target_link_libraries(asioext.ex.cpp11.tee_async asioext.static)
