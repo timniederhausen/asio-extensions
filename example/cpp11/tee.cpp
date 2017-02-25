@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include <cstdio>
-#include <cassert>
 
 using file_handles = std::vector<asioext::scoped_file_handle>;
 
