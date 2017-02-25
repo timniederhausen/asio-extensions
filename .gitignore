@@ -1,0 +1,8 @@
+# gn-build checkout
+/build
+
+# asio checkout (development)
+/asio
+
+# GN output directories (development)
+/out*
