@@ -57,6 +57,7 @@ source_set("asioext") {
     "include/asioext/scoped_file_handle.hpp",
     "include/asioext/standard_streams.hpp",
     "include/asioext/thread_pool_file_service.hpp",
+    "include/asioext/version.hpp",
   ]
 
   if (!asioext_header_only) {
