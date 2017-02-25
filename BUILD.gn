@@ -46,6 +46,7 @@ source_set("asioext") {
     "include/asioext/detail/thread_group.hpp",
     "include/asioext/detail/throw_error.hpp",
     "include/asioext/detail/work.hpp",
+    "include/asioext/file.hpp",
     "include/asioext/file_handle.hpp",
     "include/asioext/impl/file_handle.hpp",
     "include/asioext/impl/read_file.hpp",
