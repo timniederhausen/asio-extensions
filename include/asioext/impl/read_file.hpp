@@ -36,7 +36,9 @@ template <class CharContainer>
 ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
     read_file(const char* filename, CharContainer& c, error_code& ec)
 {
-  scoped_file_handle file(filename, access_read | open_existing, ec);
+  scoped_file_handle file(filename,
+                          open_flags::access_read | open_flags::open_existing,
+                          ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -55,7 +57,9 @@ template <class CharContainer>
 ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
     read_file(const wchar_t* filename, CharContainer& c, error_code& ec)
 {
-  scoped_file_handle file(filename, access_read | open_existing, ec);
+  scoped_file_handle file(filename,
+                          open_flags::access_read | open_flags::open_existing,
+                          ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -76,7 +80,9 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
     read_file(const boost::filesystem::path& filename,
               CharContainer& c, error_code& ec)
 {
-  scoped_file_handle file(filename, access_read | open_existing, ec);
+  scoped_file_handle file(filename,
+                          open_flags::access_read | open_flags::open_existing,
+                          ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -128,7 +134,9 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file(filename, access_read | open_existing, ec);
+  scoped_file_handle file(filename,
+                          open_flags::access_read | open_flags::open_existing,
+                          ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -148,7 +156,9 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file(filename, access_read | open_existing, ec);
+  scoped_file_handle file(filename,
+                          open_flags::access_read | open_flags::open_existing,
+                          ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -170,7 +180,9 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers, error_code& ec)
 {
-  scoped_file_handle file(filename, access_read | open_existing, ec);
+  scoped_file_handle file(filename,
+                          open_flags::access_read | open_flags::open_existing,
+                          ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }

@@ -21,7 +21,7 @@ scoped_file_handle::scoped_file_handle(file_handle handle) ASIOEXT_NOEXCEPT
   // ctor
 }
 
-scoped_file_handle::scoped_file_handle(const char* filename, uint32_t flags)
+scoped_file_handle::scoped_file_handle(const char* filename, open_flags flags)
   : handle_(asioext::open(filename, flags))
 {
   // ctor
@@ -30,7 +30,7 @@ scoped_file_handle::scoped_file_handle(const char* filename, uint32_t flags)
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
-                                       uint32_t flags)
+                                       open_flags flags)
   : handle_(asioext::open(filename, flags))
 {
   // ctor
@@ -65,7 +65,7 @@ scoped_file_handle& scoped_file_handle::operator=(scoped_file_handle&& other)
 
 #endif
 
-void scoped_file_handle::open(const char* filename, uint32_t flags)
+void scoped_file_handle::open(const char* filename, open_flags flags)
 {
   error_code ec;
   open(filename, flags, ec);
@@ -73,7 +73,7 @@ void scoped_file_handle::open(const char* filename, uint32_t flags)
 }
 
 void scoped_file_handle::open(const char* filename,
-                              uint32_t flags,
+                              open_flags flags,
                               error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (handle_.is_open()) {
@@ -87,7 +87,7 @@ void scoped_file_handle::open(const char* filename,
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 void scoped_file_handle::open(const boost::filesystem::path& filename,
-                              uint32_t flags)
+                              open_flags flags)
 {
   error_code ec;
   open(filename, flags, ec);
@@ -95,7 +95,7 @@ void scoped_file_handle::open(const boost::filesystem::path& filename,
 }
 
 void scoped_file_handle::open(const boost::filesystem::path& filename,
-                              uint32_t flags,
+                              open_flags flags,
                               error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (handle_.is_open()) {

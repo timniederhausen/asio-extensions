@@ -89,8 +89,9 @@ int main(int argc, const char* argv[])
 
   file_handles files(argc - 1);
   for (int i = 1; i != argc; ++i) {
-    files[i - 1].open(argv[i], asioext::create_always | asioext::access_write,
-                      ec);
+    files[i - 1].open(argv[i],
+                      asioext::open_flags::create_always |
+                      asioext::open_flags::access_write, ec);
     if (ec) {
       std::cerr << "Failed to open " << argv[i] << " with " << ec << '\n';
       return 1;

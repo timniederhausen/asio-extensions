@@ -20,10 +20,10 @@ To use the Boost version, #define ``ASIOEXT_USE_BOOST_ASIO``.
 
 ## Building
 
-AsioExt requires at least a C++03-compliant compiler.
-Not all AsioExt features are usable from C++03 though
-(e.g. movable `scoped_file_handle` objects).
-These features are enabled based on the C++11/C++14 support of the used compiler.
+AsioExt requires at compiler that supports at least some C++11 features:
+
+* Scoped enumerations
+* [optional] R-value references (If unavailable, objects will not be movable).
 
 Currently, AsioExt is being tested with the following compilers:
 
@@ -37,7 +37,7 @@ However, it is also possible to build the AsioExt library as a separate compilat
 ## Library dependencies:
 
 * Asio 1.10.0+ (Only if not using Boost.Asio)
-* [optional] Boost 1.46.0+ (If _Boost.Filesystem_ support is enabled)
+* [optional] Boost 1.46.0+ (If _Boost.Filesystem_ or _Boost.Asio_ is used)
 
 ## Simple example
 
@@ -73,8 +73,8 @@ int main(int argc, const char* argv[])
     // (There's also basic_file, which needs an asio::io_service and provides
     // asynchronous I/O.)
     asioext::scoped_file_handle file("myfile.txt",
-                                     asioext::access_read |
-                                     asioext::open_existing);
+                                     asioext::open_flags::access_read |
+                                     asioext::open_flags::open_existing);
 
     assert(file.size() == test_content.size() * 2);
 

@@ -15,6 +15,7 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/open_flags.hpp"
 
 #include "asioext/detail/error_code.hpp"
 
@@ -68,7 +69,7 @@ ASIOEXT_NS_BEGIN
 ///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL file_handle open(const char* filename, uint32_t flags);
+ASIOEXT_DECL file_handle open(const char* filename, open_flags flags);
 
 /// @brief Open a file and return its handle.
 ///
@@ -94,36 +95,36 @@ ASIOEXT_DECL file_handle open(const char* filename, uint32_t flags);
 ///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL file_handle open(const char* filename, uint32_t flags,
+ASIOEXT_DECL file_handle open(const char* filename, open_flags flags,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc open(const char*,uint32_t)
+/// @copydoc open(const char*,open_flags)
 ///
 /// @note Only available on Windows.
-ASIOEXT_DECL file_handle open(const wchar_t* filename, uint32_t flags);
+ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags);
 
-/// @copydoc open(const char*,uint32_t,error_code&)
+/// @copydoc open(const char*,open_flags,error_code&)
 ///
 /// @note Only available on Windows.
-ASIOEXT_DECL file_handle open(const wchar_t* filename, uint32_t flags,
+ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc open(const char*,uint32_t)
+/// @copydoc open(const char*,open_flags)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
-                              uint32_t flags);
+                              open_flags flags);
 
-/// @copydoc open(const char*,uint32_t,error_code&)
+/// @copydoc open(const char*,open_flags,error_code&)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
-                              uint32_t flags,
+                              open_flags flags,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 

@@ -18,7 +18,7 @@
 
 ASIOEXT_NS_BEGIN
 
-file_handle open(const char* filename, uint32_t flags)
+file_handle open(const char* filename, open_flags flags)
 {
   error_code ec;
   const file_handle h = open(filename, flags, ec);
@@ -26,7 +26,7 @@ file_handle open(const char* filename, uint32_t flags)
   return h;
 }
 
-file_handle open(const char* filename, uint32_t flags,
+file_handle open(const char* filename, open_flags flags,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
@@ -44,7 +44,7 @@ file_handle open(const char* filename, uint32_t flags,
 }
 
 #if defined(ASIOEXT_WINDOWS)
-file_handle open(const wchar_t* filename, uint32_t flags)
+file_handle open(const wchar_t* filename, open_flags flags)
 {
   error_code ec;
   const file_handle h = open(filename, flags, ec);
@@ -52,7 +52,7 @@ file_handle open(const wchar_t* filename, uint32_t flags)
   return h;
 }
 
-file_handle open(const wchar_t* filename, uint32_t flags,
+file_handle open(const wchar_t* filename, open_flags flags,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
   return detail::win_file_ops::open(filename, flags, ec);
@@ -60,7 +60,7 @@ file_handle open(const wchar_t* filename, uint32_t flags,
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-file_handle open(const boost::filesystem::path& filename, uint32_t flags)
+file_handle open(const boost::filesystem::path& filename, open_flags flags)
 {
   error_code ec;
   const file_handle h = open(filename, flags, ec);
@@ -68,7 +68,7 @@ file_handle open(const boost::filesystem::path& filename, uint32_t flags)
   return h;
 }
 
-file_handle open(const boost::filesystem::path& filename, uint32_t flags,
+file_handle open(const boost::filesystem::path& filename, open_flags flags,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)

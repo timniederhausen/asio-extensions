@@ -16,6 +16,7 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/seek_origin.hpp"
 
 #include "asioext/detail/error_code.hpp"
 #include "asioext/detail/throw_error.hpp"
@@ -96,6 +97,8 @@ public:
   ///
   /// This constructor opens a new handle to the given file.
   ///
+  /// For details, see @ref open(const char*,open_flags)
+  ///
   /// @param io_service The io_service object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
   ///
@@ -108,7 +111,7 @@ public:
   ///
   /// @see open_flags
   basic_file(asio::io_service& io_service,
-             const char* filename, uint32_t flags)
+             const char* filename, open_flags flags)
     : asio::basic_io_object<FileService>(io_service)
   {
     error_code ec;
@@ -119,6 +122,8 @@ public:
   /// @brief Open a file and construct a basic_file.
   ///
   /// This constructor opens a new handle to the given file.
+  ///
+  /// For details, see @ref open(const char*,open_flags)
   ///
   /// @param io_service The io_service object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
@@ -133,18 +138,18 @@ public:
   ///
   /// @see open_flags
   basic_file(asio::io_service& io_service, const char* filename,
-             uint32_t flags, error_code& ec) ASIOEXT_NOEXCEPT
+             open_flags flags, error_code& ec) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
     this->get_service().open(this->get_implementation(), filename, flags, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_service&,const char*,uint32_t)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags)
   ///
   /// @note Only available on Windows.
   basic_file(asio::io_service& io_service, const wchar_t* filename,
-             uint32_t flags)
+             open_flags flags)
     : asio::basic_io_object<FileService>(io_service)
   {
     error_code ec;
@@ -152,11 +157,11 @@ public:
     detail::throw_error(ec, "open");
   }
 
-  /// @copydoc basic_file(asio::io_service&,const char*,uint32_t,error_code&)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,error_code&)
   ///
   /// @note Only available on Windows.
   basic_file(asio::io_service& io_service, const wchar_t* filename,
-             uint32_t flags, error_code& ec) ASIOEXT_NOEXCEPT
+             open_flags flags, error_code& ec) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
     this->get_service().open(this->get_implementation(), filename, flags, ec);
@@ -164,9 +169,9 @@ public:
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_service&,const char*,uint32_t)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags)
   basic_file(asio::io_service& io_service,
-             const boost::filesystem::path& filename, uint32_t flags)
+             const boost::filesystem::path& filename, open_flags flags)
     : asio::basic_io_object<FileService>(io_service)
   {
     error_code ec;
@@ -174,9 +179,9 @@ public:
     detail::throw_error(ec, "open");
   }
 
-  /// @copydoc basic_file(asio::io_service&,const char*,uint32_t,error_code&)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,error_code&)
   basic_file(asio::io_service& io_service,
-             const boost::filesystem::path& filename, uint32_t flags,
+             const boost::filesystem::path& filename, open_flags flags,
              error_code& ec) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
@@ -255,7 +260,7 @@ public:
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,uint32_t)
+  /// For details, see @ref open(const char*,open_flags)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -266,7 +271,7 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  void open(const char* filename, uint32_t flags)
+  void open(const char* filename, open_flags flags)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
@@ -278,7 +283,7 @@ public:
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,uint32_t)
+  /// For details, see @ref open(const char*,open_flags)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -290,27 +295,27 @@ public:
   /// the object is reset.
   ///
   /// @see open_flags
-  void open(const char* filename, uint32_t flags,
+  void open(const char* filename, open_flags flags,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
     this->get_service().open(this->get_implementation(), filename, flags, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,uint32_t)
+  /// @copydoc open(const char*,open_flags)
   ///
   /// @note Only available on Windows.
-  void open(const wchar_t* filename, uint32_t flags)
+  void open(const wchar_t* filename, open_flags flags)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
     detail::throw_error(ec, "open");
   }
 
-  /// @copydoc open(const char*,uint32_t,error_code&)
+  /// @copydoc open(const char*,open_flags,error_code&)
   ///
   /// @note Only available on Windows.
-  void open(const wchar_t* filename, uint32_t flags,
+  void open(const wchar_t* filename, open_flags flags,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
     this->get_service().open(this->get_implementation(), filename, flags, ec);
@@ -318,22 +323,22 @@ public:
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,uint32_t)
+  /// @copydoc open(const char*,open_flags)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-  void open(const boost::filesystem::path& filename, uint32_t flags)
+  void open(const boost::filesystem::path& filename, open_flags flags)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
     detail::throw_error(ec, "open");
   }
 
-  /// @copydoc open(const char*,uint32_t,error_code&)
+  /// @copydoc open(const char*,open_flags,error_code&)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-  void open(const boost::filesystem::path& filename, uint32_t flags,
+  void open(const boost::filesystem::path& filename, open_flags flags,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
     this->get_service().open(this->get_implementation(), filename, flags, ec);
@@ -445,7 +450,7 @@ public:
   /// @return The new absolute file position.
   ///
   /// @throws asio::system_error Thrown on failure.
-  uint64_t seek(file_handle::seek_origin origin, int64_t offset)
+  uint64_t seek(seek_origin origin, int64_t offset)
   {
     error_code ec;
     uint64_t p = this->get_service().seek(this->get_implementation(), origin,
@@ -468,7 +473,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  uint64_t seek(file_handle::seek_origin origin, int64_t offset,
+  uint64_t seek(seek_origin origin, int64_t offset,
                 error_code& ec) ASIOEXT_NOEXCEPT
   {
     return this->get_service().seek(this->get_implementation(), origin, offset,

@@ -41,18 +41,22 @@ BOOST_AUTO_TEST_CASE(constructor)
 
   asioext::error_code ec;
   asioext::scoped_file_handle f1("nosuchfile",
-                                 access_read | open_existing, ec);
+                                 open_flags::access_read |
+                                 open_flags::open_existing, ec);
   BOOST_REQUIRE(ec);
   asioext::scoped_file_handle f2(empty_filename,
-                                 access_write | open_always, ec);
+                                 open_flags::access_write |
+                                 open_flags::open_always, ec);
   BOOST_REQUIRE(!ec);
 #if defined(ASIOEXT_WINDOWS)
   test_file_rm_guard rguard2(empty_filenamew);
   asioext::scoped_file_handle f3(L"nosuchfile",
-                                 access_read | open_existing, ec);
+                                 open_flags::access_read |
+                                 open_flags::open_existing, ec);
   BOOST_REQUIRE(ec);
   asioext::scoped_file_handle f4(empty_filenamew,
-                                 access_write | open_always, ec);
+                                 open_flags::access_write |
+                                 open_flags::open_always, ec);
   BOOST_REQUIRE(!ec);
 #endif
 }
@@ -67,21 +71,27 @@ BOOST_AUTO_TEST_CASE(open)
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open("nosuchfile", access_read | open_existing, ec);
+  fh.open("nosuchfile",
+          open_flags::access_read | open_flags::open_existing,
+          ec);
 
   BOOST_REQUIRE(!!ec);
   BOOST_CHECK(!fh.is_open());
   BOOST_CHECK_NO_THROW(fh.close());
 
 #if defined(ASIOEXT_WINDOWS)
-  fh.open(L"nosuchfile", access_read | open_existing, ec);
+  fh.open(L"nosuchfile",
+          open_flags::access_read | open_flags::open_existing,
+          ec);
 
   BOOST_REQUIRE(!!ec);
   BOOST_CHECK(!fh.is_open());
   BOOST_CHECK_NO_THROW(fh.close());
 #endif
 
-  fh.open(empty_filename, access_write | open_always, ec);
+  fh.open(empty_filename,
+          open_flags::access_write | open_flags::open_always,
+          ec);
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK(fh.is_open());
@@ -90,7 +100,9 @@ BOOST_AUTO_TEST_CASE(open)
   BOOST_CHECK(!fh.is_open());
 
 #if defined(ASIOEXT_WINDOWS)
-  fh.open(empty_filenamew, access_write | open_always, ec);
+  fh.open(empty_filenamew,
+          open_flags::access_write | open_flags::open_always,
+          ec);
   BOOST_REQUIRE(!ec);
   BOOST_CHECK(fh.is_open());
 #endif
@@ -103,7 +115,9 @@ BOOST_AUTO_TEST_CASE(leak_reset)
   asioext::scoped_file_handle fh, fh2;
 
   asioext::error_code ec;
-  fh.open(empty_filename, access_write | create_always, ec);
+  fh.open(empty_filename,
+          open_flags::access_write | open_flags::create_always,
+          ec);
   BOOST_REQUIRE(!ec);
 
   asioext::file_handle h = fh.get();
@@ -123,7 +137,9 @@ BOOST_AUTO_TEST_CASE(read_write)
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open(test_filename, access_write | create_always, ec);
+  fh.open(test_filename,
+          open_flags::access_write | open_flags::create_always,
+          ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_EQUAL(0, asio::write(fh, asio::buffer(test_data, 0)));
@@ -133,7 +149,9 @@ BOOST_AUTO_TEST_CASE(read_write)
 
   BOOST_REQUIRE_NO_THROW(fh.close());
 
-  fh.open(test_filename, access_read | open_existing, ec);
+  fh.open(test_filename,
+          open_flags::access_read | open_flags::open_existing,
+          ec);
   BOOST_REQUIRE(!ec);
 
   char buffer[128];
@@ -151,7 +169,9 @@ BOOST_AUTO_TEST_CASE(position_and_size)
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open(test_filename, access_write | create_always, ec);
+  fh.open(test_filename,
+          open_flags::access_write | open_flags::create_always,
+          ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.position());
@@ -169,21 +189,23 @@ BOOST_AUTO_TEST_CASE(seek)
   asioext::scoped_file_handle fh;
 
   asioext::error_code ec;
-  fh.open(test_filename, access_write | create_always, ec);
+  fh.open(test_filename,
+          open_flags::access_write | open_flags::create_always,
+          ec);
   BOOST_REQUIRE(!ec);
 
-  BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::file_handle::from_current, 0));
-  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::file_handle::from_current, 10));
+  BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::seek_origin::from_current, 0));
+  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, 10));
   BOOST_REQUIRE_EQUAL(10, fh.position());
-  BOOST_REQUIRE_EQUAL(20, fh.seek(asioext::file_handle::from_current, 10));
+  BOOST_REQUIRE_EQUAL(20, fh.seek(asioext::seek_origin::from_current, 10));
   BOOST_REQUIRE_EQUAL(20, fh.position());
-  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::file_handle::from_current, -10));
+  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, -10));
 
   char buffer[10] = {0, };
   BOOST_REQUIRE_EQUAL(10, asio::write(fh, asio::buffer(buffer)));
 
   // size is now 20
-  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::file_handle::from_end, -10));
+  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_end, -10));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

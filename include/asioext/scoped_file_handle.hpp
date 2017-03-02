@@ -50,8 +50,8 @@ ASIOEXT_NS_BEGIN
 /// @par Example
 /// @code
 /// asioext::scoped_file_handle file("myfile.txt",
-///                                  asioext::access_read_write |
-///                                  asioext::create_always);
+///                                  asioext::open_flags::access_read_write |
+///                                  asioext::open_flags::create_always);
 ///
 /// // Write a string
 /// const std::string content = "Hello world";
@@ -59,7 +59,7 @@ ASIOEXT_NS_BEGIN
 ///
 /// // Read it back
 /// // Note that we could avoid seek() by using write_at/read_t!
-/// file.seek(asioext::file_handle::from_begin, 0);
+/// file.seek(asioext::seek_origin::from_begin, 0);
 /// std::string content_returned(content.size());
 /// asio::read(file, asio::buffer(content));
 /// @endcode
@@ -92,6 +92,8 @@ public:
   ///
   /// This constructor opens a new handle to the given file.
   ///
+  /// For details, see @ref open(const char*,open_flags)
+  ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
   ///
@@ -101,11 +103,13 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL scoped_file_handle(const char* filename, uint32_t flags);
+  ASIOEXT_DECL scoped_file_handle(const char* filename, open_flags flags);
 
   /// @brief Open a file and construct a scoped_file_handle.
   ///
   /// This constructor opens a new handle to the given file.
+  ///
+  /// For details, see @ref open(const char*,open_flags)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -118,37 +122,37 @@ public:
   ///
   /// @see open_flags
   ASIOEXT_DECL scoped_file_handle(const char* filename,
-                                  uint32_t flags,
+                                  open_flags flags,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc scoped_file_handle(const char*,uint32_t)
+  /// @copydoc scoped_file_handle(const char*,open_flags)
   ///
   /// @note Only available on Windows.
-  ASIOEXT_DECL scoped_file_handle(const wchar_t* filename, uint32_t flags);
+  ASIOEXT_DECL scoped_file_handle(const wchar_t* filename, open_flags flags);
 
-  /// @copydoc scoped_file_handle(const char*,uint32_t,error_code&)
+  /// @copydoc scoped_file_handle(const char*,open_flags,error_code&)
   ///
   /// @note Only available on Windows.
   ASIOEXT_DECL scoped_file_handle(const wchar_t* filename,
-                                  uint32_t flags,
+                                  open_flags flags,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc scoped_file_handle(const char*,uint32_t)
+  /// @copydoc scoped_file_handle(const char*,open_flags)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
-                                  uint32_t flags);
+                                  open_flags flags);
 
-  /// @copydoc scoped_file_handle(const char*,uint32_t,error_code&)
+  /// @copydoc scoped_file_handle(const char*,open_flags,error_code&)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
-                                  uint32_t flags,
+                                  open_flags flags,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
@@ -232,14 +236,14 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL void open(const char* filename, uint32_t flags);
+  ASIOEXT_DECL void open(const char* filename, open_flags flags);
 
   /// @brief Open a file and assign its handle to this scoped_file_handle.
   ///
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,uint32_t)
+  /// For details, see @ref open(const char*,open_flags)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -252,37 +256,37 @@ public:
   ///
   /// @see open_flags
   ASIOEXT_DECL void open(const char* filename,
-                         uint32_t flags,
+                         open_flags flags,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,uint32_t)
+  /// @copydoc open(const char*,open_flags)
   ///
   /// @note Only available on Windows.
-  ASIOEXT_DECL void open(const wchar_t* filename, uint32_t flags);
+  ASIOEXT_DECL void open(const wchar_t* filename, open_flags flags);
 
-  /// @copydoc open(const char*,uint32_t,error_code&)
+  /// @copydoc open(const char*,open_flags,error_code&)
   ///
   /// @note Only available on Windows.
   ASIOEXT_DECL void open(const wchar_t* filename,
-                         uint32_t flags,
+                         open_flags flags,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,uint32_t)
+  /// @copydoc open(const char*,open_flags)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint32_t flags);
+                         open_flags flags);
 
-  /// @copydoc open(const char*,uint32_t,error_code&)
+  /// @copydoc open(const char*,open_flags,error_code&)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         uint32_t flags,
+                         open_flags flags,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
@@ -370,13 +374,13 @@ public:
   }
 
   /// @copydoc file_handle::seek(seek_origin,int64_t)
-  uint64_t seek(file_handle::seek_origin origin, int64_t offset)
+  uint64_t seek(seek_origin origin, int64_t offset)
   {
     return handle_.seek(origin, offset);
   }
 
   /// @copydoc file_handle::seek(seek_origin,int64_t,error_code&)
-  uint64_t seek(file_handle::seek_origin origin,
+  uint64_t seek(seek_origin origin,
                 int64_t offset,
                 error_code& ec) ASIOEXT_NOEXCEPT
   {

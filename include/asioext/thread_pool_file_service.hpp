@@ -16,6 +16,7 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/seek_origin.hpp"
 #include "asioext/cancellation_token.hpp"
 
 #include "asioext/detail/move_support.hpp"
@@ -116,14 +117,14 @@ public:
   /// Open a handle to the given file.
   ASIOEXT_DECL void open(implementation_type& impl,
                          const char* filename,
-                         uint32_t flags,
+                         open_flags flags,
                          error_code& ec);
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// Open a handle to the given file.
   ASIOEXT_DECL void open(implementation_type& impl,
                          const wchar_t* filename,
-                         uint32_t flags,
+                         open_flags flags,
                          error_code& ec);
 #endif
 
@@ -131,7 +132,7 @@ public:
   /// Open a handle to the given file.
   ASIOEXT_DECL void open(implementation_type& impl,
                          const boost::filesystem::path& filename,
-                         uint32_t flags,
+                         open_flags flags,
                          error_code& ec);
 #endif
 
@@ -165,7 +166,7 @@ public:
 
   /// Change the current file pointer position.
   ASIOEXT_DECL uint64_t seek(implementation_type& impl,
-                             file_handle::seek_origin origin,
+                             seek_origin origin,
                              int64_t offset,
                              error_code& ec) ASIOEXT_NOEXCEPT;
 

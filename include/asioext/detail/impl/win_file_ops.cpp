@@ -27,39 +27,36 @@ void set_error(error_code& ec)
   ec = error_code(::GetLastError(), asio::error::get_system_category());
 }
 
-bool parse_open_flags(create_file_args& args, uint32_t flags)
+bool parse_open_flags(create_file_args& args, open_flags flags)
 {
-  if (!are_open_flags_valid(flags))
+  if (!is_valid(flags))
     return false;
 
   args.creation_disposition = 0;
-  if (flags & create_new)
+  if ((flags & open_flags::create_new) != open_flags::none)
     args.creation_disposition = CREATE_NEW;
-  else if (flags & create_always)
+  else if ((flags & open_flags::create_always) != open_flags::none)
     args.creation_disposition = CREATE_ALWAYS;
-  else if (flags & open_existing)
+  else if ((flags & open_flags::open_existing) != open_flags::none)
     args.creation_disposition = OPEN_EXISTING;
-  else if (flags & open_always)
+  else if ((flags & open_flags::open_always) != open_flags::none)
     args.creation_disposition = OPEN_ALWAYS;
-  else if (flags & truncate_existing)
+  else if ((flags & open_flags::truncate_existing) != open_flags::none)
     args.creation_disposition = TRUNCATE_EXISTING;
 
   args.desired_access = 0;
-  if (flags & access_read)
+  if ((flags & open_flags::access_read) != open_flags::none)
     args.desired_access |= GENERIC_READ;
-  if (flags & access_write)
+  if ((flags & open_flags::access_write) != open_flags::none)
     args.desired_access |= GENERIC_WRITE;
 
   args.flags_and_attrs = 0;
-  if (flags & attribute_hidden)
-    args.flags_and_attrs |= FILE_ATTRIBUTE_HIDDEN;
-
   // TODO: Add support.
   args.share_mode = 0;
   return true;
 }
 
-handle_type open(const char* filename, uint32_t flags, error_code& ec)
+handle_type open(const char* filename, open_flags flags, error_code& ec)
 {
   create_file_args args;
   if (!parse_open_flags(args, flags)) {
@@ -79,7 +76,7 @@ handle_type open(const char* filename, uint32_t flags, error_code& ec)
   return h;
 }
 
-handle_type open(const wchar_t* filename, uint32_t flags, error_code& ec)
+handle_type open(const wchar_t* filename, open_flags flags, error_code& ec)
 {
   create_file_args args;
   if (!parse_open_flags(args, flags)) {

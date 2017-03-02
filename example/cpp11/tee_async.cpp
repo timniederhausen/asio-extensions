@@ -74,9 +74,8 @@ int main(int argc, const char* argv[])
   std::error_code ec;
   for (int i = 1; i != argc; ++i) {
     files.emplace_back(asioext::file(io_service, argv[i],
-                                     asioext::create_always |
-                                     asioext::access_write,
-                                     ec));
+                                     asioext::open_flags::create_always |
+                                     asioext::open_flags::access_write, ec));
     if (ec) {
       std::cerr << "Failed to open " << argv[i] << " with " << ec << '\n';
       return 1;

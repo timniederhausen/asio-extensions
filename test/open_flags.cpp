@@ -8,20 +8,9 @@ BOOST_AUTO_TEST_SUITE(asioext_open_flags)
 
 BOOST_AUTO_TEST_CASE(simple)
 {
-  BOOST_CHECK(are_open_flags_valid(access_write | access_read));
-  BOOST_CHECK(are_open_flags_valid(access_write | open_always));
-  BOOST_CHECK(are_open_flags_valid(access_read | open_always));
-}
-
-BOOST_AUTO_TEST_CASE(platform_dependent)
-{
-#if defined(ASIOEXT_WINDOWS)
-  BOOST_CHECK(are_open_flags_valid(create_always | attribute_hidden));
-  BOOST_CHECK(!are_open_flags_valid(create_always | attribute_executable));
-#else
-  BOOST_CHECK(!are_open_flags_valid(create_always | attribute_hidden));
-  BOOST_CHECK(are_open_flags_valid(create_always | attribute_executable));
-#endif
+  BOOST_CHECK(is_valid(open_flags::access_write | open_flags::access_read));
+  BOOST_CHECK(is_valid(open_flags::access_write | open_flags::open_always));
+  BOOST_CHECK(is_valid(open_flags::access_read | open_flags::open_always));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

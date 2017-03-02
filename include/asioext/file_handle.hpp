@@ -14,6 +14,8 @@
 # pragma once
 #endif
 
+#include "asioext/seek_origin.hpp"
+
 #if defined(ASIOEXT_WINDOWS)
 # include "asioext/detail/win_file_ops.hpp"
 #else
@@ -61,23 +63,6 @@ public:
 
   /// A file_handle is always the lowest layer.
   typedef file_handle lowest_layer_type;
-
-  /// Describes the various position offset origins.
-  ///
-  /// This enum describes the various origins,
-  /// relative to which a position offset might be interpreted.
-  enum seek_origin
-  {
-    /// Interpret the offset as relative to the file's beginning
-    /// (i.e. absolute)
-    from_begin,
-
-    /// Interpret the offset as relative to the current offset
-    from_current,
-
-    /// Interpret the offset as relative to the file's size.
-    from_end,
-  };
 
   /// @brief Construct an empy file_handle.
   ///

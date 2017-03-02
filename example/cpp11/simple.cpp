@@ -7,8 +7,7 @@
 #include <asioext/write_file.hpp>
 #include <asioext/open_flags.hpp>
 
-#include <boost/asio/read.hpp>
-namespace asio=boost::asio;
+#include <asio/read.hpp>
 
 #include <iostream>
 #include <cassert>
@@ -34,8 +33,8 @@ int main(int argc, const char* argv[])
     // (There's also basic_file, which needs an asio::io_service and provides
     // asynchronous I/O.)
     asioext::scoped_file_handle file("myfile.txt",
-                                     asioext::access_read |
-                                     asioext::open_existing);
+                                     asioext::open_flags::access_read |
+                                     asioext::open_flags::open_existing);
 
     assert(file.size() == test_content.size() * 2);
 

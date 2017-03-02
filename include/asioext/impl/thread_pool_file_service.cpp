@@ -125,7 +125,7 @@ void thread_pool_file_service::destroy(implementation_type& impl)
 
 void thread_pool_file_service::open(implementation_type& impl,
                                     const char* filename,
-                                    uint32_t flags,
+                                    open_flags flags,
                                     error_code& ec)
 {
   if (impl.handle_.is_open()) {
@@ -138,7 +138,7 @@ void thread_pool_file_service::open(implementation_type& impl,
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
 void thread_pool_file_service::open(implementation_type& impl,
                                     const wchar_t* filename,
-                                    uint32_t flags,
+                                    open_flags flags,
                                     error_code& ec)
 {
   if (impl.handle_.is_open()) {
@@ -152,7 +152,7 @@ void thread_pool_file_service::open(implementation_type& impl,
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 void thread_pool_file_service::open(implementation_type& impl,
                                     const boost::filesystem::path& filename,
-                                    uint32_t flags,
+                                    open_flags flags,
                                     error_code& ec)
 {
   if (impl.handle_.is_open()) {
@@ -194,7 +194,7 @@ uint64_t thread_pool_file_service::position(implementation_type& impl,
 }
 
 uint64_t thread_pool_file_service::seek(implementation_type& impl,
-                                        file_handle::seek_origin origin,
+                                        seek_origin origin,
                                         int64_t offset,
                                         error_code& ec) ASIOEXT_NOEXCEPT
 {

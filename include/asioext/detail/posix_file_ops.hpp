@@ -11,6 +11,8 @@
 # pragma once
 #endif
 
+#include "asioext/open_flags.hpp"
+
 #include "asioext/detail/cstdint.hpp"
 #include "asioext/detail/error_code.hpp"
 
@@ -30,7 +32,8 @@ typedef int handle_type;
 
 ASIOEXT_DECL void set_error(error_code& ec, int e);
 
-ASIOEXT_DECL handle_type open(const char* path, uint32_t flags, error_code& ec);
+ASIOEXT_DECL handle_type open(const char* path, open_flags flags,
+                              error_code& ec);
 
 ASIOEXT_DECL void close(handle_type fd, error_code& ec);
 

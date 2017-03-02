@@ -6,25 +6,14 @@
 
 ASIOEXT_NS_BEGIN
 
-bool are_open_flags_valid(uint32_t flags)
+bool is_valid(open_flags flags)
 {
-  int creation_modes = !!(flags & create_new) +
-                       !!(flags & create_always) +
-                       !!(flags & open_existing) +
-                       !!(flags & open_always) +
-                       !!(flags & truncate_existing);
-
-  if (creation_modes > 1)
-    return false;
-
-  const uint32_t unsupported_flags =
-#if defined(ASIOEXT_WINDOWS)
-    attribute_executable;
-#else
-    attribute_hidden;
-#endif
-
-  if (flags & unsupported_flags)
+  int count = ((flags & open_flags::create_new) != open_flags::none) +
+              ((flags & open_flags::create_always) != open_flags::none) +
+              ((flags & open_flags::open_existing) != open_flags::none) +
+              ((flags & open_flags::open_always) != open_flags::none) +
+              ((flags & open_flags::truncate_existing) != open_flags::none);
+  if (count > 1)
     return false;
 
   return true;

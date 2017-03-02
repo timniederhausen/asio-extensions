@@ -10,7 +10,7 @@
 ASIOEXT_NS_BEGIN
 
 scoped_file_handle::scoped_file_handle(const char* filename,
-                                       uint32_t flags,
+                                       open_flags flags,
                                        error_code& ec) ASIOEXT_NOEXCEPT
   : handle_(detail::posix_file_ops::open(filename, flags, ec))
 {
@@ -20,7 +20,7 @@ scoped_file_handle::scoped_file_handle(const char* filename,
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
-                                       uint32_t flags,
+                                       open_flags flags,
                                        error_code& ec) ASIOEXT_NOEXCEPT
   : handle_(detail::posix_file_ops::open(filename.c_str(), flags, ec))
 {
