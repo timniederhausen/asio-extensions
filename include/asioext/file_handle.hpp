@@ -115,7 +115,7 @@ public:
   /// This function may be used to obtain the underlying representation of the
   /// handle. This is intended to allow access to native handle functionality
   /// that is not otherwise provided.
-  native_handle_type native_handle() ASIOEXT_NOEXCEPT
+  native_handle_type native_handle() const ASIOEXT_NOEXCEPT
   {
     return handle_;
   }

@@ -79,6 +79,25 @@ public:
 
   /// @brief Construct a file using a native handle object.
   ///
+  /// This constructor takes ownership of the given wrapped native handle.
+  ///
+  /// @param io_service The io_service object that the file will use to
+  /// dispatch handlers for any asynchronous operations performed on it.
+  ///
+  /// @param handle The native handle object, wrapped in a file_handle,
+  /// which shall be assigned to this basic_file object.
+  basic_file(asio::io_service& io_service,
+             const file_handle& handle) ASIOEXT_NOEXCEPT
+    : asio::basic_io_object<FileService>(io_service)
+  {
+    error_code ec;
+    this->get_service().assign(this->get_implementation(),
+                               handle.native_handle(), ec);
+    detail::throw_error(ec, "construct");
+  }
+
+  /// @brief Construct a file using a native handle object.
+  ///
   /// This constructor takes ownership of the given native handle.
   ///
   /// @param io_service The io_service object that the file will use to
@@ -90,7 +109,9 @@ public:
              const native_handle_type& handle) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
-    this->get_service().assign(this->get_implementation(), handle);
+    error_code ec;
+    this->get_service().assign(this->get_implementation(), handle, ec);
+    detail::throw_error(ec, "construct");
   }
 
   /// @brief Open a file and construct a basic_file.
@@ -116,7 +137,7 @@ public:
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
-    detail::throw_error(ec, "open");
+    detail::throw_error(ec, "construct");
   }
 
   /// @brief Open a file and construct a basic_file.
@@ -154,7 +175,7 @@ public:
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
-    detail::throw_error(ec, "open");
+    detail::throw_error(ec, "construct");
   }
 
   /// @copydoc basic_file(asio::io_service&,const char*,open_flags,error_code&)
@@ -176,7 +197,7 @@ public:
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
-    detail::throw_error(ec, "open");
+    detail::throw_error(ec, "construct");
   }
 
   /// @copydoc basic_file(asio::io_service&,const char*,open_flags,error_code&)
