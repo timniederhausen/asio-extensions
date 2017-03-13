@@ -16,6 +16,8 @@
 
 #include "asioext/file_handle.hpp"
 #include "asioext/open_flags.hpp"
+#include "asioext/file_attrs.hpp"
+#include "asioext/file_perms.hpp"
 
 #include "asioext/detail/error_code.hpp"
 
@@ -58,6 +60,12 @@ ASIOEXT_NS_BEGIN
 /// @param flags Flags used to open the file.
 /// For a detailed reference, see @ref open_flags.
 ///
+/// @param perms Permissions for newly created files. Unused if an existing
+/// file is opened. Defaults to @ref file_perms::create_default.
+///
+/// @param attrs Attributes for newly created files. Unused if an existing
+/// file is opened. Defaults to @ref file_attrs::none.
+///
 /// @return A handle to the opened file (or an empty handle in case
 /// of failure). Ownership is transferred to the caller. Handles are not
 /// inherited by child processes.
@@ -69,7 +77,9 @@ ASIOEXT_NS_BEGIN
 ///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL file_handle open(const char* filename, open_flags flags);
+ASIOEXT_DECL file_handle open(const char* filename, open_flags flags,
+                              file_perms perms = file_perms::create_default,
+                              file_attrs attrs = file_attrs::none);
 
 /// @brief Open a file and return its handle.
 ///
@@ -82,6 +92,12 @@ ASIOEXT_DECL file_handle open(const char* filename, open_flags flags);
 ///
 /// @param flags Flags used to open the file.
 /// For a detailed reference, see @ref open_flags.
+///
+/// @param perms Permissions for newly created files. Unused if an existing
+/// file is opened. Defaults to @ref file_perms::create_default.
+///
+/// @param attrs Attributes for newly created files. Unused if an existing
+/// file is opened. Defaults to @ref file_attrs::none.
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
@@ -96,35 +112,42 @@ ASIOEXT_DECL file_handle open(const char* filename, open_flags flags);
 /// @see open_flags
 /// @see filenames
 ASIOEXT_DECL file_handle open(const char* filename, open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc open(const char*,open_flags)
-///
-/// @note Only available on Windows.
-ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags);
-
-/// @copydoc open(const char*,open_flags,error_code&)
+/// @copydoc open(const char*,open_flags,file_perms,file_attrs)
 ///
 /// @note Only available on Windows.
 ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags,
+                              file_perms perms = file_perms::create_default,
+                              file_attrs attrs = file_attrs::none);
+
+/// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
+///
+/// @note Only available on Windows.
+ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc open(const char*,open_flags)
-///
-/// @note Only available if using Boost.Filesystem
-/// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
-                              open_flags flags);
-
-/// @copydoc open(const char*,open_flags,error_code&)
+/// @copydoc open(const char*,open_flags,file_perms,file_attrs)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
                               open_flags flags,
+                              file_perms perms = file_perms::create_default,
+                              file_attrs attrs = file_attrs::none);
+
+/// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
+///
+/// @note Only available if using Boost.Filesystem
+/// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
+ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
+                              open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 

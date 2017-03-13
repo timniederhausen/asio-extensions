@@ -20,15 +20,25 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// Options for opening files.
+/// @brief Specify semantics for opening files.
+///
+/// This enum of bitmask values controls the behaviour of the @ref open.
+///
 /// open() converts these to their platform's native equivalent (if possible).
 /// Flags that are only available on certain platforms are marked as such.
-enum class open_flags
+///
+/// There are two categories of flags:
+/// * File access mode flags (@c access_read, ...)
+/// * File creation-mode flags (@c create_new, ...)
+///
+/// File creation-mode flags are mutually exclusive. Specifying more than one
+/// is an error.
+enum class open_flags : uint32_t
 {
+  /// No options are set.
   none = 0,
 
-  /// @name File access mode flags
-  /// @{
+  // access-mode flags
 
   /// Request read access to the file.
   access_read = 1 << 0,
@@ -42,15 +52,7 @@ enum class open_flags
   /// <tt>access_read | access_write</tt>
   access_read_write = access_read | access_write,
 
-  /// @}
-
-  /// @name File creation-mode flags
-  ///
-  /// These flags specify the action that should be taken on a file.
-  ///
-  /// @note These are mutually exclusive. Specifying more than one will
-  /// cause the operation to fail.
-  /// @{
+  // creation-mode flags
 
   /// Attempt to create a new file. Fail if the file already exists.
   create_new = 1 << 2,
@@ -67,8 +69,6 @@ enum class open_flags
   /// Attempt to open and truncate the file. Fail if no such file exists.
   /// This requires the access_write bit to be set.
   truncate_existing = 1 << 6,
-
-  /// @}
 };
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(open_flags)

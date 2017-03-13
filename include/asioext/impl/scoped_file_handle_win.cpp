@@ -12,22 +12,25 @@ ASIOEXT_NS_BEGIN
 
 scoped_file_handle::scoped_file_handle(const char* filename,
                                        open_flags flags,
+                                       file_perms perms, file_attrs attrs,
                                        error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(asioext::open(filename, flags, ec))
+  : handle_(asioext::open(filename, flags, perms, attrs, ec))
 {
   // ctor
 }
 
-scoped_file_handle::scoped_file_handle(const wchar_t* filename, open_flags flags)
-  : handle_(asioext::open(filename, flags))
+scoped_file_handle::scoped_file_handle(const wchar_t* filename, open_flags flags,
+                                       file_perms perms, file_attrs attrs)
+  : handle_(asioext::open(filename, flags, perms, attrs))
 {
   // ctor
 }
 
 scoped_file_handle::scoped_file_handle(const wchar_t* filename,
                                        open_flags flags,
+                                       file_perms perms, file_attrs attrs,
                                        error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(detail::win_file_ops::open(filename, flags, ec))
+  : handle_(detail::win_file_ops::open(filename, flags, perms, attrs, ec))
 {
   // ctor
 }
@@ -36,23 +39,27 @@ scoped_file_handle::scoped_file_handle(const wchar_t* filename,
 
 scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
                                        open_flags flags,
+                                       file_perms perms, file_attrs attrs,
                                        error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(detail::win_file_ops::open(filename.c_str(), flags, ec))
+  : handle_(detail::win_file_ops::open(filename.c_str(), flags,
+                                       perms, attrs, ec))
 {
   // ctor
 }
 
 #endif
 
-void scoped_file_handle::open(const wchar_t* filename, open_flags flags)
+void scoped_file_handle::open(const wchar_t* filename, open_flags flags,
+                              file_perms perms, file_attrs attrs)
 {
   error_code ec;
-  open(filename, flags, ec);
+  open(filename, flags, perms, attrs, ec);
   detail::throw_error(ec);
 }
 
 void scoped_file_handle::open(const wchar_t* filename,
                               open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (handle_.is_open()) {
@@ -60,7 +67,7 @@ void scoped_file_handle::open(const wchar_t* filename,
     if (ec) return;
   }
 
-  handle_ = asioext::open(filename, flags, ec);
+  handle_ = asioext::open(filename, flags, perms, attrs, ec);
 }
 
 ASIOEXT_NS_END

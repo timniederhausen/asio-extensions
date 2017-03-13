@@ -47,26 +47,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructor, FileService, service_types)
   asio::io_service io_service;
   asioext::error_code ec;
   asioext::basic_file<FileService> f1(io_service, "nosuchfile",
-                                      open_flags::access_read |
-                                      open_flags::open_existing,
-                                      ec);
+                                      asioext::open_flags::access_read |
+                                      asioext::open_flags::open_existing,
+                                      asioext::file_perms::create_default,
+                                      asioext::file_attrs::none, ec);
   BOOST_REQUIRE(ec);
   asioext::basic_file<FileService> f2(io_service, empty_filename,
-                                      open_flags::access_write |
-                                      open_flags::open_always,
-                                      ec);
+                                      asioext::open_flags::access_write |
+                                      asioext::open_flags::open_always,
+                                      asioext::file_perms::create_default,
+                                      asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 #if defined(ASIOEXT_WINDOWS)
   test_file_rm_guard rguard2(empty_filenamew);
   asioext::basic_file<FileService> f3(io_service, L"nosuchfile",
-                                      open_flags::access_read |
-                                      open_flags::open_existing,
-                                      ec);
+                                      asioext::open_flags::access_read |
+                                      asioext::open_flags::open_existing,
+                                      asioext::file_perms::create_default,
+                                      asioext::file_attrs::none, ec);
   BOOST_REQUIRE(ec);
   asioext::basic_file<FileService> f4(io_service, empty_filenamew,
-                                      open_flags::access_write |
-                                      open_flags::open_always,
-                                      ec);
+                                      asioext::open_flags::access_write |
+                                      asioext::open_flags::open_always,
+                                      asioext::file_perms::create_default,
+                                      asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 #endif
 }
@@ -84,7 +88,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
   asioext::error_code ec;
   file.open("nosuchfile",
             open_flags::access_read | open_flags::open_existing,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
 
   BOOST_REQUIRE(!!ec);
   BOOST_CHECK(!file.is_open());
@@ -93,7 +98,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
 #if defined(ASIOEXT_WINDOWS)
   file.open(L"nosuchfile",
             open_flags::access_read | open_flags::open_existing,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
 
   BOOST_REQUIRE(!!ec);
   BOOST_CHECK(!file.is_open());
@@ -102,7 +108,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
 
   file.open(empty_filename,
             open_flags::access_write | open_flags::open_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
 
   BOOST_REQUIRE(!ec);
   BOOST_CHECK(file.is_open());
@@ -113,7 +120,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
 #if defined(ASIOEXT_WINDOWS)
   file.open(empty_filenamew,
             open_flags::access_write | open_flags::open_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
   BOOST_CHECK(file.is_open());
 #endif
@@ -129,7 +137,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_write, FileService, service_types)
   asioext::error_code ec;
   file.open(test_filename,
             open_flags::access_write | open_flags::create_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_EQUAL(0, asio::write(file, asio::buffer(test_data, 0)));
@@ -141,7 +150,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_write, FileService, service_types)
 
   file.open(test_filename,
             open_flags::access_read | open_flags::open_existing,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 
   char buffer[128];
@@ -160,7 +170,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(position_and_size, FileService, service_types)
   asioext::error_code ec;
   file.open(test_filename,
             open_flags::access_write | open_flags::create_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_EQUAL(0, file.position());
@@ -181,7 +192,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(seek, FileService, service_types)
   asioext::error_code ec;
   file.open(test_filename,
             open_flags::access_write | open_flags::create_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_EQUAL(0, file.seek(asioext::seek_origin::from_current, 0));
@@ -281,7 +293,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
   asioext::error_code ec;
   file.open(test_filename,
             open_flags::access_write | open_flags::create_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 
   BOOST_REQUIRE_NO_THROW(asio::async_write(file, asio::buffer(test_data, 0),
@@ -295,7 +308,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
 
   file.open(test_filename,
             open_flags::access_read | open_flags::open_existing,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
 
   char buffer[128];
@@ -362,7 +376,8 @@ BOOST_AUTO_TEST_CASE(async_read_write_cancel)
   asioext::error_code ec;
   file.open(test_filename,
             open_flags::access_write | open_flags::create_always,
-            ec);
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
   BOOST_REQUIRE(file.is_open());
 

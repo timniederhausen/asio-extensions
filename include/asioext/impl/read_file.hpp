@@ -38,7 +38,7 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 {
   scoped_file_handle file(filename,
                           open_flags::access_read | open_flags::open_existing,
-                          ec);
+                          file_perms::create_default, file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -59,7 +59,7 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 {
   scoped_file_handle file(filename,
                           open_flags::access_read | open_flags::open_existing,
-                          ec);
+                          file_perms::create_default, file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -82,7 +82,7 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 {
   scoped_file_handle file(filename,
                           open_flags::access_read | open_flags::open_existing,
-                          ec);
+                          file_perms::create_default, file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -136,7 +136,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 {
   scoped_file_handle file(filename,
                           open_flags::access_read | open_flags::open_existing,
-                          ec);
+                          file_perms::create_default, file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -158,7 +158,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 {
   scoped_file_handle file(filename,
                           open_flags::access_read | open_flags::open_existing,
-                          ec);
+                          file_perms::create_default, file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -182,7 +182,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 {
   scoped_file_handle file(filename,
                           open_flags::access_read | open_flags::open_existing,
-                          ec);
+                          file_perms::create_default, file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }

@@ -12,6 +12,8 @@
 #endif
 
 #include "asioext/open_flags.hpp"
+#include "asioext/file_perms.hpp"
+#include "asioext/file_attrs.hpp"
 
 #include "asioext/detail/cstdint.hpp"
 #include "asioext/detail/error_code.hpp"
@@ -29,14 +31,18 @@ struct create_file_args;
 
 ASIOEXT_DECL void set_error(error_code& ec);
 
-ASIOEXT_DECL bool parse_open_flags(create_file_args& args, open_flags flags);
+ASIOEXT_DECL bool parse_open_flags(create_file_args& args,
+                                   open_flags flags,
+                                   file_perms perms, file_attrs attrs);
 
 ASIOEXT_DECL handle_type open(const char* filename,
                               open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec);
 
 ASIOEXT_DECL handle_type open(const wchar_t* filename,
                               open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec);
 
 ASIOEXT_DECL void close(handle_type fd, error_code& ec);

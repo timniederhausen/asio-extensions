@@ -12,46 +12,62 @@
 #include <asio/io_service.hpp>
 #include <asio/use_future.hpp>
 
-#include <future>
 #include <iostream>
 #include <cstdio>
 
 using file_handles = std::vector<asioext::file>;
 
-bool tee_file(asioext::file_handle source, file_handles& destinations)
+class tee_file
 {
-  char buffer[16 * 1024];
-  std::error_code ec;
+public:
+  tee_file(asioext::file& source, file_handles& destinations)
+    : source_(source)
+    , destinations_(destinations)
+    , completed_(0)
+  {
+    // ctor
+  }
 
-  std::vector<std::future<std::size_t>> futures(destinations.size());
+  void run();
 
-  while (true) {
-    const std::size_t bytes_read = source.read_some(asio::buffer(buffer), ec);
+private:
+  asioext::file& source_;
+  file_handles& destinations_;
+  char buffer_[16 * 1024];
+  std::size_t completed_;
+};
 
-    // Handle the expected errors here. (We could also use the throwing version
-    // and catch & re-throw here, but this'd be overkill.)
+void tee_file::run()
+{
+  source_.async_read_some(asio::buffer(buffer_),
+                          [this] (const std::error_code& ec,
+                                  std::size_t bytes_read) {
     if (ec) {
       if (ec == asio::error::eof || ec == asio::error::broken_pipe)
-        break;
+        return;
       else
         throw std::system_error(ec);
     }
 
+    auto write_handler = [this] (const std::error_code& ec,
+                                 std::size_t /*not needed*/) {
+      if (ec)
+        throw std::system_error(ec);
+
+      // Order of completion isn't important.
+      if (++completed_ == destinations_.size())
+        run();
+    };
+
     // Start |n| asynchronous write operations.
-    for (std::size_t i = 0, n = destinations.size(); i != n; ++i)
-      futures[i] = asio::async_write(destinations[i],
-                                     asio::buffer(buffer, bytes_read),
-                                     asio::use_future);
-
-    // Wait for |n| operations to complete. Because our thread-pool has |n|
+    // Because our thread-pool has |n|
     // threads, these writes will (probably) execute concurrently.
-    // (If we didn't have to re-use the buffer, we could skip waiting for
-    // completion.)
-    for (std::size_t i = 0, n = destinations.size(); i != n; ++i)
-      futures[i].get();
-  }
-
-  return true;
+    completed_ = 0;
+    for (std::size_t i = 0, n = destinations_.size(); i != n; ++i)
+      asio::async_write(destinations_[i],
+                        asio::buffer(buffer_, bytes_read),
+                        write_handler);
+  });
 }
 
 int main(int argc, const char* argv[])
@@ -64,7 +80,7 @@ int main(int argc, const char* argv[])
   asio::io_service io_service;
 
   // Make a service with |argc - 1| threads, so all writes
-  // can happen in parallel.
+  // *can* happen in parallel.
   auto svc = new asioext::thread_pool_file_service(io_service, argc - 1);
   asio::add_service(io_service, svc);
 
@@ -75,7 +91,9 @@ int main(int argc, const char* argv[])
   for (int i = 1; i != argc; ++i) {
     files.emplace_back(asioext::file(io_service, argv[i],
                                      asioext::open_flags::create_always |
-                                     asioext::open_flags::access_write, ec));
+                                     asioext::open_flags::access_write,
+                                     asioext::file_perms::create_default,
+                                     asioext::file_attrs::none, ec));
     if (ec) {
       std::cerr << "Failed to open " << argv[i] << " with " << ec << '\n';
       return 1;
@@ -83,17 +101,13 @@ int main(int argc, const char* argv[])
   }
 
   try {
-    std::thread t;
-    bool result = false;
+    asioext::file source(io_service, asioext::get_stdin());
 
-    {
-      asio::io_service::work w(io_service);
-      t = std::thread([&io_service]() { io_service.run(); });
-      result = tee_file(asioext::get_stdin(), files);
-    }
+    tee_file op(source, files);
+    op.run();
 
-    t.join();
-    return result ? 0 : 1;
+    io_service.run();
+    return 0;
   } catch (std::exception& e) {
     std::cerr << "fatal: copying data failed with " << e.what() << '\n';
     return 1;

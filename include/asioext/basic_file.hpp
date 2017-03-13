@@ -16,6 +16,8 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/file_perms.hpp"
+#include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
 
 #include "asioext/detail/error_code.hpp"
@@ -118,7 +120,7 @@ public:
   ///
   /// This constructor opens a new handle to the given file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param io_service The io_service object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
@@ -128,15 +130,24 @@ public:
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
   ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
+  ///
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
   basic_file(asio::io_service& io_service,
-             const char* filename, open_flags flags)
+             const char* filename, open_flags flags,
+             file_perms perms = file_perms::create_default,
+             file_attrs attrs = file_attrs::none)
     : asio::basic_io_object<FileService>(io_service)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
     detail::throw_error(ec, "construct");
   }
 
@@ -144,7 +155,7 @@ public:
   ///
   /// This constructor opens a new handle to the given file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param io_service The io_service object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
@@ -154,59 +165,77 @@ public:
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
   ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
+  ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
   ///
   /// @see open_flags
   basic_file(asio::io_service& io_service, const char* filename,
-             open_flags flags, error_code& ec) ASIOEXT_NOEXCEPT
+             open_flags flags, file_perms perms, file_attrs attrs,
+             error_code& ec) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_service&,const char*,open_flags)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available on Windows.
   basic_file(asio::io_service& io_service, const wchar_t* filename,
-             open_flags flags)
+             open_flags flags,
+             file_perms perms = file_perms::create_default,
+             file_attrs attrs = file_attrs::none)
     : asio::basic_io_object<FileService>(io_service)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
     detail::throw_error(ec, "construct");
   }
 
-  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,error_code&)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,file_perms,file_attrs,error_code&)
   ///
   /// @note Only available on Windows.
   basic_file(asio::io_service& io_service, const wchar_t* filename,
-             open_flags flags, error_code& ec) ASIOEXT_NOEXCEPT
+             open_flags flags, file_perms perms, file_attrs attrs,
+             error_code& ec) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
   }
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_service&,const char*,open_flags)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,file_perms,file_attrs)
   basic_file(asio::io_service& io_service,
-             const boost::filesystem::path& filename, open_flags flags)
+             const boost::filesystem::path& filename, open_flags flags,
+             file_perms perms = file_perms::create_default,
+             file_attrs attrs = file_attrs::none)
     : asio::basic_io_object<FileService>(io_service)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
     detail::throw_error(ec, "construct");
   }
 
-  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,error_code&)
+  /// @copydoc basic_file(asio::io_service&,const char*,open_flags,file_perms,file_attrs,error_code&)
   basic_file(asio::io_service& io_service,
              const boost::filesystem::path& filename, open_flags flags,
+             file_perms perms, file_attrs attrs,
              error_code& ec) ASIOEXT_NOEXCEPT
     : asio::basic_io_object<FileService>(io_service)
   {
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
   }
 #endif
 
@@ -281,7 +310,7 @@ public:
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -289,10 +318,18 @@ public:
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
   ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
+  ///
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  void open(const char* filename, open_flags flags)
+  void open(const char* filename, open_flags flags,
+            file_perms perms = file_perms::create_default,
+            file_attrs attrs = file_attrs::none)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, flags, ec);
@@ -304,7 +341,7 @@ public:
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -312,57 +349,75 @@ public:
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
   ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
+  ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
   ///
   /// @see open_flags
   void open(const char* filename, open_flags flags,
+            file_perms perms, file_attrs attrs,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,open_flags)
-  ///
-  /// @note Only available on Windows.
-  void open(const wchar_t* filename, open_flags flags)
-  {
-    error_code ec;
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
-    detail::throw_error(ec, "open");
-  }
-
-  /// @copydoc open(const char*,open_flags,error_code&)
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available on Windows.
   void open(const wchar_t* filename, open_flags flags,
+            file_perms perms = file_perms::create_default,
+            file_attrs attrs = file_attrs::none)
+  {
+    error_code ec;
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
+    detail::throw_error(ec, "open");
+  }
+
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
+  ///
+  /// @note Only available on Windows.
+  void open(const wchar_t* filename, open_flags flags,
+            file_perms perms, file_attrs attrs,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
   }
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,open_flags)
-  ///
-  /// @note Only available if using Boost.Filesystem
-  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-  void open(const boost::filesystem::path& filename, open_flags flags)
-  {
-    error_code ec;
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
-    detail::throw_error(ec, "open");
-  }
-
-  /// @copydoc open(const char*,open_flags,error_code&)
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   void open(const boost::filesystem::path& filename, open_flags flags,
+            file_perms perms = file_perms::create_default,
+            file_attrs attrs = file_attrs::none)
+  {
+    error_code ec;
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
+    detail::throw_error(ec, "open");
+  }
+
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
+  ///
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
+  void open(const boost::filesystem::path& filename, open_flags flags,
+            file_perms perms, file_attrs attrs,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().open(this->get_implementation(), filename, flags, ec);
+    this->get_service().open(this->get_implementation(), filename, flags,
+                             perms, attrs, ec);
   }
 #endif
 

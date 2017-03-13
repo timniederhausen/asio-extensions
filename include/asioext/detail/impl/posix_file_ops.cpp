@@ -23,7 +23,47 @@ void set_error(error_code& ec, int e)
   ec = error_code(e, asio::error::get_system_category());
 }
 
-handle_type open(const char* path, open_flags flags, error_code& ec)
+uint32_t convert_attrs(file_attrs attrs)
+{
+  uint32_t raw_attrs = 0;
+#ifdef UF_HIDDEN
+  if ((attrs & file_attrs::hidden) != file_attrs::none)
+    raw_attrs |= UF_HIDDEN;
+#endif
+#ifdef UF_SYSTEM
+  if ((attrs & file_attrs::system) != file_attrs::none)
+    raw_attrs |= UF_SYSTEM;
+#endif
+#ifdef UF_ARCHIVE
+  if ((attrs & file_attrs::archive) != file_attrs::none)
+    raw_attrs |= UF_ARCHIVE;
+#endif
+#ifdef UF_NODUMP
+  if ((attrs & file_attrs::no_dump) != file_attrs::none)
+    raw_attrs |= UF_NODUMP;
+#endif
+#ifdef UF_IMMUTABLE
+  if ((attrs & file_attrs::user_immutable) != file_attrs::none)
+    raw_attrs |= UF_IMMUTABLE;
+#endif
+#ifdef SF_IMMUTABLE
+  if ((attrs & file_attrs::system_immutable) != file_attrs::none)
+    raw_attrs |= SF_IMMUTABLE;
+#endif
+#ifdef UF_NOUNLINK
+  if ((attrs & file_attrs::user_no_unlink) != file_attrs::none)
+    raw_attrs |= UF_NOUNLINK;
+#endif
+#ifdef SF_NOUNLINK
+  if ((attrs & file_attrs::system_no_unlink) != file_attrs::none)
+    raw_attrs |= SF_NOUNLINK;
+#endif
+  return raw_attrs;
+}
+
+handle_type open(const char* path, open_flags flags,
+                 file_perms perms, file_attrs attrs,
+                 error_code& ec)
 {
   if (!is_valid(flags)) {
     ec = asio::error::invalid_argument;
@@ -50,10 +90,22 @@ handle_type open(const char* path, open_flags flags, error_code& ec)
     case open_flags::access_write: native_flags |= O_WRONLY; break;
   }
 
-  mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+  mode_t mode = static_cast<mode_t>(perms);
   while (true) {
     handle_type fd = ::open(path, native_flags, mode);
     if (fd != -1) {
+      // Skip calling set_attributes() in case we don't support
+      // attributes at all. TODO(tim): Fail in case attrs were requested?
+#if ASIOEXT_HAS_FILE_FLAGS
+      // Unfortunately there's no way to atomically set file
+      // flags as part of the open() call.
+      if (attrs != file_attrs::none &&
+          !set_attributes(fd, attrs, ec)) {
+        ::close(fd);
+        return -1;
+      }
+#endif
+
       ec = error_code();
       return fd;
     }
@@ -106,6 +158,34 @@ handle_type get_stdout(error_code& ec)
 handle_type get_stderr(error_code& ec)
 {
   return STDERR_FILENO;
+}
+
+void set_attributes(handle_type fd, file_attrs attrs, error_code& ec)
+{
+#if ASIOEXT_HAS_FILE_FLAGS
+  uint32_t new_attrs = convert_attrs(attrs);
+  if ((attrs & (file_attrs::add_attrs | file_attrs::remove_attrs)) !=
+      file_attrs::none) {
+    struct stat st;
+    if (::fstat(fd, &st) != 0) {
+      set_error(ec, errno);
+      return;
+    }
+    if ((attrs & file_attrs::add_attrs) != file_attrs::none)
+      new_attrs = st.st_flags | new_attrs;
+    else
+      new_attrs = st.st_flags & ~new_attrs;
+  }
+
+  if (::fchflags(fd, new_attrs) == 0)
+    ec = error_code();
+  else
+    set_error(ec, errno);
+#else
+  // TODO(tim): Silently ignore everything?
+  // Seems consistent.
+  ec = error_code();
+#endif
 }
 
 uint64_t size(handle_type fd, error_code& ec)

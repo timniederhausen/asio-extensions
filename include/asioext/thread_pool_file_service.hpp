@@ -16,6 +16,8 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/file_perms.hpp"
+#include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
 #include "asioext/cancellation_token.hpp"
 
@@ -118,6 +120,7 @@ public:
   ASIOEXT_DECL void open(implementation_type& impl,
                          const char* filename,
                          open_flags flags,
+                         file_perms perms, file_attrs attrs,
                          error_code& ec);
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -125,6 +128,7 @@ public:
   ASIOEXT_DECL void open(implementation_type& impl,
                          const wchar_t* filename,
                          open_flags flags,
+                         file_perms perms, file_attrs attrs,
                          error_code& ec);
 #endif
 
@@ -133,6 +137,7 @@ public:
   ASIOEXT_DECL void open(implementation_type& impl,
                          const boost::filesystem::path& filename,
                          open_flags flags,
+                         file_perms perms, file_attrs attrs,
                          error_code& ec);
 #endif
 

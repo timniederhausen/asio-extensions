@@ -11,8 +11,9 @@ ASIOEXT_NS_BEGIN
 
 scoped_file_handle::scoped_file_handle(const char* filename,
                                        open_flags flags,
+                                       file_perms perms, file_attrs attrs,
                                        error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(detail::posix_file_ops::open(filename, flags, ec))
+  : handle_(detail::posix_file_ops::open(filename, flags, perms, attrs, ec))
 {
   // ctor
 }
@@ -21,8 +22,10 @@ scoped_file_handle::scoped_file_handle(const char* filename,
 
 scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
                                        open_flags flags,
+                                       file_perms perms, file_attrs attrs,
                                        error_code& ec) ASIOEXT_NOEXCEPT
-  : handle_(detail::posix_file_ops::open(filename.c_str(), flags, ec))
+  : handle_(detail::posix_file_ops::open(filename.c_str(), flags, perms,
+                                         attrs, ec))
 {
   // ctor
 }

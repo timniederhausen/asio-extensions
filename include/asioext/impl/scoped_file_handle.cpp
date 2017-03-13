@@ -21,8 +21,9 @@ scoped_file_handle::scoped_file_handle(file_handle handle) ASIOEXT_NOEXCEPT
   // ctor
 }
 
-scoped_file_handle::scoped_file_handle(const char* filename, open_flags flags)
-  : handle_(asioext::open(filename, flags))
+scoped_file_handle::scoped_file_handle(const char* filename, open_flags flags,
+                                       file_perms perms, file_attrs attrs)
+  : handle_(asioext::open(filename, flags, perms, attrs))
 {
   // ctor
 }
@@ -30,8 +31,9 @@ scoped_file_handle::scoped_file_handle(const char* filename, open_flags flags)
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 scoped_file_handle::scoped_file_handle(const boost::filesystem::path& filename,
-                                       open_flags flags)
-  : handle_(asioext::open(filename, flags))
+                                       open_flags flags, file_perms perms,
+                                       file_attrs attrs)
+  : handle_(asioext::open(filename, flags, perms, attrs))
 {
   // ctor
 }
@@ -65,15 +67,17 @@ scoped_file_handle& scoped_file_handle::operator=(scoped_file_handle&& other)
 
 #endif
 
-void scoped_file_handle::open(const char* filename, open_flags flags)
+void scoped_file_handle::open(const char* filename, open_flags flags,
+                              file_perms perms, file_attrs attrs)
 {
   error_code ec;
-  open(filename, flags, ec);
+  open(filename, flags, perms, attrs, ec);
   detail::throw_error(ec);
 }
 
 void scoped_file_handle::open(const char* filename,
                               open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (handle_.is_open()) {
@@ -81,21 +85,23 @@ void scoped_file_handle::open(const char* filename,
     if (ec) return;
   }
 
-  handle_ = asioext::open(filename, flags, ec);
+  handle_ = asioext::open(filename, flags, perms, attrs, ec);
 }
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 
 void scoped_file_handle::open(const boost::filesystem::path& filename,
-                              open_flags flags)
+                              open_flags flags, file_perms perms,
+                              file_attrs attrs)
 {
   error_code ec;
-  open(filename, flags, ec);
+  open(filename, flags, perms, attrs, ec);
   detail::throw_error(ec);
 }
 
 void scoped_file_handle::open(const boost::filesystem::path& filename,
                               open_flags flags,
+                              file_perms perms, file_attrs attrs,
                               error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (handle_.is_open()) {
@@ -103,7 +109,7 @@ void scoped_file_handle::open(const boost::filesystem::path& filename,
     if (ec) return;
   }
 
-  handle_ = asioext::open(filename, flags, ec);
+  handle_ = asioext::open(filename, flags, perms, attrs, ec);
 }
 
 #endif

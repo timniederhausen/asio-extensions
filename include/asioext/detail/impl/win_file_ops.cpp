@@ -27,7 +27,8 @@ void set_error(error_code& ec)
   ec = error_code(::GetLastError(), asio::error::get_system_category());
 }
 
-bool parse_open_flags(create_file_args& args, open_flags flags)
+bool parse_open_flags(create_file_args& args, open_flags flags,
+                      file_perms perms, file_attrs attrs)
 {
   if (!is_valid(flags))
     return false;
@@ -51,15 +52,21 @@ bool parse_open_flags(create_file_args& args, open_flags flags)
     args.desired_access |= GENERIC_WRITE;
 
   args.flags_and_attrs = 0;
+  if ((attrs & file_attrs::hidden) != file_attrs::none)
+    args.flags_and_attrs |= FILE_ATTRIBUTE_HIDDEN;
+  if ((attrs & file_attrs::system) != file_attrs::none)
+    args.flags_and_attrs |= FILE_ATTRIBUTE_SYSTEM;
+
   // TODO: Add support.
   args.share_mode = 0;
   return true;
 }
 
-handle_type open(const char* filename, open_flags flags, error_code& ec)
+handle_type open(const char* filename, open_flags flags,
+                 file_perms perms, file_attrs attrs, error_code& ec)
 {
   create_file_args args;
-  if (!parse_open_flags(args, flags)) {
+  if (!parse_open_flags(args, flags, perms, attrs)) {
     ec = asio::error::invalid_argument;
     return INVALID_HANDLE_VALUE;
   }
@@ -76,10 +83,11 @@ handle_type open(const char* filename, open_flags flags, error_code& ec)
   return h;
 }
 
-handle_type open(const wchar_t* filename, open_flags flags, error_code& ec)
+handle_type open(const wchar_t* filename, open_flags flags,
+                 file_perms perms, file_attrs attrs, error_code& ec)
 {
   create_file_args args;
-  if (!parse_open_flags(args, flags)) {
+  if (!parse_open_flags(args, flags, perms, attrs)) {
     ec = asio::error::invalid_argument;
     return INVALID_HANDLE_VALUE;
   }

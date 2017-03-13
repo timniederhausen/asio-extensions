@@ -15,6 +15,9 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/file_perms.hpp"
+#include "asioext/file_attrs.hpp"
+#include "asioext/seek_origin.hpp"
 
 #include "asioext/detail/error_code.hpp"
 
@@ -92,7 +95,7 @@ public:
   ///
   /// This constructor opens a new handle to the given file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -100,22 +103,36 @@ public:
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
   ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
+  ///
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL scoped_file_handle(const char* filename, open_flags flags);
+  ASIOEXT_DECL scoped_file_handle(const char* filename, open_flags flags,
+                                  file_perms perms = file_perms::create_default,
+                                  file_attrs attrs = file_attrs::none);
 
   /// @brief Open a file and construct a scoped_file_handle.
   ///
   /// This constructor opens a new handle to the given file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
   ///
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
+  ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
@@ -123,36 +140,43 @@ public:
   /// @see open_flags
   ASIOEXT_DECL scoped_file_handle(const char* filename,
                                   open_flags flags,
+                                  file_perms perms, file_attrs attrs,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc scoped_file_handle(const char*,open_flags)
+  /// @copydoc scoped_file_handle(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available on Windows.
-  ASIOEXT_DECL scoped_file_handle(const wchar_t* filename, open_flags flags);
+  ASIOEXT_DECL scoped_file_handle(const wchar_t* filename, open_flags flags,
+                                  file_perms perms = file_perms::create_default,
+                                  file_attrs attrs = file_attrs::none);
 
-  /// @copydoc scoped_file_handle(const char*,open_flags,error_code&)
+  /// @copydoc scoped_file_handle(const char*,open_flags,file_perms,file_attrs,error_code&)
   ///
   /// @note Only available on Windows.
   ASIOEXT_DECL scoped_file_handle(const wchar_t* filename,
                                   open_flags flags,
+                                  file_perms perms, file_attrs attrs,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc scoped_file_handle(const char*,open_flags)
-  ///
-  /// @note Only available if using Boost.Filesystem
-  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-  ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
-                                  open_flags flags);
-
-  /// @copydoc scoped_file_handle(const char*,open_flags,error_code&)
+  /// @copydoc scoped_file_handle(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
                                   open_flags flags,
+                                  file_perms perms = file_perms::create_default,
+                                  file_attrs attrs = file_attrs::none);
+
+  /// @copydoc scoped_file_handle(const char*,open_flags,file_perms,file_attrs,error_code&)
+  ///
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
+  ASIOEXT_DECL scoped_file_handle(const boost::filesystem::path& filename,
+                                  open_flags flags,
+                                  file_perms perms, file_attrs attrs,
                                   error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
@@ -225,7 +249,7 @@ public:
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,uint32_t)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
@@ -233,23 +257,37 @@ public:
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
   ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
+  ///
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  ASIOEXT_DECL void open(const char* filename, open_flags flags);
+  ASIOEXT_DECL void open(const char* filename, open_flags flags,
+                         file_perms perms = file_perms::create_default,
+                         file_attrs attrs = file_attrs::none);
 
   /// @brief Open a file and assign its handle to this scoped_file_handle.
   ///
   /// This function closes any currently held handle and attempts to open
   /// a handle to the specified file.
   ///
-  /// For details, see @ref open(const char*,open_flags)
+  /// For details, see @ref open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @param filename The path of the file to open.
   /// See @ref filenames for details.
   ///
   /// @param flags Flags used to open the file.
   /// For a detailed reference, see @ref open_flags.
+  ///
+  /// @param perms Permissions for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_perms::create_default.
+  ///
+  /// @param attrs Attributes for newly created files. Unused if an existing
+  /// file is opened. Defaults to @ref file_attrs::none.
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
@@ -257,36 +295,43 @@ public:
   /// @see open_flags
   ASIOEXT_DECL void open(const char* filename,
                          open_flags flags,
+                         file_perms perms, file_attrs attrs,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,open_flags)
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available on Windows.
-  ASIOEXT_DECL void open(const wchar_t* filename, open_flags flags);
+  ASIOEXT_DECL void open(const wchar_t* filename, open_flags flags,
+                         file_perms perms = file_perms::create_default,
+                         file_attrs attrs = file_attrs::none);
 
-  /// @copydoc open(const char*,open_flags,error_code&)
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
   ///
   /// @note Only available on Windows.
   ASIOEXT_DECL void open(const wchar_t* filename,
                          open_flags flags,
+                         file_perms perms, file_attrs attrs,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc open(const char*,open_flags)
-  ///
-  /// @note Only available if using Boost.Filesystem
-  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-  ASIOEXT_DECL void open(const boost::filesystem::path& filename,
-                         open_flags flags);
-
-  /// @copydoc open(const char*,open_flags,error_code&)
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs)
   ///
   /// @note Only available if using Boost.Filesystem
   /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
   ASIOEXT_DECL void open(const boost::filesystem::path& filename,
                          open_flags flags,
+                         file_perms perms = file_perms::create_default,
+                         file_attrs attrs = file_attrs::none);
+
+  /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
+  ///
+  /// @note Only available if using Boost.Filesystem
+  /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
+  ASIOEXT_DECL void open(const boost::filesystem::path& filename,
+                         open_flags flags,
+                         file_perms perms, file_attrs attrs,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
