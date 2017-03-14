@@ -5,15 +5,20 @@
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/error.hpp"
 
+#ifndef _FILE_OFFSET_BITS
 #define _FILE_OFFSET_BITS 64
+#endif
 
 #include <cerrno>
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h> // for off_t etc.
 
 ASIOEXT_NS_BEGIN
+
+static_assert(sizeof(int64_t) == sizeof(off_t), "off_t must be 64 bits");
 
 namespace detail {
 namespace posix_file_ops {
@@ -251,10 +256,10 @@ std::size_t writev(handle_type fd, const iovec* bufs, int count, error_code& ec)
 std::size_t preadv(handle_type fd,
                    iovec* bufs,
                    int count,
-                   off_t offset,
+                   uint64_t offset,
                    error_code& ec)
 {
-  const ssize_t r = ::preadv(fd, bufs, count, offset);
+  const ssize_t r = ::preadv(fd, bufs, count, static_cast<off_t>(offset));
 
   if (r != 0) {
     if (r != -1) {
@@ -278,10 +283,10 @@ std::size_t preadv(handle_type fd,
 std::size_t pwritev(handle_type fd,
                     const iovec* bufs,
                     int count,
-                    off_t offset,
+                    uint64_t offset,
                     error_code& ec)
 {
-  const ssize_t r = ::pwritev(fd, bufs, count, offset);
+  const ssize_t r = ::pwritev(fd, bufs, count, static_cast<off_t>(offset));
   if (r != -1) {
     ec = error_code();
     return static_cast<std::size_t>(r);
