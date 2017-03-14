@@ -130,6 +130,8 @@ void close(handle_type fd, error_code& ec)
   // and could be re-used by another thread. Retrying the call would then
   // close someone elses' fd, which is certainly not what we want to do.
   // see: http://alobbs.com/post/54503240599/close-and-eintr
+  // also: http://ewontfix.com/4/
+  // TODO: This unfortunately doesn't apply to all UNIX systems...
   const int r = ::close(fd);
 
   if (r != -1)
@@ -196,11 +198,12 @@ void set_attributes(handle_type fd, file_attrs attrs, error_code& ec)
 uint64_t size(handle_type fd, error_code& ec)
 {
   struct stat st;
-  if (fstat(fd, &st) != 0) {
+  if (::fstat(fd, &st) != 0) {
     set_error(ec, errno);
     return 0;
   }
 
+  ec = error_code();
   return st.st_size;
 }
 
@@ -237,6 +240,7 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
       return 0;
     }
   }
+
   ec = error_code();
   return 0;
 }
@@ -276,6 +280,7 @@ std::size_t preadv(handle_type fd,
       return 0;
     }
   }
+
   ec = error_code();
   return 0;
 }
