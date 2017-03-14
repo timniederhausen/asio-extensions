@@ -161,6 +161,10 @@ BOOST_AUTO_TEST_CASE(read_write)
                       asio::write(fh, asio::buffer(test_data,
                                                    test_data_size)));
 
+  asio::const_buffers_1 empty_buffer1(nullptr, 0);
+  BOOST_REQUIRE_EQUAL(0, fh.write_some_at(0, empty_buffer1));
+  BOOST_REQUIRE_EQUAL(0, fh.write_some_at(1, empty_buffer1));
+
   BOOST_REQUIRE_NO_THROW(fh.close());
 
   fh.open(test_filename,
@@ -168,6 +172,10 @@ BOOST_AUTO_TEST_CASE(read_write)
           asioext::file_perms::create_default,
           asioext::file_attrs::none, ec);
   BOOST_REQUIRE(!ec);
+
+  asio::mutable_buffers_1 empty_buffer2(nullptr, 0);
+  BOOST_REQUIRE_EQUAL(0, fh.read_some_at(0, empty_buffer2));
+  BOOST_REQUIRE_EQUAL(0, fh.read_some_at(1, empty_buffer2));
 
   char buffer[128];
   BOOST_REQUIRE_EQUAL(0,
