@@ -117,8 +117,8 @@ handle_type duplicate(handle_type fd, error_code& ec)
   const handle_type current_process = ::GetCurrentProcess();
   handle_type new_fd = INVALID_HANDLE_VALUE;
 
-  if (::DuplicateHandle(current_process, fd, current_process, &new_fd, 0, FALSE,
-                        DUPLICATE_SAME_ACCESS))
+  if (::DuplicateHandle(current_process, fd, current_process, &new_fd,
+                        0, FALSE, DUPLICATE_SAME_ACCESS))
     ec = error_code();
   else
     set_error(ec);
@@ -230,7 +230,7 @@ uint32_t pread(handle_type fd,
     return 0;
   }
 
-  if (bytesRead == 0)
+  if (bytesRead == 0 && size != 0)
     ec = asio::error::eof;
 
   return bytesRead;
