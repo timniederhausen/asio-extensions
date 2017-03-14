@@ -75,8 +75,7 @@ handle_type open(const char* path, open_flags flags,
     return -1;
   }
 
-  int native_flags = O_CLOEXEC;
-
+  int native_flags = 0;
   if ((flags & open_flags::create_new) != open_flags::none)
     native_flags = O_CREAT | O_EXCL;
   else if ((flags & open_flags::create_always) != open_flags::none)
@@ -97,7 +96,7 @@ handle_type open(const char* path, open_flags flags,
 
   mode_t mode = static_cast<mode_t>(perms);
   while (true) {
-    handle_type fd = ::open(path, native_flags, mode);
+    handle_type fd = ::open(path, O_CLOEXEC | native_flags, mode);
     if (fd != -1) {
       // Skip calling set_attributes() in case we don't support
       // attributes at all. TODO(tim): Fail in case attrs were requested?
