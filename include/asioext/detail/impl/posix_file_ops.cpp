@@ -207,11 +207,17 @@ uint64_t size(handle_type fd, error_code& ec)
   return st.st_size;
 }
 
-uint64_t seek(handle_type fd, int origin, int64_t offset, error_code& ec)
-{
-  const off_t res =
-      ::lseek(fd, static_cast<off_t>(offset), static_cast<int>(origin));
+// Make sure our origin mappings match the system headers.
+static_assert(static_cast<int>(seek_origin::from_begin) == SEEK_SET &&
+              static_cast<int>(seek_origin::from_current) == SEEK_CUR &&
+              static_cast<int>(seek_origin::from_end) == SEEK_END,
+              "whence mapping must match the system headers");
 
+uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
+              error_code& ec)
+{
+  const off_t res = ::lseek(fd, static_cast<off_t>(offset),
+                            static_cast<int>(origin));
   if (res != -1) {
     ec = error_code();
     return static_cast<uint64_t>(res);
@@ -224,7 +230,6 @@ uint64_t seek(handle_type fd, int origin, int64_t offset, error_code& ec)
 std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
 {
   const ssize_t r = ::readv(fd, bufs, count);
-
   if (r != 0) {
     if (r != -1) {
       ec = error_code();
@@ -264,7 +269,6 @@ std::size_t preadv(handle_type fd,
                    error_code& ec)
 {
   const ssize_t r = ::preadv(fd, bufs, count, static_cast<off_t>(offset));
-
   if (r != 0) {
     if (r != -1) {
       ec = error_code();

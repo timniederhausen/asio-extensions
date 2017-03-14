@@ -12,6 +12,7 @@
 #endif
 
 #include "asioext/open_flags.hpp"
+#include "asioext/seek_origin.hpp"
 #include "asioext/file_perms.hpp"
 #include "asioext/file_attrs.hpp"
 
@@ -54,7 +55,7 @@ ASIOEXT_DECL void set_attributes(handle_type fd, file_attrs attrs,
 ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
 
 ASIOEXT_DECL uint64_t seek(handle_type fd,
-                           int origin,
+                           seek_origin origin,
                            int64_t offset,
                            error_code& ec);
 

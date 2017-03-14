@@ -171,12 +171,19 @@ uint64_t size(handle_type fd, error_code& ec)
   return 0;
 }
 
-uint64_t seek(handle_type fd, uint32_t origin, int64_t offset, error_code& ec)
+// Make sure our origin mappings match the system headers.
+static_assert(static_cast<DWORD>(seek_origin::from_begin) == FILE_BEGIN &&
+              static_cast<DWORD>(seek_origin::from_current) == FILE_CURRENT &&
+              static_cast<DWORD>(seek_origin::from_end) == FILE_END,
+              "whence mapping must match the system headers");
+
+uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
+              error_code& ec)
 {
   LARGE_INTEGER pos, res;
   pos.QuadPart = offset;
 
-  if (::SetFilePointerEx(fd, pos, &res, origin))
+  if (::SetFilePointerEx(fd, pos, &res, static_cast<DWORD>(origin)))
     return res.QuadPart;
 
   set_error(ec);

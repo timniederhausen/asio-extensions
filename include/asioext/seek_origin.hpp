@@ -15,14 +15,6 @@
 # pragma once
 #endif
 
-#if defined(ASIOEXT_WINDOWS)
-# include "asioext/detail/win_file_ops.hpp"
-#else
-# include "asioext/detail/posix_file_ops.hpp"
-#endif
-
-#include "asioext/detail/error_code.hpp"
-
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files

@@ -52,8 +52,7 @@ uint64_t file_handle::seek(seek_origin origin,
                            int64_t offset,
                            error_code& ec) ASIOEXT_NOEXCEPT
 {
-  return detail::posix_file_ops::seek(handle_, static_cast<int>(origin),
-                                      offset, ec);
+  return detail::posix_file_ops::seek(handle_, origin, offset, ec);
 }
 
 ASIOEXT_NS_END
