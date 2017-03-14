@@ -103,10 +103,12 @@ handle_type open(const char* path, open_flags flags,
 #if ASIOEXT_HAS_FILE_FLAGS
       // Unfortunately there's no way to atomically set file
       // flags as part of the open() call.
-      if (attrs != file_attrs::none &&
-          !set_attributes(fd, attrs, ec)) {
-        ::close(fd);
-        return -1;
+      if (attrs != file_attrs::none) {
+        set_attributes(fd, attrs, ec);
+        if (ec) {
+          ::close(fd);
+          return -1;
+        }
       }
 #endif
 
@@ -267,6 +269,7 @@ std::size_t preadv(handle_type fd,
                    uint64_t offset,
                    error_code& ec)
 {
+#if !defined(__APPLE__)
   const ssize_t r = ::preadv(fd, bufs, count, static_cast<off_t>(offset));
   if (r != 0) {
     if (r != -1) {
@@ -276,6 +279,20 @@ std::size_t preadv(handle_type fd,
     set_error(ec, errno);
     return 0;
   }
+#else
+  if (count != 0) {
+    const ssize_t r = ::pread(fd, bufs[0].iov_base, bufs[0].iov_len,
+                              static_cast<off_t>(offset));
+    if (r != 0) {
+      if (r != -1) {
+        ec = error_code();
+        return static_cast<std::size_t>(r);
+      }
+      set_error(ec, errno);
+      return 0;
+    }
+  }
+#endif
 
   for (int i = 0; i != count; ++i) {
     if (bufs[i].iov_len != 0) {
@@ -294,7 +311,13 @@ std::size_t pwritev(handle_type fd,
                     uint64_t offset,
                     error_code& ec)
 {
+#if !defined(__APPLE__)
   const ssize_t r = ::pwritev(fd, bufs, count, static_cast<off_t>(offset));
+#else
+  const ssize_t r = ::pwrite(fd, bufs[0].iov_base, bufs[0].iov_len,
+                             static_cast<off_t>(offset));
+#endif
+
   if (r != -1) {
     ec = error_code();
     return static_cast<std::size_t>(r);
