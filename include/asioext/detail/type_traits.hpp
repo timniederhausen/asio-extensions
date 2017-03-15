@@ -7,31 +7,16 @@
 #pragma once
 #endif
 
-#if defined(ASIOEXT_HAS_STD_TYPE_TRAITS)
 # include <type_traits>
-#else
-# include <boost/utility/enable_if.hpp>
-# include <boost/type_traits/conditional.hpp>
-# include <boost/type_traits/is_same.hpp>
-# include <boost/type_traits/integral_constant.hpp>
-#endif
 
 ASIOEXT_NS_BEGIN
 
-#if defined(ASIOEXT_HAS_STD_TYPE_TRAITS)
 using std::enable_if;
 using std::conditional;
 using std::is_same;
 using std::true_type;
 using std::false_type;
-#else
-template <bool Condition, typename Type = void>
-struct enable_if : boost::enable_if_c<Condition, Type> {};
-using boost::conditional;
-using boost::is_same;
-using boost::true_type;
-using boost::false_type;
-#endif
+using std::underlying_type;
 
 ASIOEXT_NS_END
 

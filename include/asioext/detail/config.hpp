@@ -168,29 +168,6 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_STD_TYPE_TRAITS: <type_traits> header
-#if !defined(ASIOEXT_HAS_STD_TYPE_TRAITS)
-# if !defined(ASIOEXT_DISABLE_STD_TYPE_TRAITS)
-#  if defined(__clang__)
-#   if (__cplusplus >= 201103)
-#    if __has_include(<type_traits>)
-#     define ASIOEXT_HAS_STD_TYPE_TRAITS 1
-#    endif
-#   endif
-#  endif
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
-#     define ASIOEXT_HAS_STD_TYPE_TRAITS 1
-#    endif
-#   endif
-#  endif
-#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1700)
-#   define ASIOEXT_HAS_STD_TYPE_TRAITS 1
-#  endif
-# endif
-#endif
-
 // Standard library support for shared_ptr and weak_ptr.
 #if !defined(ASIOEXT_HAS_STD_SHARED_PTR)
 # if !defined(ASIOEXT_DISABLE_STD_SHARED_PTR)

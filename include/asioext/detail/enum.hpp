@@ -12,26 +12,48 @@
 # pragma once
 #endif
 
-#define ASIOEXT_ENUM_CLASS_BITMASK_OPS(Enum) \
+#include "asioext/detail/type_traits.hpp"
+
+#if !defined(ASIOEXT_IS_DOCUMENTATION)
+# define ASIOEXT_ENUM_CLASS_BITMASK_OPS(Enum) \
 inline Enum& operator&=(Enum& left, Enum right) \
-{ left = (Enum)((int)left & (int)right); return (left); } \
+{ using utype = underlying_type<Enum>::type; \
+  left = static_cast<Enum>(static_cast<utype>(left) & \
+                           static_cast<utype>(right)); \
+  return (left); } \
 \
 inline Enum& operator|=(Enum& left, Enum right) \
-{ left = (Enum)((int)left | (int)right); return (left); } \
+{ using utype = underlying_type<Enum>::type; \
+  left = static_cast<Enum>(static_cast<utype>(left) | \
+                           static_cast<utype>(right)); \
+  return (left); } \
 \
 inline Enum& operator^=(Enum& left, Enum right) \
-{ left = (Enum)((int)left ^ (int)right); return (left); } \
+{ using utype = underlying_type<Enum>::type; \
+  left = static_cast<Enum>(static_cast<utype>(left) ^ \
+                           static_cast<utype>(right)); \
+  return (left); } \
 \
 inline constexpr Enum operator&(Enum left, Enum right) \
-{ return ((Enum)((int)left & (int)right)); } \
+{ using utype = underlying_type<Enum>::type; \
+  return static_cast<Enum>(static_cast<utype>(left) & \
+                           static_cast<utype>(right)); } \
 \
 inline constexpr Enum operator|(Enum left, Enum right) \
-{ return ((Enum)((int)left | (int)right)); } \
+{ using utype = underlying_type<Enum>::type; \
+  return static_cast<Enum>(static_cast<utype>(left) | \
+                           static_cast<utype>(right)); } \
 \
 inline constexpr Enum operator^(Enum left, Enum right) \
-{ return ((Enum)((int)left ^ (int)right)); } \
+{ using utype = underlying_type<Enum>::type; \
+  return static_cast<Enum>(static_cast<utype>(left) ^ \
+                           static_cast<utype>(right)); } \
 \
 inline constexpr Enum operator~(Enum left) \
-{ return ((Enum)~(int)left); }
+{ using utype = underlying_type<Enum>::type; \
+  return static_cast<Enum>(~static_cast<utype>(left)); }
+#else
+#define ASIOEXT_ENUM_CLASS_BITMASK_OPS(Enum)
+#endif
 
 #endif
