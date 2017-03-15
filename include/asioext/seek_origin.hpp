@@ -18,7 +18,7 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// Describes the various position offset origins.
+/// @brief Specify the various position offset origins.
 ///
 /// This enum describes the various origins,
 /// relative to which a position offset might be interpreted.

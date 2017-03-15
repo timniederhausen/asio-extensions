@@ -24,6 +24,8 @@ ASIOEXT_NS_BEGIN
 /// @brief Names for permissions.
 ///
 /// This type represents file access permissions.
+/// @c file_perms meets the requirements
+/// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
 enum class file_perms
 {
   /// No permissions are set.
@@ -92,7 +94,7 @@ enum class file_perms
   ///  others_read | others_write`) on all systems.
   ///
   /// @note Actual file permissions might differ, as these permissions
-  /// are
+  /// are modified by the process' umask.
   create_default = 0666,
 
   /// All valid permission bits

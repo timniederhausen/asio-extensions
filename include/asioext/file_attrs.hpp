@@ -20,9 +20,10 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// @brief File attributes
+/// @brief Names for file attributes.
 ///
-/// These flags specify file attributes.
+/// This enum represents file attributes. @c file_attrs meets the requirements
+/// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
 ///
 /// @note The file's attributes are replaced if neither add_attrs nor
 /// remove_attrs has been set.

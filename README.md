@@ -5,15 +5,19 @@
 
 ## Feature overview
 
-* Wrappers around native file handles with support for asio's `*Stream` concepts.
-  (`asioext::file_handle` and `asioext::scoped_file_handle`).
-* Asynchronous file I/O (`asioext::basic_file`).
-  Currently only a thread(-pool) service is implemented
-  (`asioext::thread_pool_file_service`).
+* File handle wrappers (`file_handle`, `scoped_file_handle`) with support for:
+  * Creating and opening files
+  * File permissions
+  * File attributes
+  * Asio's `*Stream` concepts (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
+* Asynchronous file I/O interface (`basic_file`) with the following implementations:
+  * `thread_pool_file_service`: Currently only a thread(-pool) service is implemented.
 * Utilities for reading/writing files:
-  * `asioext::read_file`
-  * `asioext::write_file`
-* Utilities for service/custom I/O object writers.
+  * `read_file`
+  * `write_file`
+* Utilities for service writers:
+  * Cancellation tokens
+  * `Handler` wrappers
 
 AsioExt is compatible with standalone Asio, as well as the Boost version.
 To use the Boost version, #define ``ASIOEXT_USE_BOOST_ASIO``.
@@ -22,7 +26,9 @@ To use the Boost version, #define ``ASIOEXT_USE_BOOST_ASIO``.
 
 AsioExt requires at compiler that supports at least some C++11 features:
 
-* Scoped enumerations
+* `constexpr` functions
+* Scoped enumerations (`enum class`)
+* C++11 `<type_traits>`
 * [optional] R-value references (If unavailable, objects will not be movable).
 
 Currently, AsioExt is being tested with the following compilers:

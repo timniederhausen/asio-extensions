@@ -20,7 +20,7 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// @brief Specify semantics for opening files.
+/// @brief Specifies semantics for opening files.
 ///
 /// This enum of bitmask values controls the behaviour of the @ref open.
 ///
@@ -33,7 +33,7 @@ ASIOEXT_NS_BEGIN
 ///
 /// File creation-mode flags are mutually exclusive. Specifying more than one
 /// is an error.
-enum class open_flags : uint32_t
+enum class open_flags
 {
   /// No options are set.
   none = 0,

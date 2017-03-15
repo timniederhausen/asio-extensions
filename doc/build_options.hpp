@@ -45,31 +45,38 @@
 
 /// @brief Disable the use of Boost.Filesystem
 ///
-/// Disable the use of Boost.Filesystem, even if Boost is used
+/// This macro disables the use of Boost.Filesystem, even if Boost is used
 /// and the used version has a compatible Boost.Filesystem version.
 #define ASIOEXT_DISABLE_BOOST_FILESYSTEM
 
 /// @brief Disable C++11 rvalue reference support.
 ///
-/// Disable the use of rvalue references, regardless of
+/// This macro disables the use of rvalue references, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_MOVE
 
 /// @brief Disable C++11 variadic template support.
 ///
-/// Disable the use of variadic templates, regardless of
+/// This macro disables the use of variadic templates, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_VARIADIC_TEMPLATES
 
 /// @brief Disable C++11 @c noexcept support.
 ///
-/// Disable the use of @c noexcept, regardless of
+/// This macro disables the use of @c noexcept, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_NOEXCEPT
 
+/// @brief Disable file flags support.
+///
+/// This macro disables file flags, regardless of platform support.
+/// Attributes passed to @c open() are silently ignored, while attempts
+/// to query or modify file attributes fail.
+#define ASIOEXT_DISABLE_FILE_FLAGS
+
 /// @brief Disable <code>\#pragma once</code> support.
 ///
-/// Disable the use of <code>\#pragma once</code>, regardless of
+/// This macro disables the use of <code>\#pragma once</code>, regardless of
 /// compiler support.
 #define ASIOEXT_DISABLE_PRAGMA_ONCE
 
