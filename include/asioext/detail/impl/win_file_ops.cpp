@@ -56,6 +56,8 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
     args.flags_and_attrs |= FILE_ATTRIBUTE_HIDDEN;
   if ((attrs & file_attrs::system) != file_attrs::none)
     args.flags_and_attrs |= FILE_ATTRIBUTE_SYSTEM;
+  if ((attrs & file_attrs::not_indexed) != file_attrs::none)
+    args.flags_and_attrs |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
 
   // TODO: Add support.
   args.share_mode = 0;
