@@ -15,10 +15,9 @@
 # pragma once
 #endif
 
-#include "asioext/detail/type_traits.hpp"
-
 #include <string>
 #include <vector>
+#include <type_traits>
 
 ASIOEXT_NS_BEGIN
 
@@ -66,37 +65,37 @@ struct is_char_container
 };
 #else
 template <class T>
-struct is_char_container : false_type
+struct is_char_container : std::false_type
 {};
 
 template <class Traits, class Allocator>
 struct is_char_container<std::basic_string<char, Traits, Allocator> >
-  : true_type
+  : std::true_type
 {};
 
 template <class Traits, class Allocator>
 struct is_char_container<std::basic_string<unsigned char, Traits, Allocator> >
-  : true_type
+  : std::true_type
 {};
 
 template <class Traits, class Allocator>
 struct is_char_container<std::basic_string<signed char, Traits, Allocator> >
-  : true_type
+  : std::true_type
 {};
 
 template <class Allocator>
 struct is_char_container<std::vector<char, Allocator> >
-  : true_type
+  : std::true_type
 {};
 
 template <class Allocator>
 struct is_char_container<std::vector<unsigned char, Allocator> >
-  : true_type
+  : std::true_type
 {};
 
 template <class Allocator>
 struct is_char_container<std::vector<signed char, Allocator> >
-  : true_type
+  : std::true_type
 {};
 #endif
 

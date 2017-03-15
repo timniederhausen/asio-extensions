@@ -19,27 +19,14 @@
 
 ASIOEXT_NS_BEGIN
 
+// TODO(tim): If std::error_code is unavailable, Asio uses a bundled custom
+// error_code/error_category class, whose interface isn't conforming.
+
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 using boost::system::error_code;
 #else
 using asio::error_code;
 #endif
-
-namespace detail {
-
-// If std::error_code is unavailable, Asio uses a bundled custom
-// error_code/error_category class, whose interface isn't conforming.
-
-inline void clear_error(error_code& ec)
-{
-#if defined(ASIOEXT_USE_BOOST_ASIO) || defined(ASIO_HAS_STD_SYSTEM_ERROR)
-  ec.clear();
-#else
-  ec = error_code();
-#endif
-}
-
-}
 
 ASIOEXT_NS_END
 

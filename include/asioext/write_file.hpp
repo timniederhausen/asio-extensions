@@ -50,7 +50,7 @@ ASIOEXT_NS_BEGIN
 #  define ASIOEXT_DETAIL_WRITEFILE_BUF_RET(T) void
 # else
 #  define ASIOEXT_DETAIL_WRITEFILE_BUF_RET(T) \
-    typename enable_if<asio::is_const_buffer_sequence<T>::value>::type
+    typename std::enable_if<asio::is_const_buffer_sequence<T>::value>::type
 # endif
 #else
 # define ASIOEXT_DETAIL_WRITEFILE_BUF_RET(T) void

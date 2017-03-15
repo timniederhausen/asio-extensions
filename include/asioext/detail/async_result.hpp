@@ -12,7 +12,6 @@
 # pragma once
 #endif
 
-#include "asioext/detail/type_traits.hpp"
 #include "asioext/detail/asio_version.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
@@ -26,6 +25,8 @@
 #else
 # define ASIOEXT_INITFN_RESULT_TYPE ASIO_INITFN_RESULT_TYPE
 #endif
+
+#include <type_traits>
 
 ASIOEXT_NS_BEGIN
 
@@ -42,8 +43,8 @@ struct async_completion
 #if defined(ASIOEXT_HAS_MOVE)
   explicit async_completion(
       Handler& orig_handler)
-    : handler(static_cast<typename conditional<
-        is_same<Handler, handler_type>::value,
+    : handler(static_cast<typename std::conditional<
+        std::is_same<Handler, handler_type>::value,
         handler_type&, Handler&&>::type>(orig_handler)),
       result(handler)
   {
@@ -57,8 +58,8 @@ struct async_completion
 #endif
 
 #if defined(ASIOEXT_HAS_MOVE)
-  typename conditional<
-    is_same<Handler, handler_type>::value,
+  typename std::conditional<
+    std::is_same<Handler, handler_type>::value,
     handler_type&, handler_type>::type handler;
 #else
   typename asio::handler_type<Handler, Signature>::type handler;

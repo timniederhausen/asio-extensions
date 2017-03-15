@@ -18,12 +18,13 @@
 #include "asioext/is_char_container.hpp"
 
 #include "asioext/detail/error_code.hpp"
-#include "asioext/detail/type_traits.hpp"
 #include "asioext/detail/asio_version.hpp"
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>
 #endif
+
+#include <type_traits>
 
 ASIOEXT_NS_BEGIN
 
@@ -39,7 +40,7 @@ ASIOEXT_NS_BEGIN
 
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
 # define ASIOEXT_DETAIL_READFILE_CHAR_RET(T) \
-    typename enable_if<is_char_container<T>::value>::type
+    typename std::enable_if<is_char_container<T>::value>::type
 #else
 # define ASIOEXT_DETAIL_READFILE_CHAR_RET(T) void
 #endif
@@ -159,10 +160,10 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
 # if ASIOEXT_ASIO_VERSION < 101100
 #  define ASIOEXT_DETAIL_READFILE_BUF_RET(T) \
-    typename enable_if<!is_char_container<T>::value>::type
+    typename std::enable_if<!is_char_container<T>::value>::type
 # else
 #  define ASIOEXT_DETAIL_READFILE_BUF_RET(T) \
-    typename enable_if<asio::is_mutable_buffer_sequence<T>::value>::type
+    typename std::enable_if<asio::is_mutable_buffer_sequence<T>::value>::type
 # endif
 #else
 # define ASIOEXT_DETAIL_READFILE_BUF_RET(T) void
