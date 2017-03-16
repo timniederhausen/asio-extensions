@@ -9,9 +9,6 @@
 
 #if defined(ASIOEXT_WINDOWS)
 # include "asioext/detail/win_file_ops.hpp"
-# if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES)
-#  include "asioext/detail/win_path.hpp"
-# endif
 #else
 # include "asioext/detail/posix_file_ops.hpp"
 #endif
@@ -32,14 +29,7 @@ file_handle open(const char* filename, open_flags flags,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
-# if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES)
-  detail::win_path p(filename, std::strlen(filename), ec);
-  if (!ec)
-    return detail::win_file_ops::open(p.c_str(), flags, perms, attrs, ec);
-  return file_handle();
-# else
   return detail::win_file_ops::open(filename, flags, perms, attrs, ec);
-# endif
 #else
   return detail::posix_file_ops::open(filename, flags, perms, attrs, ec);
 #endif

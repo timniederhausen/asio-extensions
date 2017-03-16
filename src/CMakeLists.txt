@@ -31,7 +31,12 @@ else ()
 endif ()
 
 if (WIN32)
-	target_compile_definitions(asioext.asio PUBLIC _WIN32_WINNT=0x0501)
+message("${WINDOWS_STORE}")
+	if (WINDOWS_STORE)
+		target_compile_definitions(asioext.asio PUBLIC _WIN32_WINNT=0x0A00)
+	else ()
+		target_compile_definitions(asioext.asio PUBLIC _WIN32_WINNT=0x0501)
+	endif ()
 endif ()
 
 add_library(asioext.static STATIC ${asioext_source_files})

@@ -221,10 +221,23 @@
 # endif
 #endif
 
+// Windows App target. Windows but with a limited API.
+#if !defined(ASIOEXT_WINDOWS_APP)
+# if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0603)
+#  include <winapifamily.h>
+#  if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) \
+   && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#   define ASIOEXT_WINDOWS_APP 1
+#  endif
+# endif
+#endif
+
 #if !defined(ASIOEXT_WINDOWS)
 # if defined(ASIOEXT_HAS_BOOST_CONFIG) && defined(BOOST_WINDOWS)
 #  define ASIOEXT_WINDOWS 1
 # elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#  define ASIOEXT_WINDOWS 1
+# elif defined(ASIOEXT_WINDOWS_APP)
 #  define ASIOEXT_WINDOWS 1
 # endif
 #endif

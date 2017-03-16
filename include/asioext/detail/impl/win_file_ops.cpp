@@ -7,6 +7,10 @@
 #include "asioext/detail/win_file_ops.hpp"
 #include "asioext/detail/error.hpp"
 
+#if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES) || defined(ASIOEXT_WINDOWS_APP)
+# include "asioext/detail/win_path.hpp"
+#endif
+
 #include <windows.h>
 
 ASIOEXT_NS_BEGIN
@@ -19,7 +23,8 @@ struct create_file_args
   DWORD creation_disposition;
   DWORD desired_access;
   DWORD share_mode;
-  DWORD flags_and_attrs;
+  DWORD attrs;
+  DWORD flags;
 };
 
 void set_error(error_code& ec)
@@ -51,15 +56,16 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
   if ((flags & open_flags::access_write) != open_flags::none)
     args.desired_access |= GENERIC_WRITE;
 
-  args.flags_and_attrs = 0;
+  args.attrs = 0;
   if ((attrs & file_attrs::hidden) != file_attrs::none)
-    args.flags_and_attrs |= FILE_ATTRIBUTE_HIDDEN;
+    args.attrs |= FILE_ATTRIBUTE_HIDDEN;
   if ((attrs & file_attrs::system) != file_attrs::none)
-    args.flags_and_attrs |= FILE_ATTRIBUTE_SYSTEM;
+    args.attrs |= FILE_ATTRIBUTE_SYSTEM;
   if ((attrs & file_attrs::not_indexed) != file_attrs::none)
-    args.flags_and_attrs |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
+    args.attrs |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
 
-  // TODO: Add support.
+  args.flags = 0;
+  // TODO: Add support
   args.share_mode = 0;
   return true;
 }
@@ -73,9 +79,31 @@ handle_type open(const char* filename, open_flags flags,
     return INVALID_HANDLE_VALUE;
   }
 
-  handle_type h =
-      ::CreateFileA(filename, args.desired_access, args.share_mode, NULL,
-                    args.creation_disposition, args.flags_and_attrs, NULL);
+#if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES) || defined(ASIOEXT_WINDOWS_APP)
+  detail::win_path p(filename, std::strlen(filename), ec);
+  if (ec) return INVALID_HANDLE_VALUE;
+#endif
+
+#if !defined(ASIOEXT_WINDOWS_APP)
+  const handle_type h =
+# if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES)
+      ::CreateFileW(p.c_str(),
+                    args.desired_access, args.share_mode, NULL,
+                    args.creation_disposition, args.attrs | args.flags, NULL);
+# else
+      ::CreateFileA(filename,
+                    args.desired_access, args.share_mode, NULL,
+                    args.creation_disposition, args.attrs | args.flags, NULL);
+# endif
+#else
+  CREATEFILE2_EXTENDED_PARAMETERS params = {};
+  params.dwSize = sizeof(params);
+  params.dwFileAttributes = args.attrs;
+  params.dwFileFlags = args.flags;
+  const handle_type h =
+      ::CreateFile2(p.c_str(), args.desired_access, args.share_mode,
+                    args.creation_disposition, &params);
+#endif
 
   if (h == INVALID_HANDLE_VALUE)
     set_error(ec);
@@ -94,9 +122,19 @@ handle_type open(const wchar_t* filename, open_flags flags,
     return INVALID_HANDLE_VALUE;
   }
 
+#if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h =
       ::CreateFileW(filename, args.desired_access, args.share_mode, NULL,
-                    args.creation_disposition, args.flags_and_attrs, NULL);
+                    args.creation_disposition, args.attrs | args.flags, NULL);
+#else
+  CREATEFILE2_EXTENDED_PARAMETERS params = {};
+  params.dwSize = sizeof(params);
+  params.dwFileAttributes = args.attrs;
+  params.dwFileFlags = args.flags;
+  const handle_type h =
+      ::CreateFile2(filename, args.desired_access, args.share_mode,
+                    args.creation_disposition, &params);
+#endif
 
   if (h != INVALID_HANDLE_VALUE)
     ec = error_code();
@@ -130,6 +168,7 @@ handle_type duplicate(handle_type fd, error_code& ec)
 
 handle_type get_stdin(error_code& ec)
 {
+#if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h = ::GetStdHandle(STD_INPUT_HANDLE);
   if (h != INVALID_HANDLE_VALUE)
     ec = error_code();
@@ -137,10 +176,15 @@ handle_type get_stdin(error_code& ec)
     set_error(ec);
 
   return h;
+#else
+  ec = asio::error::operation_not_supported;
+  return INVALID_HANDLE_VALUE;
+#endif
 }
 
 handle_type get_stdout(error_code& ec)
 {
+#if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h = ::GetStdHandle(STD_OUTPUT_HANDLE);
   if (h != INVALID_HANDLE_VALUE)
     ec = error_code();
@@ -148,10 +192,15 @@ handle_type get_stdout(error_code& ec)
     set_error(ec);
 
   return h;
+#else
+  ec = asio::error::operation_not_supported;
+  return INVALID_HANDLE_VALUE;
+#endif
 }
 
 handle_type get_stderr(error_code& ec)
 {
+#if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h = ::GetStdHandle(STD_ERROR_HANDLE);
   if (h != INVALID_HANDLE_VALUE)
     ec = error_code();
@@ -159,6 +208,10 @@ handle_type get_stderr(error_code& ec)
     set_error(ec);
 
   return h;
+#else
+  ec = asio::error::operation_not_supported;
+  return INVALID_HANDLE_VALUE;
+#endif
 }
 
 uint64_t size(handle_type fd, error_code& ec)
