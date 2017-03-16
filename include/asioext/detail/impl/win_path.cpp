@@ -11,17 +11,30 @@ ASIOEXT_NS_BEGIN
 
 namespace detail {
 
-win_path::win_path(const char* s,
-                   std::size_t len,
-                   error_code& ec) ASIOEXT_NOEXCEPT
+win_path::win_path(const char* s, std::size_t len, error_code& ec)
+  : heap_memory_(nullptr)
 {
-  int new_length = ::MultiByteToWideChar(CP_UTF8, 0, s, len, buffer_, kMaxPath);
+  int new_length;
+  if (len >= kMaxPath) {
+    new_length = ::MultiByteToWideChar(CP_UTF8, 0, s, len, nullptr, 0);
+    heap_memory_ = new wchar_t[new_length + 1];
+    new_length = ::MultiByteToWideChar(CP_UTF8, 0, s, len,
+                                       heap_memory_, new_length);
+    heap_memory_[new_length] = L'\0';
+  } else {
+    new_length = ::MultiByteToWideChar(CP_UTF8, 0, s, len, buffer_, kMaxPath);
+    buffer_[new_length] = L'\0';
+  }
+
   if (new_length == 0) {
     ec.assign(::GetLastError(), asio::error::get_system_category());
     return;
   }
+}
 
-  buffer_[new_length] = L'\0';
+win_path::~win_path()
+{
+  delete[] heap_memory_;
 }
 
 }

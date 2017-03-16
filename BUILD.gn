@@ -147,6 +147,12 @@ executable("asioext_unittests") {
     "test/write_file.cpp",
   ]
 
+  if (is_win) {
+    sources += [
+      "test/win_path.cpp",
+    ]
+  }
+
   deps = [
     ":asioext",
     "$external/boost/libs/filesystem",

@@ -2,7 +2,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-add_executable(asioext.test
+set(sources
 	basic_file.cpp
 	main.cpp
 	open_flags.cpp
@@ -10,5 +10,13 @@ add_executable(asioext.test
 	scoped_file_handle.cpp
 	write_file.cpp
 )
+
+if (WIN32)
+	list(APPEND sources
+		win_path.cpp
+	)
+endif ()
+
+add_executable(asioext.test ${sources})
 
 target_link_libraries(asioext.test asioext.static)

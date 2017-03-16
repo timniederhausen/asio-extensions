@@ -17,9 +17,6 @@ ASIOEXT_NS_BEGIN
 
 namespace detail {
 
-// TODO(tim): We currently only support paths up to 260 characters.
-// Most windows applications won't need/use more since that'd break
-// all other applications that don't use extended-length prefixes.
 // See: https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
 class win_path
 {
@@ -27,15 +24,17 @@ public:
   static const std::size_t kMaxPath = 260;
 
   ASIOEXT_DECL win_path(const char* s, std::size_t len,
-                        error_code& ec) ASIOEXT_NOEXCEPT;
+                        error_code& ec);
+  ASIOEXT_DECL ~win_path();
 
   const wchar_t* c_str() const ASIOEXT_NOEXCEPT
   {
-    return buffer_;
+    return heap_memory_ ? heap_memory_ : buffer_;
   }
 
 private:
-  wchar_t buffer_[kMaxPath];
+  wchar_t buffer_[kMaxPath + 1];
+  wchar_t* heap_memory_;
 };
 
 }
