@@ -65,8 +65,8 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
     args.attrs |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
 
   args.flags = 0;
-  // TODO: Add support
-  args.share_mode = 0;
+  // TODO: Add support + FILE_SHARE_DELETE?
+  args.share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
   return true;
 }
 
