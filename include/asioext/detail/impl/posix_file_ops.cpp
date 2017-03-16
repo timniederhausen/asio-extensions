@@ -230,14 +230,22 @@ uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
 
 std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
 {
-  const ssize_t r = ::readv(fd, bufs, count);
-  if (r != 0) {
-    if (r != -1) {
-      ec = error_code();
-      return static_cast<std::size_t>(r);
+  while (true) {
+    const ssize_t r = ::readv(fd, bufs, count);
+    if (r != 0) {
+      if (r != -1) {
+        ec = error_code();
+        return static_cast<std::size_t>(r);
+      }
+
+      const int e = errno;
+      if (e == EINTR)
+        continue;
+
+      set_error(ec, e);
+      return 0;
     }
-    set_error(ec, errno);
-    return 0;
+    break;
   }
 
   for (int i = 0; i != count; ++i) {
@@ -253,14 +261,20 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
 
 std::size_t writev(handle_type fd, const iovec* bufs, int count, error_code& ec)
 {
-  const ssize_t r = ::writev(fd, bufs, count);
-  if (r != -1) {
-    ec = error_code();
-    return static_cast<std::size_t>(r);
-  }
+  while (true) {
+    const ssize_t r = ::writev(fd, bufs, count);
+    if (r != -1) {
+      ec = error_code();
+      return static_cast<std::size_t>(r);
+    }
 
-  set_error(ec, errno);
-  return 0;
+    const int e = errno;
+    if (e == EINTR)
+      continue;
+
+    set_error(ec, e);
+    return 0;
+  }
 }
 
 std::size_t preadv(handle_type fd,
@@ -269,27 +283,43 @@ std::size_t preadv(handle_type fd,
                    uint64_t offset,
                    error_code& ec)
 {
-#if !defined(__APPLE__)
-  const ssize_t r = ::preadv(fd, bufs, count, static_cast<off_t>(offset));
-  if (r != 0) {
-    if (r != -1) {
-      ec = error_code();
-      return static_cast<std::size_t>(r);
-    }
-    set_error(ec, errno);
-    return 0;
-  }
-#else
-  if (count != 0) {
-    const ssize_t r = ::pread(fd, bufs[0].iov_base, bufs[0].iov_len,
-                              static_cast<off_t>(offset));
+#if !defined(__APPLE__) && !defined(__MACH__)
+  while (true) {
+    const ssize_t r = ::preadv(fd, bufs, count, static_cast<off_t>(offset));
     if (r != 0) {
       if (r != -1) {
         ec = error_code();
         return static_cast<std::size_t>(r);
       }
-      set_error(ec, errno);
+
+      const int e = errno;
+      if (e == EINTR)
+        continue;
+
+      set_error(ec, e);
       return 0;
+    }
+    break;
+  }
+#else
+  if (count != 0) {
+    while (true) {
+      const ssize_t r = ::pread(fd, bufs[0].iov_base, bufs[0].iov_len,
+                                static_cast<off_t>(offset));
+      if (r != 0) {
+        if (r != -1) {
+          ec = error_code();
+          return static_cast<std::size_t>(r);
+        }
+
+        const int e = errno;
+        if (e == EINTR)
+          continue;
+
+        set_error(ec, e);
+        return 0;
+      }
+      break;
     }
   }
 #endif
@@ -311,20 +341,26 @@ std::size_t pwritev(handle_type fd,
                     uint64_t offset,
                     error_code& ec)
 {
-#if !defined(__APPLE__)
-  const ssize_t r = ::pwritev(fd, bufs, count, static_cast<off_t>(offset));
+  while (true) {
+#if !defined(__APPLE__) && !defined(__MACH__)
+    const ssize_t r = ::pwritev(fd, bufs, count, static_cast<off_t>(offset));
 #else
-  const ssize_t r = ::pwrite(fd, bufs[0].iov_base, bufs[0].iov_len,
-                             static_cast<off_t>(offset));
+    const ssize_t r = ::pwrite(fd, bufs[0].iov_base, bufs[0].iov_len,
+                               static_cast<off_t>(offset));
 #endif
 
-  if (r != -1) {
-    ec = error_code();
-    return static_cast<std::size_t>(r);
-  }
+    if (r != -1) {
+      ec = error_code();
+      return static_cast<std::size_t>(r);
+    }
 
-  set_error(ec, errno);
-  return 0;
+    const int e = errno;
+    if (e == EINTR)
+      continue;
+
+    set_error(ec, e);
+    return 0;
+  }
 }
 
 }
