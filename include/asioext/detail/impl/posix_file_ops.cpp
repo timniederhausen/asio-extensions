@@ -71,35 +71,35 @@ file_attrs native_to_file_attrs(uint32_t native)
   file_attrs attrs = file_attrs::none;
 #ifdef UF_HIDDEN
   if (native & UF_HIDDEN)
-    native |= file_attrs::hidden;
+    attrs |= file_attrs::hidden;
 #endif
 #ifdef UF_SYSTEM
   if (native & UF_SYSTEM)
-    native |= file_attrs::system;
+    attrs |= file_attrs::system;
 #endif
 #ifdef UF_ARCHIVE
   if (native & UF_ARCHIVE)
-    native |= file_attrs::archive;
+    attrs |= file_attrs::archive;
 #endif
 #ifdef UF_NODUMP
   if (native & UF_NODUMP)
-    native |= file_attrs::no_dump;
+    attrs |= file_attrs::no_dump;
 #endif
 #ifdef UF_IMMUTABLE
   if (native & UF_IMMUTABLE)
-    native |= file_attrs::user_immutable;
+    attrs |= file_attrs::user_immutable;
 #endif
 #ifdef SF_IMMUTABLE
   if (native & SF_IMMUTABLE)
-    native |= file_attrs::system_immutable;
+    attrs |= file_attrs::system_immutable;
 #endif
 #ifdef UF_NOUNLINK
   if (native & UF_NOUNLINK)
-    native |= file_attrs::user_no_unlink;
+    attrs |= file_attrs::user_no_unlink;
 #endif
 #ifdef SF_NOUNLINK
   if (native & SF_NOUNLINK)
-    native |= file_attrs::system_no_unlink;
+    attrs |= file_attrs::system_no_unlink;
 #endif
   return attrs;
 }
