@@ -7,8 +7,6 @@
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/throw_error.hpp"
 
-#include <cstddef> // for size_t
-
 ASIOEXT_NS_BEGIN
 
 file_handle::file_handle() ASIOEXT_NOEXCEPT
@@ -53,6 +51,28 @@ uint64_t file_handle::seek(seek_origin origin,
                            error_code& ec) ASIOEXT_NOEXCEPT
 {
   return detail::posix_file_ops::seek(handle_, origin, offset, ec);
+}
+
+file_perms file_handle::permissions(error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return detail::posix_file_ops::permissions(handle_, ec);
+}
+
+void file_handle::permissions(file_perms perms,
+                              error_code& ec) ASIOEXT_NOEXCEPT
+{
+  detail::posix_file_ops::permissions(handle_, perms, ec);
+}
+
+file_attrs file_handle::attributes(error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return detail::posix_file_ops::attributes(handle_, ec);
+}
+
+void file_handle::attributes(file_attrs attrs,
+                             error_code& ec) ASIOEXT_NOEXCEPT
+{
+  detail::posix_file_ops::attributes(handle_, attrs, ec);
 }
 
 ASIOEXT_NS_END

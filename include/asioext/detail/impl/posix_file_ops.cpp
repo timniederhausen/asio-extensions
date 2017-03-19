@@ -28,42 +28,80 @@ void set_error(error_code& ec, int e)
   ec = error_code(e, asio::error::get_system_category());
 }
 
-uint32_t convert_attrs(file_attrs attrs)
+uint32_t file_attrs_to_native(file_attrs attrs)
 {
-  uint32_t raw_attrs = 0;
+  uint32_t native = 0;
 #ifdef UF_HIDDEN
   if ((attrs & file_attrs::hidden) != file_attrs::none)
-    raw_attrs |= UF_HIDDEN;
+    native |= UF_HIDDEN;
 #endif
 #ifdef UF_SYSTEM
   if ((attrs & file_attrs::system) != file_attrs::none)
-    raw_attrs |= UF_SYSTEM;
+    native |= UF_SYSTEM;
 #endif
 #ifdef UF_ARCHIVE
   if ((attrs & file_attrs::archive) != file_attrs::none)
-    raw_attrs |= UF_ARCHIVE;
+    native |= UF_ARCHIVE;
 #endif
 #ifdef UF_NODUMP
   if ((attrs & file_attrs::no_dump) != file_attrs::none)
-    raw_attrs |= UF_NODUMP;
+    native |= UF_NODUMP;
 #endif
 #ifdef UF_IMMUTABLE
   if ((attrs & file_attrs::user_immutable) != file_attrs::none)
-    raw_attrs |= UF_IMMUTABLE;
+    native |= UF_IMMUTABLE;
 #endif
 #ifdef SF_IMMUTABLE
   if ((attrs & file_attrs::system_immutable) != file_attrs::none)
-    raw_attrs |= SF_IMMUTABLE;
+    native |= SF_IMMUTABLE;
 #endif
 #ifdef UF_NOUNLINK
   if ((attrs & file_attrs::user_no_unlink) != file_attrs::none)
-    raw_attrs |= UF_NOUNLINK;
+    native |= UF_NOUNLINK;
 #endif
 #ifdef SF_NOUNLINK
   if ((attrs & file_attrs::system_no_unlink) != file_attrs::none)
-    raw_attrs |= SF_NOUNLINK;
+    native |= SF_NOUNLINK;
 #endif
-  return raw_attrs;
+  return native;
+}
+
+file_attrs native_to_file_attrs(uint32_t native)
+{
+  file_attrs attrs = file_attrs::none;
+#ifdef UF_HIDDEN
+  if (native & UF_HIDDEN)
+    native |= file_attrs::hidden;
+#endif
+#ifdef UF_SYSTEM
+  if (native & UF_SYSTEM)
+    native |= file_attrs::system;
+#endif
+#ifdef UF_ARCHIVE
+  if (native & UF_ARCHIVE)
+    native |= file_attrs::archive;
+#endif
+#ifdef UF_NODUMP
+  if (native & UF_NODUMP)
+    native |= file_attrs::no_dump;
+#endif
+#ifdef UF_IMMUTABLE
+  if (native & UF_IMMUTABLE)
+    native |= file_attrs::user_immutable;
+#endif
+#ifdef SF_IMMUTABLE
+  if (native & SF_IMMUTABLE)
+    native |= file_attrs::system_immutable;
+#endif
+#ifdef UF_NOUNLINK
+  if (native & UF_NOUNLINK)
+    native |= file_attrs::user_no_unlink;
+#endif
+#ifdef SF_NOUNLINK
+  if (native & SF_NOUNLINK)
+    native |= file_attrs::system_no_unlink;
+#endif
+  return attrs;
 }
 
 handle_type open(const char* path, open_flags flags,
@@ -94,7 +132,7 @@ handle_type open(const char* path, open_flags flags,
     case open_flags::access_write: native_flags |= O_WRONLY; break;
   }
 
-  mode_t mode = static_cast<mode_t>(perms);
+  mode_t mode = static_cast<mode_t>(perms & file_perms::all);
   while (true) {
     handle_type fd = ::open(path, O_CLOEXEC | native_flags, mode);
     if (fd != -1) {
@@ -104,7 +142,7 @@ handle_type open(const char* path, open_flags flags,
       // Unfortunately there's no way to atomically set file
       // flags as part of the open() call.
       if (attrs != file_attrs::none) {
-        set_attributes(fd, attrs, ec);
+        attributes(fd, attrs, ec);
         if (ec) {
           ::close(fd);
           return -1;
@@ -168,34 +206,6 @@ handle_type get_stderr(error_code& ec)
   return STDERR_FILENO;
 }
 
-void set_attributes(handle_type fd, file_attrs attrs, error_code& ec)
-{
-#if ASIOEXT_HAS_FILE_FLAGS
-  uint32_t new_attrs = convert_attrs(attrs);
-  if ((attrs & (file_attrs::add_attrs | file_attrs::remove_attrs)) !=
-      file_attrs::none) {
-    struct stat st;
-    if (::fstat(fd, &st) != 0) {
-      set_error(ec, errno);
-      return;
-    }
-    if ((attrs & file_attrs::add_attrs) != file_attrs::none)
-      new_attrs = st.st_flags | new_attrs;
-    else
-      new_attrs = st.st_flags & ~new_attrs;
-  }
-
-  if (::fchflags(fd, new_attrs) == 0)
-    ec = error_code();
-  else
-    set_error(ec, errno);
-#else
-  // TODO(tim): Silently ignore everything?
-  // Seems consistent.
-  ec = error_code();
-#endif
-}
-
 uint64_t size(handle_type fd, error_code& ec)
 {
   struct stat st;
@@ -226,6 +236,84 @@ uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
 
   set_error(ec, errno);
   return 0;
+}
+
+file_perms permissions(handle_type fd, error_code& ec)
+{
+  struct stat st;
+  if (::fstat(fd, &st) == 0) {
+    ec = error_code();
+    return static_cast<file_perms>(st.st_mode) & file_perms::all;
+  }
+  set_error(ec, errno);
+  return file_perms::none;
+}
+
+void permissions(handle_type fd, file_perms perms, error_code& ec)
+{
+  mode_t mode = static_cast<mode_t>(perms & file_perms::all);
+  if ((perms & (file_perms::add_perms | file_perms::remove_perms)) !=
+      file_perms::none) {
+    struct stat st;
+    if (::fstat(fd, &st) != 0) {
+      set_error(ec, errno);
+      return;
+    }
+    if ((perms & file_perms::add_perms) != file_perms::none)
+      mode |= st.st_mode;
+    else
+      mode = st.st_mode & ~mode;
+  }
+
+  if (::fchmod(fd, mode) == 0)
+    ec = error_code();
+  else
+    set_error(ec, errno);
+}
+
+file_attrs attributes(handle_type fd, error_code& ec)
+{
+#if ASIOEXT_HAS_FILE_FLAGS
+  struct stat st;
+  if (::fstat(fd, &st) == 0) {
+    ec = error_code();
+    return native_to_file_attrs(st.st_flags);
+  }
+  set_error(ec, errno);
+#else
+  // TODO(tim): Silently ignore everything?
+  // Seems consistent.
+  ec = error_code();
+#endif
+  return file_attrs::none;
+}
+
+void attributes(handle_type fd, file_attrs attrs, error_code& ec)
+{
+#if ASIOEXT_HAS_FILE_FLAGS
+  uint32_t new_attrs = file_attrs_to_native(attrs);
+  if ((attrs & (file_attrs::add_attrs | file_attrs::remove_attrs)) !=
+      file_attrs::none) {
+    struct stat st;
+    if (::fstat(fd, &st) != 0) {
+      set_error(ec, errno);
+      return;
+    }
+    if ((attrs & file_attrs::add_attrs) != file_attrs::none)
+      new_attrs = st.st_flags | new_attrs;
+    else
+      new_attrs = st.st_flags & ~new_attrs;
+  }
+
+  if (::fchflags(fd, new_attrs) == 0)
+    ec = error_code();
+  else
+    set_error(ec, errno);
+#else
+  // TODO(tim): Silently ignore everything?
+  // Seems consistent.
+  ec = error_code();
+#endif
 }
 
 std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)

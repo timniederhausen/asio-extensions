@@ -11,6 +11,8 @@ environment:
           CMAKE_OPTIONS: "-DASIOEXT_USE_BOOST_ASIO=ON"
         - ASIOEXT_GENERATOR: "Visual Studio 14 2015"
           CMAKE_OPTIONS: "-DASIOEXT_WINDOWS_USE_UTF8_FILENAMES=ON"
+        - ASIOEXT_GENERATOR: "Visual Studio 14 2015"
+          CMAKE_OPTIONS: "-DASIOEXT_WINDOWS_XP=ON"
 
 install:
     - git clone --branch=asio-1-10-8 --depth=1 https://github.com/chriskohlhoff/asio.git

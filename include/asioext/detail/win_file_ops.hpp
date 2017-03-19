@@ -32,6 +32,9 @@ struct create_file_args;
 
 ASIOEXT_DECL void set_error(error_code& ec);
 
+ASIOEXT_DECL uint32_t file_attrs_to_native(file_attrs attrs);
+ASIOEXT_DECL file_attrs native_to_file_attrs(uint32_t native);
+
 ASIOEXT_DECL bool parse_open_flags(create_file_args& args,
                                    open_flags flags,
                                    file_perms perms, file_attrs attrs);
@@ -60,6 +63,12 @@ ASIOEXT_DECL uint64_t seek(handle_type fd,
                            seek_origin origin,
                            int64_t offset,
                            error_code& ec);
+
+ASIOEXT_DECL file_perms permissions(handle_type fd, error_code& ec);
+ASIOEXT_DECL void permissions(handle_type fd, file_perms perms, error_code& ec);
+
+ASIOEXT_DECL file_attrs attributes(handle_type fd, error_code& ec);
+ASIOEXT_DECL void attributes(handle_type fd, file_attrs attrs, error_code& ec);
 
 ASIOEXT_DECL uint32_t read(handle_type fd,
                            void* buffer,

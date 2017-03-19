@@ -229,6 +229,154 @@ public:
 
   /// @}
 
+  /// @name Metadata functions
+  /// @{
+
+  /// @brief Get the file's current access permissions.
+  ///
+  /// This function returns the file's current access permissions as
+  /// a @c file_perms bitmask.
+  ///
+  /// @return The file's access permissions.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL file_perms permissions();
+
+  /// @brief Get the file's current access permissions.
+  ///
+  /// This function returns the file's current access permissions as
+  /// a @c file_perms bitmask.
+  ///
+  /// @return The file's access permissions.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL file_perms permissions(error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Change file access permissions.
+  ///
+  /// This function changes the file's access permissions.
+  /// Depending on whether @c file_perms::add_perms,
+  /// @c file_perms::remove_perms are set, permissions are either added,
+  /// removed or replaced.
+  ///
+  /// @param perms Permissions to set, add or remove.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL void permissions(file_perms perms);
+
+  /// @brief Change file access permissions.
+  ///
+  /// This function changes the file's access permissions.
+  /// Depending on whether @c file_perms::add_perms,
+  /// @c file_perms::remove_perms are set, permissions are either added,
+  /// removed or replaced.
+  ///
+  /// @param perms Permissions to set, add or remove.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL void permissions(file_perms perms,
+                                error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Get the file's attributes.
+  ///
+  /// This function returns the file's attributes as
+  /// a @c file_attrs bitmask.
+  ///
+  /// @return The file's attributes.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL file_attrs attributes();
+
+  /// @brief Get the file's attributes.
+  ///
+  /// This function returns the file's attributes as
+  /// a @c file_attrs bitmask.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ///
+  /// @return The file's attributes.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL file_attrs attributes(error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Change the file's attributes.
+  ///
+  /// This function changes the file's attributes.
+  /// Depending on whether @c file_attrs::add_attrs,
+  /// @c file_attrs::remove_attrs are set, attributes are either added,
+  /// removed or replaced.
+  ///
+  /// @param attrs Attributes to set, add or remove.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL void attributes(file_attrs attrs);
+
+  /// @brief Change the file's attributes.
+  ///
+  /// This function changes the file's attributes.
+  /// Depending on whether @c file_attrs::add_attrs,
+  /// @c file_attrs::remove_attrs are set, attributes are either added,
+  /// removed or replaced.
+  ///
+  /// @param attrs Attributes to set, add or remove.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
+  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+  __declspec(deprecated("By default, this function always fails with "
+        "operation_not_supported when used on Windows XP, Windows Server 2003, "
+        "or earlier. Consult documentation for details."))
+#endif
+  ASIOEXT_DECL void attributes(file_attrs attrs,
+                               error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @}
+
   /// @name SyncReadStream functions
   /// @{
 

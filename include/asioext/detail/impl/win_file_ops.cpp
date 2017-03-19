@@ -32,6 +32,30 @@ void set_error(error_code& ec)
   ec = error_code(::GetLastError(), asio::error::get_system_category());
 }
 
+uint32_t file_attrs_to_native(file_attrs attrs)
+{
+  uint32_t native = 0;
+  if ((attrs & file_attrs::hidden) != file_attrs::none)
+    native |= FILE_ATTRIBUTE_HIDDEN;
+  if ((attrs & file_attrs::system) != file_attrs::none)
+    native |= FILE_ATTRIBUTE_SYSTEM;
+  if ((attrs & file_attrs::not_indexed) != file_attrs::none)
+    native |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
+  return native;
+}
+
+file_attrs native_to_file_attrs(uint32_t native)
+{
+  file_attrs attrs = file_attrs::none;
+  if (native & FILE_ATTRIBUTE_HIDDEN)
+    attrs |= file_attrs::hidden;
+  if (native & FILE_ATTRIBUTE_SYSTEM)
+    attrs |= file_attrs::system;
+  if (native & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+    attrs |= file_attrs::not_indexed;
+  return attrs;
+}
+
 bool parse_open_flags(create_file_args& args, open_flags flags,
                       file_perms perms, file_attrs attrs)
 {
@@ -56,13 +80,7 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
   if ((flags & open_flags::access_write) != open_flags::none)
     args.desired_access |= GENERIC_WRITE;
 
-  args.attrs = 0;
-  if ((attrs & file_attrs::hidden) != file_attrs::none)
-    args.attrs |= FILE_ATTRIBUTE_HIDDEN;
-  if ((attrs & file_attrs::system) != file_attrs::none)
-    args.attrs |= FILE_ATTRIBUTE_SYSTEM;
-  if ((attrs & file_attrs::not_indexed) != file_attrs::none)
-    args.attrs |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
+  args.attrs = file_attrs_to_native(attrs);
 
   args.flags = 0;
   // TODO: Add support + FILE_SHARE_DELETE?
@@ -243,6 +261,119 @@ uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
 
   set_error(ec);
   return 0;
+}
+
+file_perms permissions(handle_type fd, error_code& ec)
+{
+#if (_WIN32_WINNT >= 0x0600)
+  constexpr file_perms write_perms = file_perms::owner_write |
+                                     file_perms::group_write |
+                                     file_perms::others_write;
+  FILE_BASIC_INFO info;
+  if (::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
+    ec = error_code();
+    return info.FileAttributes & FILE_ATTRIBUTE_READONLY ?
+           file_perms::all & ~write_perms : file_perms::all;
+  }
+  set_error(ec);
+#else
+  ec = asio::error::operation_not_supported;
+#endif
+  return file_perms::none;
+}
+
+void permissions(handle_type fd, file_perms perms, error_code& ec)
+{
+#if (_WIN32_WINNT >= 0x0600)
+  constexpr file_perms write_perms = file_perms::owner_write |
+                                     file_perms::group_write |
+                                     file_perms::others_write;
+
+  // Exit early if the changed values are without effect (i.e. not implemented)
+  if ((perms & (file_perms::add_perms | file_perms::remove_perms)) !=
+      file_perms::none && (perms & write_perms) == file_perms::none) {
+    ec = error_code();
+    return;
+  }
+
+  FILE_BASIC_INFO info;
+  if (::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
+    if ((perms & file_perms::add_perms) != file_perms::none)
+      info.FileAttributes &= ~FILE_ATTRIBUTE_READONLY;
+    else if ((perms & file_perms::remove_perms) != file_perms::none)
+      info.FileAttributes |= FILE_ATTRIBUTE_READONLY;
+    else if ((perms & write_perms) != file_perms::none)
+      info.FileAttributes &= ~FILE_ATTRIBUTE_READONLY;
+    else
+      info.FileAttributes |= FILE_ATTRIBUTE_READONLY;
+  } else {
+    set_error(ec);
+    return;
+  }
+
+  // We deliberately set all the other fields (file times) to zero,
+  // so they are ignored by the kernel. Otherwise we'd risk overwriting
+  // changes that happened in the meantime.
+  info.CreationTime.QuadPart = 0;
+  info.LastAccessTime.QuadPart = 0;
+  info.LastWriteTime.QuadPart = 0;
+  info.ChangeTime.QuadPart = 0;
+
+  if (::SetFileInformationByHandle(fd, FileBasicInfo, &info, sizeof(info)))
+    return;
+  set_error(ec);
+#else
+  ec = asio::error::operation_not_supported;
+#endif
+}
+
+file_attrs attributes(handle_type fd, error_code& ec)
+{
+#if (_WIN32_WINNT >= 0x0600)
+  FILE_BASIC_INFO info;
+  if (::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
+    ec = error_code();
+    return native_to_file_attrs(info.FileAttributes);
+  }
+  set_error(ec);
+#else
+  ec = asio::error::operation_not_supported;
+#endif
+  return file_attrs::none;
+}
+
+void attributes(handle_type fd, file_attrs attrs, error_code& ec)
+{
+#if (_WIN32_WINNT >= 0x0600)
+  FILE_BASIC_INFO info;
+  if (!::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
+    set_error(ec);
+    return;
+  }
+
+  const uint32_t new_attrs = file_attrs_to_native(attrs);
+  if ((attrs & (file_attrs::add_attrs | file_attrs::remove_attrs)) !=
+      file_attrs::none) {
+    if ((attrs & file_attrs::add_attrs) != file_attrs::none)
+      info.FileAttributes |= new_attrs;
+    else
+      info.FileAttributes &= ~new_attrs;
+  }
+
+  // We deliberately set all the other fields (file times) to zero,
+  // so they are ignored by the kernel. Otherwise we'd risk overwriting
+  // changes that happened in the meantime.
+  info.CreationTime.QuadPart = 0;
+  info.LastAccessTime.QuadPart = 0;
+  info.LastWriteTime.QuadPart = 0;
+  info.ChangeTime.QuadPart = 0;
+
+  if (::SetFileInformationByHandle(fd, FileBasicInfo, &info, sizeof(info)))
+    return;
+  set_error(ec);
+#else
+  ec = asio::error::operation_not_supported;
+#endif
 }
 
 uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)

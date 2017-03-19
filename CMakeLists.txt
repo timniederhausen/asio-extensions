@@ -10,6 +10,7 @@ include(CMakeDependentOption)
 option(ASIOEXT_BUILD_DOC "Build documentation" ON)
 option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
 option(ASIOEXT_BUILD_SHARED "Build the shared library as well" OFF)
+option(ASIOEXT_WINDOWS_XP "Build with Windows XP support" OFF)
 cmake_dependent_option(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES
                        "Assume char* filenames are UTF-8" OFF
                        "WIN32" OFF)
