@@ -83,8 +83,15 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
   args.attrs = file_attrs_to_native(attrs);
 
   args.flags = 0;
-  // TODO: Add support + FILE_SHARE_DELETE?
+  if ((flags & open_flags::async) != open_flags::none)
+    args.flags |= FILE_FLAG_OVERLAPPED;
+
+  // TODO: FILE_SHARE_DELETE?
   args.share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+  if ((flags & open_flags::exclusive_read) != open_flags::none)
+    args.share_mode &= ~FILE_SHARE_READ;
+  if ((flags & open_flags::exclusive_write) != open_flags::none)
+    args.share_mode &= ~FILE_SHARE_WRITE;
   return true;
 }
 

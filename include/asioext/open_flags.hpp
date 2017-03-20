@@ -23,16 +23,20 @@ ASIOEXT_NS_BEGIN
 /// @brief Specifies semantics for opening files.
 ///
 /// This enum of bitmask values controls the behaviour of the @ref open.
+/// @c open_flags meets the requirements
+/// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
 ///
 /// open() converts these to their platform's native equivalent (if possible).
 /// Flags that are only available on certain platforms are marked as such.
 ///
-/// There are two categories of flags:
-/// * File access mode flags (@c access_read, ...)
-/// * File creation-mode flags (@c create_new, ...)
+/// There are 4 categories of flags:
+/// * File access flags (@c access_read, ...)
+/// * File creation disposition flags (@c create_new, ...)
+/// * Sharing mode flags (@c exclusive_read, ...)
+/// * Special flags (@c async, ...)
 ///
-/// File creation-mode flags are mutually exclusive. Specifying more than one
-/// is an error.
+/// File creation disposition flags are mutually exclusive.
+/// Specifying more than one is an error.
 enum class open_flags
 {
   /// No options are set.
@@ -69,6 +73,27 @@ enum class open_flags
   /// Attempt to open and truncate the file. Fail if no such file exists.
   /// This requires the access_write bit to be set.
   truncate_existing = 1 << 6,
+
+  // sharing
+
+  /// Request exclusive read access to the file.
+  ///
+  /// @note Currently only implemented on Windows.
+  exclusive_read = 1 << 7,
+
+  /// Request exclusive write access to the file.
+  ///
+  /// @note Currently only implemented on Windows.
+  exclusive_write = 1 << 8,
+
+  // special
+
+  /// Open the file for asynchronous operations.
+  ///
+  /// Setting this option will not prevent synchronous I/O operations
+  /// on the file. However, mixing synchronous and asynchronous operations
+  /// is discouraged.
+  async = 1 << 9,
 };
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(open_flags)
