@@ -19,14 +19,12 @@ ASIOEXT_NS_BEGIN
 // Windows has vectored I/O functions (ReadFileScatter, WriteFileGather),
 // but they impose very strict alignment and size requirements and thus are
 // unusable here.
-//
-// @todo Skip zero-length buffers (?)
 
 template <typename MutableBufferSequence>
 std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
                                    error_code& ec)
 {
-  const asio::mutable_buffer buf = *buffers.begin();
+  const asio::mutable_buffer buf = asioext::first_mutable_buffer(buffers);
   return detail::win_file_ops::read(handle_, asio::buffer_cast<void*>(buf),
                                     asio::buffer_size(buf), ec);
 }
@@ -35,7 +33,7 @@ template <typename ConstBufferSequence>
 std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
                                     error_code& ec)
 {
-  const asio::const_buffer buf = *buffers.begin();
+  const asio::const_buffer buf = asioext::first_const_buffer(buffers);
   return detail::win_file_ops::write(
       handle_, asio::buffer_cast<const void*>(buf), asio::buffer_size(buf), ec);
 }
@@ -45,7 +43,7 @@ std::size_t file_handle::read_some_at(uint64_t offset,
                                       const MutableBufferSequence& buffers,
                                       error_code& ec)
 {
-  const asio::mutable_buffer buf = *buffers.begin();
+  const asio::mutable_buffer buf = asioext::first_mutable_buffer(buffers);
   return detail::win_file_ops::pread(handle_, asio::buffer_cast<void*>(buf),
                                      asio::buffer_size(buf), offset, ec);
 }
@@ -55,7 +53,7 @@ std::size_t file_handle::write_some_at(uint64_t offset,
                                        const ConstBufferSequence& buffers,
                                        error_code& ec)
 {
-  const asio::const_buffer buf = *buffers.begin();
+  const asio::const_buffer buf = asioext::first_const_buffer(buffers);
   return detail::win_file_ops::pwrite(handle_,
                                       asio::buffer_cast<const void*>(buf),
                                       asio::buffer_size(buf), offset, ec);

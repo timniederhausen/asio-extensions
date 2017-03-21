@@ -19,7 +19,6 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
 {
   detail::buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence>
       bufs(buffers);
-
   return detail::posix_file_ops::readv(handle_, bufs.buffers(), bufs.count(),
                                        ec);
 }
@@ -28,9 +27,8 @@ template <typename ConstBufferSequence>
 std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
                                     error_code& ec)
 {
-  detail::buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence> bufs(
-      buffers);
-
+  detail::buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence>
+      bufs(buffers);
   return detail::posix_file_ops::writev(handle_, bufs.buffers(), bufs.count(),
                                         ec);
 }
@@ -40,11 +38,18 @@ std::size_t file_handle::read_some_at(uint64_t offset,
                                       const MutableBufferSequence& buffers,
                                       error_code& ec)
 {
+#if defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
   detail::buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence>
       bufs(buffers);
-
   return detail::posix_file_ops::preadv(handle_, bufs.buffers(), bufs.count(),
                                         offset, ec);
+#else
+  const asio::mutable_buffer buf = asioext::first_mutable_buffer(buffers);
+  return detail::posix_file_ops::pread(handle_,
+                                       asio::buffer_cast<void*>(buf),
+                                       asio::buffer_size(buf),
+                                       offset, ec);
+#endif
 }
 
 template <typename ConstBufferSequence>
@@ -52,11 +57,18 @@ std::size_t file_handle::write_some_at(uint64_t offset,
                                        const ConstBufferSequence& buffers,
                                        error_code& ec)
 {
-  detail::buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence> bufs(
-      buffers);
-
+#if defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
+  detail::buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence>
+      bufs(buffers);
   return detail::posix_file_ops::pwritev(handle_, bufs.buffers(), bufs.count(),
                                          offset, ec);
+#else
+  const asio::const_buffer buf = asioext::first_const_buffer(buffers);
+  return detail::posix_file_ops::pwrite(handle_,
+                                        asio::buffer_cast<const void*>(buf),
+                                        asio::buffer_size(buf),
+                                        offset, ec);
+#endif
 }
 
 ASIOEXT_NS_END

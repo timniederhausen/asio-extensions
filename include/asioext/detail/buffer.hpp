@@ -17,4 +17,36 @@
 # include <asio/buffer.hpp>
 #endif
 
+ASIOEXT_NS_BEGIN
+
+// If we only can process one buffer at a time, we previously just used the
+// first. On newer asio versions (1.11.0+) this fails if the first buffer has
+// a length of zero, in which case we end up in an infinite loop.
+// TODO: Is this a bug?
+template <typename MutableBufferSequence>
+asio::mutable_buffer first_mutable_buffer(const MutableBufferSequence& buffers)
+{
+  typename MutableBufferSequence::const_iterator it = buffers.begin();
+  while (it != buffers.end()) {
+    if (asio::buffer_size(*it) != 0)
+      return *it;
+    ++it;
+  }
+  return asio::mutable_buffer();
+}
+
+template <typename ConstBufferSequence>
+asio::const_buffer first_const_buffer(const ConstBufferSequence& buffers)
+{
+  typename ConstBufferSequence::const_iterator it = buffers.begin();
+  while (it != buffers.end()) {
+    if (asio::buffer_size(*it) != 0)
+      return *it;
+    ++it;
+  }
+  return asio::const_buffer();
+}
+
+ASIOEXT_NS_END
+
 #endif

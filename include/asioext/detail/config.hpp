@@ -191,17 +191,6 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_FILE_FLAGS: Defined if the OS has a fchflags syscall
-// and the stat struct has a st_flags member.
-#if !defined(ASIOEXT_HAS_FILE_FLAGS)
-# if !defined(ASIOEXT_DISABLE_FILE_FLAGS)
-#  if defined(__FreeBSD__) || defined (__APPLE__) || defined (__OpenBSD__) || \
-      defined (__NetBSD__)
-#   define ASIOEXT_HAS_FILE_FLAGS 1
-#  endif
-# endif
-#endif
-
 // ASIOEXT_HAS_PRAGMA_ONCE: Defined if the compiler supports '#pragma once'
 #if !defined(ASIOEXT_HAS_PRAGMA_ONCE)
 # if !defined(ASIOEXT_DISABLE_PRAGMA_ONCE)
@@ -239,6 +228,24 @@
 #  define ASIOEXT_WINDOWS 1
 # elif defined(ASIOEXT_WINDOWS_APP)
 #  define ASIOEXT_WINDOWS 1
+# endif
+#endif
+
+// ASIOEXT_HAS_FILE_FLAGS: Defined if the OS has a fchflags syscall
+// and the stat struct has a st_flags member.
+#if !defined(ASIOEXT_HAS_FILE_FLAGS)
+# if !defined(ASIOEXT_DISABLE_FILE_FLAGS)
+#  if defined(__FreeBSD__) || defined (__APPLE__) || defined (__OpenBSD__) || \
+      defined (__NetBSD__)
+#   define ASIOEXT_HAS_FILE_FLAGS 1
+#  endif
+# endif
+#endif
+
+// ASIOEXT_HAS_PVEC_IO_FUNCTIONS: Defined if the OS supports preadv/pwritev.
+#if !defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
+# if !defined(__APPLE__) && !defined(__MACH__) && !defined(ASIOEXT_WINDOWS)
+#  define ASIOEXT_HAS_PVEC_IO_FUNCTIONS
 # endif
 #endif
 

@@ -73,6 +73,17 @@ ASIOEXT_DECL std::size_t writev(handle_type fd,
                                 int count,
                                 error_code& ec);
 
+ASIOEXT_DECL std::size_t pread(handle_type fd,
+                               void* buffer, std::size_t size,
+                               uint64_t offset,
+                               error_code& ec);
+
+ASIOEXT_DECL std::size_t pwrite(handle_type fd,
+                                const void* buffer, std::size_t size,
+                                uint64_t offset,
+                                error_code& ec);
+
+#if defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
 ASIOEXT_DECL std::size_t preadv(handle_type fd,
                                 iovec* bufs,
                                 int count,
@@ -84,6 +95,7 @@ ASIOEXT_DECL std::size_t pwritev(handle_type fd,
                                  int count,
                                  uint64_t offset,
                                  error_code& ec);
+#endif
 
 }
 }
