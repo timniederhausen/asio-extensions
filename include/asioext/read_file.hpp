@@ -19,6 +19,7 @@
 
 #include "asioext/detail/error_code.hpp"
 #include "asioext/detail/asio_version.hpp"
+#include "asioext/detail/buffer.hpp"
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>

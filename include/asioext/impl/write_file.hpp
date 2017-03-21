@@ -38,9 +38,11 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const char* filename, const ConstBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_write | open_flags::create_always,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_write |
+                                 open_flags::create_always,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     asio::write(file, buffers, ec);
 }
@@ -60,9 +62,11 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const wchar_t* filename, const ConstBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_write | open_flags::create_always,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_write |
+                                 open_flags::create_always,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     asio::write(file, buffers, ec);
 }
@@ -84,9 +88,11 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const boost::filesystem::path& filename,
               const ConstBufferSequence& buffers, error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_write | open_flags::create_always,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_write |
+                                 open_flags::create_always,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     asio::write(file, buffers, ec);
 }

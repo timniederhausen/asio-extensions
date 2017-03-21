@@ -7,7 +7,7 @@
 
 #include "asioext/file_handle.hpp"
 #include "asioext/scoped_file_handle.hpp"
-#include "asioext/open_flags.hpp"
+#include "asioext/open.hpp"
 
 #include "asioext/detail/error_code.hpp"
 #include "asioext/detail/error.hpp"
@@ -36,9 +36,11 @@ template <class CharContainer>
 ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
     read_file(const char* filename, CharContainer& c, error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_read | open_flags::open_existing,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_read |
+                                 open_flags::open_existing,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -57,9 +59,11 @@ template <class CharContainer>
 ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
     read_file(const wchar_t* filename, CharContainer& c, error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_read | open_flags::open_existing,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_read |
+                                 open_flags::open_existing,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -80,9 +84,11 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
     read_file(const boost::filesystem::path& filename,
               CharContainer& c, error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_read | open_flags::open_existing,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_read |
+                                 open_flags::open_existing,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -134,9 +140,11 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_read | open_flags::open_existing,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_read |
+                                 open_flags::open_existing,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -156,9 +164,11 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_read | open_flags::open_existing,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_read |
+                                 open_flags::open_existing,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -180,9 +190,11 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers, error_code& ec)
 {
-  scoped_file_handle file(filename,
-                          open_flags::access_read | open_flags::open_existing,
-                          file_perms::create_default, file_attrs::none, ec);
+  scoped_file_handle file = open(filename,
+                                 open_flags::access_read |
+                                 open_flags::open_existing,
+                                 file_perms::create_default,
+                                 file_attrs::none, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }

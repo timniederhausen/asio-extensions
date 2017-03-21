@@ -133,7 +133,7 @@ void thread_pool_file_service::open(implementation_type& impl,
     ec = asio::error::already_open;
     return;
   }
-  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec);
+  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec).release();
 }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -147,7 +147,7 @@ void thread_pool_file_service::open(implementation_type& impl,
     ec = asio::error::already_open;
     return;
   }
-  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec);
+  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec).release();
 }
 #endif
 
@@ -162,7 +162,7 @@ void thread_pool_file_service::open(implementation_type& impl,
     ec = asio::error::already_open;
     return;
   }
-  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec);
+  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec).release();
 }
 #endif
 

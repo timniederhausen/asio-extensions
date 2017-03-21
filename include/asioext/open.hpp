@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-#include "asioext/file_handle.hpp"
+#include "asioext/scoped_file_handle.hpp"
 #include "asioext/open_flags.hpp"
 #include "asioext/file_attrs.hpp"
 #include "asioext/file_perms.hpp"
@@ -72,14 +72,12 @@ ASIOEXT_NS_BEGIN
 ///
 /// @throws asio::system_error Thrown on failure.
 ///
-/// @note Unless manual ownership management is needed,
-/// @ref scoped_file_handle::open should be preferred.
-///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL file_handle open(const char* filename, open_flags flags,
-                              file_perms perms = file_perms::create_default,
-                              file_attrs attrs = file_attrs::none);
+ASIOEXT_DECL scoped_file_handle open(
+    const char* filename, open_flags flags,
+    file_perms perms = file_perms::create_default,
+    file_attrs attrs = file_attrs::none);
 
 /// @brief Open a file and return its handle.
 ///
@@ -111,24 +109,25 @@ ASIOEXT_DECL file_handle open(const char* filename, open_flags flags,
 ///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL file_handle open(const char* filename, open_flags flags,
-                              file_perms perms, file_attrs attrs,
-                              error_code& ec) ASIOEXT_NOEXCEPT;
+ASIOEXT_DECL scoped_file_handle open(
+    const char* filename, open_flags flags,
+    file_perms perms, file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
 /// @copydoc open(const char*,open_flags,file_perms,file_attrs)
 ///
 /// @note Only available on Windows.
-ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags,
-                              file_perms perms = file_perms::create_default,
-                              file_attrs attrs = file_attrs::none);
+ASIOEXT_DECL scoped_file_handle open(
+    const wchar_t* filename, open_flags flags,
+    file_perms perms = file_perms::create_default,
+    file_attrs attrs = file_attrs::none);
 
 /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
 ///
 /// @note Only available on Windows.
-ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags,
-                              file_perms perms, file_attrs attrs,
-                              error_code& ec) ASIOEXT_NOEXCEPT;
+ASIOEXT_DECL scoped_file_handle open(
+    const wchar_t* filename, open_flags flags,
+    file_perms perms, file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -136,19 +135,18 @@ ASIOEXT_DECL file_handle open(const wchar_t* filename, open_flags flags,
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
-                              open_flags flags,
-                              file_perms perms = file_perms::create_default,
-                              file_attrs attrs = file_attrs::none);
+ASIOEXT_DECL scoped_file_handle open(
+    const boost::filesystem::path& filename, open_flags flags,
+    file_perms perms = file_perms::create_default,
+    file_attrs attrs = file_attrs::none);
 
 /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-ASIOEXT_DECL file_handle open(const boost::filesystem::path& filename,
-                              open_flags flags,
-                              file_perms perms, file_attrs attrs,
-                              error_code& ec) ASIOEXT_NOEXCEPT;
+ASIOEXT_DECL scoped_file_handle open(
+    const boost::filesystem::path& filename, open_flags flags,
+    file_perms perms, file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 /// @}

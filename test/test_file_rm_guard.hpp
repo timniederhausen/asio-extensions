@@ -15,6 +15,7 @@
 #include <boost/filesystem.hpp>
 
 #include <iostream>
+#include <utility>
 
 ASIOEXT_NS_BEGIN
 
@@ -26,14 +27,29 @@ struct test_file_rm_guard
     // ctor
   }
 
+  test_file_rm_guard(test_file_rm_guard&& o)
+    : filename_(std::move(o.filename_))
+  {
+    // ctor
+  }
+
   ~test_file_rm_guard()
   {
+    if (filename_.empty())
+      return;
+
     boost::system::error_code ec;
     boost::filesystem::remove(filename_, ec);
     if (ec) {
       std::cerr << "Failed to delete " << filename_;
       std::abort();
     }
+  }
+
+  test_file_rm_guard& operator=(test_file_rm_guard&& o)
+  {
+    filename_ = std::move(filename_);
+    return *this;
   }
 
   boost::filesystem::path filename_;

@@ -8,7 +8,7 @@
 
 #include <asioext/scoped_file_handle.hpp>
 #include <asioext/file_handle.hpp>
-#include <asioext/open_flags.hpp>
+#include <asioext/open.hpp>
 
 #include <boost/asio/write.hpp>
 #include <boost/asio/read.hpp>
@@ -52,9 +52,9 @@ bool copy_file(const boost::filesystem::path& src_path,
   asioext::scoped_file_handle src;
 
   try {
-    src.open(src_path,
-             asioext::open_flags::access_read |
-             asioext::open_flags::open_existing);
+    src.reset(asioext::open(src_path,
+                            asioext::open_flags::access_read |
+                            asioext::open_flags::open_existing).release());
   } catch (std::exception& e) {
     std::cerr << "error: Failed to open " << src_path << " with: "
         << e.what() << '\n';
@@ -64,9 +64,9 @@ bool copy_file(const boost::filesystem::path& src_path,
   asioext::scoped_file_handle dst;
 
   try {
-    dst.open(dst_path,
-             asioext::open_flags::access_write |
-             asioext::open_flags::create_always);
+    dst.reset(asioext::open(dst_path,
+                            asioext::open_flags::access_write |
+                            asioext::open_flags::create_always).release());
   } catch (std::exception& e) {
     std::cerr << "error: Failed to open " << dst_path << " with: "
         << e.what() << '\n';

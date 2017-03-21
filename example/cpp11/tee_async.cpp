@@ -10,7 +10,6 @@
 
 #include <asio/write.hpp>
 #include <asio/io_service.hpp>
-#include <asio/use_future.hpp>
 
 #include <iostream>
 #include <cstdio>

@@ -6,22 +6,32 @@ declare_args() {
   # Use the Boost variant of Asio.
   asioext_use_boost_asio = true
 
-  # Enable Boost.Filesystem path support.
-  asioext_use_boost_fs = false
-
   # Build without external dependencies.
   asioext_standalone = false
+
+  # Enable Boost.Filesystem path support.
+  asioext_use_boost_fs = false
 }
+
+assert(!asioext_standalone || !asioext_use_boost_fs,
+       "Cannot use asioext_standalone with asioext_use_boost_fs")
 
 config("asioext_config") {
   defines = []
   include_dirs = [ "include" ]
 
+  if (!asioext_header_only) {
+    defines += [ "ASIOEXT_SEPARATE_COMPILATION" ]
+  }
   if (asioext_use_boost_asio) {
     defines += [ "ASIOEXT_USE_BOOST_ASIO" ]
   }
-  if (!asioext_header_only) {
-    defines += [ "ASIOEXT_SEPARATE_COMPILATION" ]
+  if (asioext_standalone) {
+    defines += [ "ASIOEXT_STANDALONE" ]
+  }
+  if (!asioext_use_boost_fs && !asioext_standalone) {
+    # Implied for asioext_standalone = true
+    defines += [ "ASIOEXT_DISABLE_BOOST_FILESYSTEM" ]
   }
 }
 
@@ -99,7 +109,6 @@ source_set("asioext") {
         "include/asioext/detail/impl/win_file_ops.cpp",
         "include/asioext/detail/impl/win_path.cpp",
         "include/asioext/impl/file_handle_win.cpp",
-        "include/asioext/impl/scoped_file_handle_win.cpp",
       ]
     }
   } else {
@@ -108,7 +117,6 @@ source_set("asioext") {
       sources += [
         "include/asioext/detail/impl/posix_file_ops.cpp",
         "include/asioext/impl/file_handle_posix.cpp",
-        "include/asioext/impl/scoped_file_handle_posix.cpp",
       ]
     }
   }
@@ -118,8 +126,10 @@ source_set("asioext") {
   public_configs = [ ":asioext_config" ]
   public_deps = []
 
-  assert(!asioext_standalone || !asioext_use_boost_fs,
-         "Cannot use asioext_standalone with asioext_use_boost_fs")
+  if (!asioext_standalone) {
+    # Header-only dependency
+    public_deps += [ "$external/boost" ]
+  }
 
   if (asioext_use_boost_fs) {
     public_deps += [ "$external/boost/libs/filesystem" ]
@@ -141,6 +151,7 @@ executable("asioext_unittests") {
   sources = [
     "test/basic_file.cpp",
     "test/main.cpp",
+    "test/open.cpp",
     "test/open_flags.cpp",
     "test/read_file.cpp",
     "test/scoped_file_handle.cpp",
@@ -158,4 +169,20 @@ executable("asioext_unittests") {
     "$external/boost/libs/filesystem",
     "$external/boost/libs/test:unit_test_framework",
   ]
+}
+
+group("examples") {
+  if (asioext_use_boost_asio) {
+    deps = [
+      "example/cpp03:cp",
+      "example/cpp03:tee",
+    ]
+  } else {
+    deps = [
+      "example/cpp11:cp",
+      "example/cpp11:simple",
+      "example/cpp11:tee",
+      "example/cpp11:tee_async",
+    ]
+  }
 }

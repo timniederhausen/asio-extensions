@@ -5,6 +5,7 @@
 set(sources
 	basic_file.cpp
 	main.cpp
+	open.cpp
 	open_flags.cpp
 	read_file.cpp
 	scoped_file_handle.cpp

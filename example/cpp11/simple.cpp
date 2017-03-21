@@ -5,7 +5,7 @@
 #include <asioext/scoped_file_handle.hpp>
 #include <asioext/read_file.hpp>
 #include <asioext/write_file.hpp>
-#include <asioext/open_flags.hpp>
+#include <asioext/open.hpp>
 
 #include <asio/read.hpp>
 
@@ -32,9 +32,9 @@ int main(int argc, const char* argv[])
     // (scoped_)file_handle provides low-level access to files.
     // (There's also basic_file, which needs an asio::io_service and provides
     // asynchronous I/O.)
-    asioext::scoped_file_handle file("myfile.txt",
-                                     asioext::open_flags::access_read |
-                                     asioext::open_flags::open_existing);
+    asioext::scoped_file_handle file =
+        asioext::open("myfile.txt", asioext::open_flags::access_read |
+                                    asioext::open_flags::open_existing);
 
     assert(file.size() == test_content.size() * 2);
 

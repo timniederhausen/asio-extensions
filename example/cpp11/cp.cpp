@@ -3,7 +3,8 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <asioext/scoped_file_handle.hpp>
-#include <asioext/open_flags.hpp>
+#include <asioext/open.hpp>
+#include <asioext/standard_streams.hpp>
 
 #include <asio/write.hpp>
 #include <asio/read.hpp>
@@ -39,25 +40,33 @@ void copy_file_aux(asioext::file_handle src, asioext::file_handle dst)
 
 bool copy_file(const std::string& src_path, const std::string& dst_path)
 {
-  // Exercise for the reader: Add support for '-' (i.e. stdout/stdin)
-  asioext::scoped_file_handle src;
+  asioext::file_handle src, dst;
+  asioext::scoped_file_handle src_file, dst_file;
 
   try {
-    src.open(src_path.c_str(),
-             asioext::open_flags::access_read |
-             asioext::open_flags::open_existing);
+    if (src_path != "-") {
+      src_file = asioext::open(src_path.c_str(),
+                               asioext::open_flags::access_read |
+                               asioext::open_flags::open_existing);
+      src = src_file.get();
+    } else {
+      src = asioext::get_stdin();
+    }
   } catch (std::exception& e) {
     std::cerr << "error: Failed to open " << src_path << " with: "
         << e.what() << '\n';
     return false;
   }
 
-  asioext::scoped_file_handle dst;
-
   try {
-    dst.open(dst_path.c_str(),
-             asioext::open_flags::access_write |
-             asioext::open_flags::create_always);
+    if (dst_path != "-") {
+      dst_file = asioext::open(src_path.c_str(),
+                               asioext::open_flags::access_write |
+                               asioext::open_flags::create_always);
+      dst = dst_file.get();
+    } else {
+      dst = asioext::get_stdout();
+    }
   } catch (std::exception& e) {
     std::cerr << "error: Failed to open " << dst_path << " with: "
         << e.what() << '\n';
@@ -65,7 +74,7 @@ bool copy_file(const std::string& src_path, const std::string& dst_path)
   }
 
   try {
-    copy_file_aux(src.get(), dst.get());
+    copy_file_aux(src, dst);
   } catch (std::exception& e) {
     std::cerr << "error: Copying data failed with " << e.what() << '\n';
     return false;

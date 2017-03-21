@@ -5,7 +5,7 @@
 
 #include <asioext/scoped_file_handle.hpp>
 #include <asioext/file_handle.hpp>
-#include <asioext/open_flags.hpp>
+#include <asioext/open.hpp>
 #include <asioext/standard_streams.hpp>
 
 #include <asio/write.hpp>
@@ -50,11 +50,11 @@ int main(int argc, const char* argv[])
 
   file_handles files(argc - 1);
   for (int i = 1; i != argc; ++i) {
-    files[i - 1].open(argv[i],
-                      asioext::open_flags::create_always |
-                      asioext::open_flags::access_write,
-                      asioext::file_perms::create_default,
-                      asioext::file_attrs::none, ec);
+    files[i - 1] = asioext::open(argv[i],
+                                 asioext::open_flags::create_always |
+                                 asioext::open_flags::access_write,
+                                 asioext::file_perms::create_default,
+                                 asioext::file_attrs::none, ec);
     if (ec) {
       std::cerr << "Failed to open " << argv[i] << " with " << ec << '\n';
       return 1;
