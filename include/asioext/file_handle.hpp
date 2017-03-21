@@ -240,12 +240,7 @@ public:
   /// @return The file's access permissions.
   ///
   /// @throws asio::system_error Thrown on failure.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL file_perms permissions();
 
   /// @brief Get the file's current access permissions.
@@ -257,12 +252,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL file_perms permissions(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Change file access permissions.
@@ -275,12 +265,7 @@ public:
   /// @param perms Permissions to set, add or remove.
   ///
   /// @throws asio::system_error Thrown on failure.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void permissions(file_perms perms);
 
   /// @brief Change file access permissions.
@@ -294,12 +279,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void permissions(file_perms perms,
                                 error_code& ec) ASIOEXT_NOEXCEPT;
 
@@ -311,12 +291,7 @@ public:
   /// @return The file's attributes.
   ///
   /// @throws asio::system_error Thrown on failure.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL file_attrs attributes();
 
   /// @brief Get the file's attributes.
@@ -328,12 +303,7 @@ public:
   /// the object is reset.
   ///
   /// @return The file's attributes.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL file_attrs attributes(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Change the file's attributes.
@@ -347,12 +317,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void attributes(file_attrs attrs);
 
   /// @brief Change the file's attributes.
@@ -366,12 +331,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-#if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
-  && (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
-  __declspec(deprecated("By default, this function always fails with "
-        "operation_not_supported when used on Windows XP, Windows Server 2003, "
-        "or earlier. Consult documentation for details."))
-#endif
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void attributes(file_attrs attrs,
                                error_code& ec) ASIOEXT_NOEXCEPT;
 

@@ -257,6 +257,18 @@
 # endif
 #endif
 
+#if !defined(ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING)
+# if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) && \
+     (!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600)
+#  define ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING __declspec(deprecated( \
+     "By default, this function always fails with operation_not_supported " \
+     "when used on Windows XP, Windows Server 2003, or earlier. " \
+     "Consult documentation for details."))
+# else
+#  define ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+# endif
+#endif
+
 // ASIOEXT_USE_BOOST_ASIO: Defines whether the standalone or
 // Boost version of Asio is used.
 //

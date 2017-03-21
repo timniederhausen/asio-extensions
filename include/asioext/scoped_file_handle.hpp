@@ -258,6 +258,67 @@ public:
 
   /// @}
 
+  /// @name Metadata functions
+  /// @{
+
+  /// @copydoc file_handle::permissions()
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_perms permissions()
+  {
+    return handle_.permissions();
+  }
+
+  /// @copydoc file_handle::permissions(error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_perms permissions(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle_.permissions(ec);
+  }
+
+  /// @copydoc file_handle::permissions(file_perms)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void permissions(file_perms perms)
+  {
+    return handle_.permissions(perms);
+  }
+
+  /// @copydoc file_handle::permissions(file_perms,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void permissions(file_perms perms, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle_.permissions(perms, ec);
+  }
+
+  /// @copydoc file_handle::attributes()
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_attrs attributes()
+  {
+    return handle_.attributes();
+  }
+
+  /// @copydoc file_handle::attributes(error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_attrs attributes(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle_.attributes(ec);
+  }
+
+  /// @copydoc file_handle::attributes(file_attrs)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void attributes(file_attrs attrs)
+  {
+    return handle_.attributes(attrs);
+  }
+
+  /// @copydoc file_handle::attributes(file_attrs,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void attributes(file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle_.attributes(attrs, ec);
+  }
+
+  /// @}
+
   /// @name SyncReadStream functions
   /// @{
 
