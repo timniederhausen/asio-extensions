@@ -226,7 +226,7 @@ thread_pool_file_service::async_read_some(implementation_type& impl,
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.handler),
+               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
                this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
@@ -244,7 +244,7 @@ thread_pool_file_service::async_write_some(implementation_type& impl,
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.handler),
+               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
                this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
@@ -263,7 +263,7 @@ thread_pool_file_service::async_read_some_at(
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.handler),
+               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
                this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
@@ -281,7 +281,7 @@ thread_pool_file_service::async_write_some_at(
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.handler),
+               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
                this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();

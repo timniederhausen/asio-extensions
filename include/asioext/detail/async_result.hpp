@@ -43,16 +43,16 @@ struct async_completion
 #if defined(ASIOEXT_HAS_MOVE)
   explicit async_completion(
       Handler& orig_handler)
-    : handler(static_cast<typename std::conditional<
+    : completion_handler(static_cast<typename std::conditional<
         std::is_same<Handler, handler_type>::value,
         handler_type&, Handler&&>::type>(orig_handler)),
-      result(handler)
+      result(completion_handler)
   {
   }
 #else
   explicit async_completion(const Handler& orig_handler)
-    : handler(orig_handler),
-      result(handler)
+    : completion_handler(orig_handler),
+      result(completion_handler)
   {
   }
 #endif
@@ -60,9 +60,9 @@ struct async_completion
 #if defined(ASIOEXT_HAS_MOVE)
   typename std::conditional<
     std::is_same<Handler, handler_type>::value,
-    handler_type&, handler_type>::type handler;
+    handler_type&, handler_type>::type completion_handler;
 #else
-  typename asio::handler_type<Handler, Signature>::type handler;
+  typename asio::handler_type<Handler, Signature>::type completion_handler;
 #endif
 
   asio::async_result<typename asio::handler_type<Handler, Signature>
