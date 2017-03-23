@@ -82,6 +82,15 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
 
   args.attrs = file_attrs_to_native(attrs);
 
+  constexpr file_perms write_perms = file_perms::owner_write |
+                                     file_perms::group_write |
+                                     file_perms::others_write;
+
+  if ((perms & write_perms) != file_perms::none)
+    args.attrs &= ~FILE_ATTRIBUTE_READONLY;
+  else
+    args.attrs |= FILE_ATTRIBUTE_READONLY;
+
   args.flags = 0;
   if ((flags & open_flags::async) != open_flags::none)
     args.flags |= FILE_FLAG_OVERLAPPED;

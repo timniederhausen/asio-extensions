@@ -20,6 +20,18 @@
 
 ASIOEXT_NS_BEGIN
 
+std::ostream& operator<<(std::ostream& os, file_attrs attrs)
+{
+   os << static_cast<std::underlying_type<file_perms>::type>(attrs);
+   return os;
+}
+
+std::ostream& operator<<(std::ostream& os, file_perms perms)
+{
+   os << static_cast<std::underlying_type<file_perms>::type>(perms);
+   return os;
+}
+
 BOOST_AUTO_TEST_SUITE(asioext_open)
 
 // BOOST_AUTO_TEST_SUITE() gives us a unique NS, so we don't need to
@@ -84,7 +96,7 @@ typedef boost::mpl::list<char_file, bfs_file> file_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
 {
-  File f;
+  File delete_guard;
   asioext::error_code ec;
 
   auto h = asioext::open(File::test_filename,
@@ -142,7 +154,87 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
   BOOST_CHECK(h.is_open());
   BOOST_CHECK(!ec);
 }
+BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
+{
+  asioext::error_code ec;
 
+#if !defined(ASIOEXT_WINDOWS)
+  // Ensure the process' umask doesn't interfere with our permission tests.
+  scoped_umask umsk(0);
+
+  static constexpr file_perms permissions_to_test[] = {
+    asioext::file_perms::owner_read,
+    asioext::file_perms::owner_write,
+    asioext::file_perms::owner_read | asioext::file_perms::owner_write,
+    asioext::file_perms::owner_all,
+
+    asioext::file_perms::group_read,
+    asioext::file_perms::group_write,
+    asioext::file_perms::group_read | asioext::file_perms::owner_write,
+    asioext::file_perms::group_all,
+
+    asioext::file_perms::others_read,
+    asioext::file_perms::others_write,
+    asioext::file_perms::others_read | asioext::file_perms::owner_write,
+    asioext::file_perms::others_all,
+
+    asioext::file_perms::all,
+  };
+
+  {
+    File delete_guard;
+    auto h = asioext::open(File::test_filename,
+                           open_flags::access_write |
+                           open_flags::create_new,
+                           asioext::file_perms::create_default,
+                           asioext::file_attrs::none, ec);
+    BOOST_REQUIRE(h.is_open());
+    BOOST_REQUIRE(!ec);
+    for (file_perms perms : permissions_to_test) {
+      BOOST_REQUIRE_NO_THROW(h.permissions(perms));
+      BOOST_REQUIRE_EQUAL(h.permissions(), perms);
+    }
+  }
+
+  for (file_perms perms : permissions_to_test) {
+    test_file_rm_guard delete_guard(File::test_filename);
+    auto h = asioext::open(File::test_filename,
+                           open_flags::access_read |
+                           open_flags::create_new,
+                           perms,
+                           asioext::file_attrs::none, ec);
+
+    BOOST_REQUIRE(h.is_open());
+    BOOST_REQUIRE(!ec);
+    BOOST_REQUIRE_EQUAL(h.permissions(), perms);
+  }
+
+  test_file_rm_guard delete_guard(File::test_filename);
+
+#else
+  File delete_guard;
+
+  constexpr asioext::file_perms write_perms =
+      asioext::file_perms::owner_write |
+      asioext::file_perms::group_write |
+      asioext::file_perms::others_write;
+
+  auto h = asioext::open(File::test_filename,
+                         open_flags::access_write |
+                         open_flags::create_new,
+                         asioext::file_perms::create_default & ~write_perms,
+                         asioext::file_attrs::none, ec);
+
+  BOOST_REQUIRE(h.is_open());
+  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_EQUAL(h.permissions(),
+                      (asioext::file_perms::all & ~write_perms));
+
+  BOOST_REQUIRE_NO_THROW(h.permissions(asioext::file_perms::all));
+  BOOST_REQUIRE_EQUAL(h.permissions(),
+                      asioext::file_perms::all);
+#endif
+}
 BOOST_AUTO_TEST_SUITE_END()
 
 ASIOEXT_NS_END
