@@ -74,7 +74,7 @@ source_set("asioext") {
     "include/asioext/impl/read_file.hpp",
     "include/asioext/impl/thread_pool_file_service.hpp",
     "include/asioext/impl/write_file.hpp",
-    "include/asioext/is_char_container.hpp",
+    "include/asioext/is_byte_array.hpp",
     "include/asioext/open.hpp",
     "include/asioext/open_flags.hpp",
     "include/asioext/read_file.hpp",
@@ -159,9 +159,7 @@ executable("asioext_unittests") {
   ]
 
   if (is_win) {
-    sources += [
-      "test/win_path.cpp",
-    ]
+    sources += [ "test/win_path.cpp" ]
   }
 
   deps = [

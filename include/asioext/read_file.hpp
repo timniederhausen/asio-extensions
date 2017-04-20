@@ -15,7 +15,7 @@
 # pragma once
 #endif
 
-#include "asioext/is_char_container.hpp"
+#include "asioext/is_byte_array.hpp"
 
 #include "asioext/detail/error_code.hpp"
 #include "asioext/detail/asio_version.hpp"
@@ -35,15 +35,15 @@ ASIOEXT_NS_BEGIN
 ///
 ///@{
 
-/// @name CharContainer overloads
-/// See @ref concept-CharContainer for CharContainer requirements.
+/// @name ByteArray overloads
+/// See @ref concept-ByteArray for ByteArray requirements.
 /// @{
 
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
-# define ASIOEXT_DETAIL_READFILE_CHAR_RET(T) \
-    typename std::enable_if<is_char_container<T>::value>::type
+# define ASIOEXT_DETAIL_READFILE_BYTE_RET(T) \
+    typename std::enable_if<is_byte_array<T>::value>::type
 #else
-# define ASIOEXT_DETAIL_READFILE_CHAR_RET(T) void
+# define ASIOEXT_DETAIL_READFILE_BYTE_RET(T) void
 #endif
 
 /// Read a file into a container.
@@ -55,12 +55,12 @@ ASIOEXT_NS_BEGIN
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-CharContainer requirements.
+///  @ref concept-ByteArray requirements.
 ///
 /// @throws asio::system_error Thrown on failure.
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const char* filename, CharContainer& c);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const char* filename, ByteArray& c);
 
 /// Read a file into a container.
 ///
@@ -71,47 +71,47 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-CharContainer requirements.
+///  @ref concept-ByteArray requirements.
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const char* filename, CharContainer& c, error_code& ec);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const char* filename, ByteArray& c, error_code& ec);
 
 #if defined(ASIOEXT_WINDOWS)  || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc read_file(const char*,CharContainer&)
+/// @copydoc read_file(const char*,ByteArray&)
 ///
 /// @note Only available on Windows.
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const wchar_t* filename, CharContainer& c);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const wchar_t* filename, ByteArray& c);
 
-/// @copydoc read_file(const char*,CharContainer&,error_code&)
+/// @copydoc read_file(const char*,ByteArray&,error_code&)
 ///
 /// @note Only available on Windows.
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const wchar_t* filename, CharContainer& c, error_code& ec);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const wchar_t* filename, ByteArray& c, error_code& ec);
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc read_file(const char*,CharContainer&)
+/// @copydoc read_file(const char*,ByteArray&)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const boost::filesystem::path& filename, CharContainer& c);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const boost::filesystem::path& filename, ByteArray& c);
 
-/// @copydoc read_file(const char*,CharContainer&,error_code&)
+/// @copydoc read_file(const char*,ByteArray&,error_code&)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
     read_file(const boost::filesystem::path& filename,
-              CharContainer& c, error_code& ec);
+              ByteArray& c, error_code& ec);
 #endif
 
 class file_handle;
@@ -127,12 +127,12 @@ class file_handle;
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-CharContainer requirements.
+///  @ref concept-ByteArray requirements.
 ///
 /// @throws asio::system_error Thrown on failure.
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(file_handle file, CharContainer& c);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(file_handle file, ByteArray& c);
 
 /// Read a file into a container.
 ///
@@ -145,13 +145,13 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-CharContainer requirements.
+///  @ref concept-ByteArray requirements.
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(file_handle file, CharContainer& c, error_code& ec);
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(file_handle file, ByteArray& c, error_code& ec);
 
 /// @}
 
@@ -161,7 +161,7 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
 # if ASIOEXT_ASIO_VERSION < 101100
 #  define ASIOEXT_DETAIL_READFILE_BUF_RET(T) \
-    typename std::enable_if<!is_char_container<T>::value>::type
+    typename std::enable_if<!is_byte_array<T>::value>::type
 # else
 #  define ASIOEXT_DETAIL_READFILE_BUF_RET(T) \
     typename std::enable_if<asio::is_mutable_buffer_sequence<T>::value>::type

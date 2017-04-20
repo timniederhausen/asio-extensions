@@ -23,18 +23,18 @@
 
 ASIOEXT_NS_BEGIN
 
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const char* filename, CharContainer& c)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const char* filename, ByteArray& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const char* filename, CharContainer& c, error_code& ec)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const char* filename, ByteArray& c, error_code& ec)
 {
   scoped_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -46,18 +46,18 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 }
 
 #if defined(ASIOEXT_WINDOWS)
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const wchar_t* filename, CharContainer& c)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const wchar_t* filename, ByteArray& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const wchar_t* filename, CharContainer& c, error_code& ec)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const wchar_t* filename, ByteArray& c, error_code& ec)
 {
   scoped_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -70,19 +70,19 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(const boost::filesystem::path& filename, CharContainer& c)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(const boost::filesystem::path& filename, ByteArray& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
     read_file(const boost::filesystem::path& filename,
-              CharContainer& c, error_code& ec)
+              ByteArray& c, error_code& ec)
 {
   scoped_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -94,30 +94,30 @@ ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
 }
 #endif
 
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(file_handle file, CharContainer& c)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(file_handle file, ByteArray& c)
 {
   error_code ec;
   read_file(file, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class CharContainer>
-ASIOEXT_DETAIL_READFILE_CHAR_RET(CharContainer)
-    read_file(file_handle file, CharContainer& c, error_code& ec)
+template <class ByteArray>
+ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+    read_file(file_handle file, ByteArray& c, error_code& ec)
 {
   const uint64_t size = file.size(ec);
   if (ec) return;
 
-  if (size > std::numeric_limits<typename CharContainer::size_type>::max() ||
+  if (size > std::numeric_limits<typename ByteArray::size_type>::max() ||
       size > c.max_size()) {
     ec = asio::error::message_size;
     return;
   }
 
   if (size != 0) {
-    c.resize(static_cast<typename CharContainer::size_type>(size));
+    c.resize(static_cast<typename ByteArray::size_type>(size));
     asio::read(file, asio::buffer(&c[0], c.size()), ec);
   } else {
     c.clear();

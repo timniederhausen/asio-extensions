@@ -1,13 +1,13 @@
 /// @file
-/// Defines the asioext::is_char_container trait.
+/// Defines the asioext::is_byte_array trait.
 ///
 /// @copyright Copyright (c) 2016 Tim Niederhausen (tim@rnc-ag.de)
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at
 /// http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_ISCHARCONTAINER_HPP
-#define ASIOEXT_ISCHARCONTAINER_HPP
+#ifndef ASIOEXT_ISBYTEARRAY_HPP
+#define ASIOEXT_ISBYTEARRAY_HPP
 
 #include "asioext/detail/config.hpp"
 
@@ -22,12 +22,13 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup concepts
-/// @defgroup concept-CharContainer CharContainer
-/// A `CharContainer` is a special SequenceContainer, storing `char`-like objects.
+/// @defgroup concept-ByteArray ByteArray
+/// A `ByteArray` is a special ContiguousContainer that stores POD-type objects
+/// with a size of 1 byte.
 ///
 /// ## Requirements
 ///
-/// The type X satisfies CharContainer if
+/// The type X satisfies ByteArray if
 /// * The type X satisfies SequenceContainer, and
 /// * The type X satisfies ContiguousContainer and
 /// * The type @c X::value_type satisfies PODType and
@@ -47,54 +48,54 @@ ASIOEXT_NS_BEGIN
 ///
 
 /// @ingroup traits
-///@{
+/// @{
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)
-/// Determines whether T satisfies the \ref concept-CharContainer requirements.
+/// Determines whether T satisfies the \ref concept-ByteArray requirements.
 ///
 /// @note Currently there is no automatic way of determining conformance,
 /// so by default @c value is false. There are partial specializations for
 /// std::vector and std::basic_string that define value as @c true if the
 /// contained type is one of @c char, `unsigned char`, `signed char`.
 template <class T>
-struct is_char_container
+struct is_byte_array
 {
-  /// @c true if T satisfies the \ref concept-CharContainer requirements,
+  /// @c true if T satisfies the \ref concept-ByteArray requirements,
   /// @c false otherwise.
   static const bool value;
 };
 #else
 template <class T>
-struct is_char_container : std::false_type
+struct is_byte_array : std::false_type
 {};
 
 template <class Traits, class Allocator>
-struct is_char_container<std::basic_string<char, Traits, Allocator> >
-  : std::true_type
-{};
-
-template <class Traits, class Allocator>
-struct is_char_container<std::basic_string<unsigned char, Traits, Allocator> >
+struct is_byte_array<std::basic_string<char, Traits, Allocator> >
   : std::true_type
 {};
 
 template <class Traits, class Allocator>
-struct is_char_container<std::basic_string<signed char, Traits, Allocator> >
+struct is_byte_array<std::basic_string<unsigned char, Traits, Allocator> >
+  : std::true_type
+{};
+
+template <class Traits, class Allocator>
+struct is_byte_array<std::basic_string<signed char, Traits, Allocator> >
   : std::true_type
 {};
 
 template <class Allocator>
-struct is_char_container<std::vector<char, Allocator> >
+struct is_byte_array<std::vector<char, Allocator> >
   : std::true_type
 {};
 
 template <class Allocator>
-struct is_char_container<std::vector<unsigned char, Allocator> >
+struct is_byte_array<std::vector<unsigned char, Allocator> >
   : std::true_type
 {};
 
 template <class Allocator>
-struct is_char_container<std::vector<signed char, Allocator> >
+struct is_byte_array<std::vector<signed char, Allocator> >
   : std::true_type
 {};
 #endif
