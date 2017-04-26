@@ -8,7 +8,7 @@
 
 #include "asioext/file_handle.hpp"
 #include "asioext/scoped_file_handle.hpp"
-#include "asioext/open_flags.hpp"
+#include "asioext/open.hpp"
 
 #include "asioext/detail/error_code.hpp"
 #include "asioext/detail/error.hpp"
