@@ -104,9 +104,6 @@ ASIOEXT_DECL scoped_file_handle open(
 /// of failure). Ownership is transferred to the caller. Handles are not
 /// inherited by child processes.
 ///
-/// @note Unless manual ownership management is needed,
-/// @ref scoped_file_handle::open should be preferred.
-///
 /// @see open_flags
 /// @see filenames
 ASIOEXT_DECL scoped_file_handle open(

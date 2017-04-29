@@ -315,8 +315,7 @@ public:
   ///
   /// @param attrs Attributes to set, add or remove.
   ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
+  /// @throws asio::system_error Thrown on failure.
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void attributes(file_attrs attrs);
 
