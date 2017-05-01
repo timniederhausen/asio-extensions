@@ -3,47 +3,23 @@
 [![Build Status](https://travis-ci.org/timniederhausen/asio-extensions.svg?branch=master)](https://travis-ci.org/timniederhausen/asio-extensions)
 [![Build status](https://ci.appveyor.com/api/projects/status/696yog08f0fbpck0/branch/master?svg=true)](https://ci.appveyor.com/project/timniederhausen/asio-extensions/branch/master)
 
+AsioExt is a collection of components that build on Asio.
+It is compatible with standalone Asio, as well as the Boost version.
+
 ## Feature overview
 
-* File handle wrappers (`file_handle`, `scoped_file_handle`) with support for:
+* File handle wrappers with support for:
   * Creating and opening files
+  * Asio's `*Stream` concepts (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
   * File permissions
   * File attributes
-  * Asio's `*Stream` concepts (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
 * Asynchronous file I/O interface (`basic_file`) with the following implementations:
-  * `thread_pool_file_service`: Currently only a thread(-pool) service is implemented.
-* Utilities for reading/writing files:
-  * `read_file`
-  * `write_file`
+  * `thread_pool_file_service`: Blocking I/O operations are performed on the
+     thread-pool.
+* Utilities for reading/writing files
 * Utilities for service writers:
   * Cancellation tokens
   * `Handler` wrappers
-
-AsioExt is compatible with standalone Asio, as well as the Boost version.
-To use the Boost version, #define ``ASIOEXT_USE_BOOST_ASIO``.
-
-## Building
-
-AsioExt requires at compiler that supports at least some C++11 features:
-
-* `constexpr` functions
-* Scoped enumerations (`enum class`)
-* C++11 `<type_traits>`
-* [optional] R-value references (If unavailable, objects will not be movable).
-
-Currently, AsioExt is being tested with the following compilers:
-
-* GCC 4.8
-* Clang 3.6
-* MSVC 2015
-
-Like Asio, AsioExt is header-only by default.
-However, it is also possible to build the AsioExt library as a separate compilation unit.
-
-## Library dependencies:
-
-* Asio 1.10.0+ (Only if not using Boost.Asio)
-* [optional] Boost 1.46.0+ (If _Boost.Filesystem_ or _Boost.Asio_ is used)
 
 ## Simple example
 
@@ -51,7 +27,7 @@ However, it is also possible to build the AsioExt library as a separate compilat
 #include <asioext/scoped_file_handle.hpp>
 #include <asioext/read_file.hpp>
 #include <asioext/write_file.hpp>
-#include <asioext/open_flags.hpp>
+#include <asioext/open.hpp>
 
 #include <asio/read.hpp>
 
@@ -75,7 +51,7 @@ int main(int argc, const char* argv[])
 
     assert(read_content == test_content + test_content);
 
-    // (scoped_)file_handle provides low-level access to files.
+    // (scoped_)file_handle simply wraps a native file handle.
     // (There's also basic_file, which needs an asio::io_service and provides
     // asynchronous I/O.)
     asioext::scoped_file_handle file =
