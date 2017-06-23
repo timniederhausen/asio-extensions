@@ -4,13 +4,20 @@ declare_args() {
   asioext_header_only = true
 
   # Use the Boost variant of Asio.
+  # see: ASIOEXT_USE_BOOST_ASIO
   asioext_use_boost_asio = true
 
   # Build without external dependencies.
+  # see: ASIOEXT_STANDALONE
   asioext_standalone = false
 
   # Enable Boost.Filesystem path support.
+  # see: ASIOEXT_DISABLE_BOOST_FILESYSTEM
   asioext_use_boost_fs = false
+
+  # Treat char* filenames as UTF-8 encoded on Windows.
+  # see: ASIOEXT_WINDOWS_USE_UTF8_FILENAMES
+  asioext_win_use_utf8 = false
 }
 
 assert(!asioext_standalone || !asioext_use_boost_fs,
@@ -32,6 +39,19 @@ config("asioext_config") {
   if (!asioext_use_boost_fs && !asioext_standalone) {
     # Implied for asioext_standalone = true
     defines += [ "ASIOEXT_DISABLE_BOOST_FILESYSTEM" ]
+  }
+  # Defines that only control code in the implementation can
+  # be omitted here:
+  if (asioext_win_use_utf8 && is_win && asioext_header_only) {
+    defines += [ "ASIOEXT_WINDOWS_USE_UTF8_FILENAMES" ]
+  }
+}
+
+config("internal") {
+  defines = [ "ASIOEXT_SOURCE" ]
+
+  if (asioext_win_use_utf8 && is_win && !asioext_header_only) {
+    defines += [ "ASIOEXT_WINDOWS_USE_UTF8_FILENAMES" ]
   }
 }
 
@@ -121,7 +141,7 @@ source_set("asioext") {
     }
   }
 
-  defines = [ "ASIOEXT_SOURCE" ]
+  configs += [ ":internal" ]
 
   public_configs = [ ":asioext_config" ]
   public_deps = []
