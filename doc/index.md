@@ -16,9 +16,9 @@ It is compatible with standalone Asio, as well as the Boost version.
 * Utilities for reading/writing files:
   * @ref asioext::read_file
   * @ref asioext::write_file
-* Utilities for service writers:
-  * Cancellation tokens
-  * `Handler` wrappers
+* Utilities for service writers (@ref service):
+  * Cancellation tokens (@ref asioext::cancellation_token)
+  * `Handler` wrappers (@ref asioext::composed_operation)
 
 ## Building
 

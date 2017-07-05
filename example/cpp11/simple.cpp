@@ -29,7 +29,7 @@ int main(int argc, const char* argv[])
 
     assert(read_content == test_content + test_content);
 
-    // (scoped_)file_handle provides low-level access to files.
+    // (scoped_)file_handle simply wraps a native file handle.
     // (There's also basic_file, which needs an asio::io_service and provides
     // asynchronous I/O.)
     asioext::scoped_file_handle file =

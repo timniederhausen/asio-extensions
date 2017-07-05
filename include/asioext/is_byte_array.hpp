@@ -44,23 +44,22 @@ ASIOEXT_NS_BEGIN
 ///
 /// | expression | return type | effects | precondition | postcondition |
 /// | ---------- | ----------- | ------- | ------------ | ------------- |
-/// | a.resize(n) | void | erases or appends elements to meet @c size() == @c n | | @c a.size() == n |
-///
+/// | `a.resize(n)` | void | erases or appends elements to meet `size() == n` | | `a.size() == n` |
 
 /// @ingroup traits
 /// @{
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)
-/// Determines whether T satisfies the \ref concept-ByteArray requirements.
+/// Determines whether T satisfies the @ref concept-ByteArray requirements.
 ///
 /// @note Currently there is no automatic way of determining conformance,
 /// so by default @c value is false. There are partial specializations for
 /// std::vector and std::basic_string that define value as @c true if the
-/// contained type is one of @c char, `unsigned char`, `signed char`.
+/// contained type is one of `char`, `unsigned char`, `signed char`.
 template <class T>
 struct is_byte_array
 {
-  /// @c true if T satisfies the \ref concept-ByteArray requirements,
+  /// @c true if T satisfies the @ref concept-ByteArray requirements,
   /// @c false otherwise.
   static const bool value;
 };

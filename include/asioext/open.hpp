@@ -33,12 +33,12 @@ ASIOEXT_NS_BEGIN
 /// On Windows you can either use ANSI or UTF-16 filenames, while on most
 /// Unix systems UTF-8 is used.
 ///
-/// By default, this library just passes the unmodified filename it receives
-/// to OS APIs.
+/// By default, this library just forwards the filename it receives
+/// to the OS APIs.
 ///
 /// On Windows this can be changed by defining
 /// @ref ASIOEXT_WINDOWS_USE_UTF8_FILENAMES, in which case AsioExt will assume
-/// that all <tt>const char*</tt> filenames passed to e.g. open() are UTF-8
+/// that all <tt>const char*</tt> filenames (passed to e.g. open()) are UTF-8
 /// encoded. AsioExt will then convert them to UTF-16 and call the appropriate
 /// wide character version of the API instead.
 
@@ -50,9 +50,7 @@ ASIOEXT_NS_BEGIN
 
 /// @brief Open a file and return its handle.
 ///
-/// This function attempts to open the specified file.
-/// If successful, the returned file_handle will contain the
-/// handle of the opened file. Otherwise the file_handle will be empty.
+/// This function opens the specified file and returns a handle to it.
 ///
 /// @param filename The path of the file to open.
 /// See @ref filenames for details.
@@ -66,9 +64,8 @@ ASIOEXT_NS_BEGIN
 /// @param attrs Attributes for newly created files. Unused if an existing
 /// file is opened. Defaults to @ref file_attrs::none.
 ///
-/// @return A handle to the opened file (or an empty handle in case
-/// of failure). Ownership is transferred to the caller. Handles are not
-/// inherited by child processes.
+/// @return A handle to the opened file. Ownership is transferred to the
+/// caller. Handles are not inherited by child processes.
 ///
 /// @throws asio::system_error Thrown on failure.
 ///
