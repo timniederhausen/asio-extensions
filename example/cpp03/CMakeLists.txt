@@ -5,4 +5,4 @@
 
 add_executable(asioext.ex.cpp03.cp cp.cpp)
 set_property(TARGET asioext.ex.cpp03.cp PROPERTY OUTPUT_NAME cp)
-target_link_libraries(asioext.ex.cpp03.cp asioext.static)
+target_link_libraries(asioext.ex.cpp03.cp asioext)

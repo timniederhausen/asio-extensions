@@ -20,4 +20,4 @@ endif ()
 
 add_executable(asioext.test ${sources})
 
-target_link_libraries(asioext.test asioext.static)
+target_link_libraries(asioext.test asioext)
