@@ -66,20 +66,6 @@ public:
     // ctor
   }
 
-#if defined(ASIOEXT_HAS_MOVE)
-  composed_operation(const composed_operation& other)
-    : handler_(ASIOEXT_MOVE_CAST(Handler)(other.handler_))
-  {
-    // ctor
-  }
-
-  composed_operation(composed_operation&& other)
-    : handler_(ASIOEXT_MOVE_CAST(Handler)(other.handler_))
-  {
-    // ctor
-  }
-#endif
-
 // TODO(tim): Make this protected.
 //protected:
   Handler handler_;
