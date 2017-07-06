@@ -15,8 +15,7 @@
 #endif
 
 #include "asioext/file_handle.hpp"
-
-#include "asioext/detail/error_code.hpp"
+#include "asioext/error_code.hpp"
 
 ASIOEXT_NS_BEGIN
 

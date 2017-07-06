@@ -18,8 +18,7 @@
 #include "asioext/open_flags.hpp"
 #include "asioext/file_attrs.hpp"
 #include "asioext/file_perms.hpp"
-
-#include "asioext/detail/error_code.hpp"
+#include "asioext/error_code.hpp"
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>

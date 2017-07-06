@@ -8,8 +8,8 @@
 
 #include "asioext/file_handle.hpp"
 #include "asioext/composed_operation.hpp"
+#include "asioext/error_code.hpp"
 
-#include "asioext/detail/error_code.hpp"
 #include "asioext/detail/error.hpp"
 #include "asioext/detail/move_support.hpp"
 #include "asioext/detail/operation.hpp"

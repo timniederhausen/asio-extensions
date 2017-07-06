@@ -15,9 +15,9 @@
 #include "asioext/seek_origin.hpp"
 #include "asioext/file_perms.hpp"
 #include "asioext/file_attrs.hpp"
+#include "asioext/error_code.hpp"
 
 #include "asioext/detail/cstdint.hpp"
-#include "asioext/detail/error_code.hpp"
 
 #define _FILE_OFFSET_BITS 64
 

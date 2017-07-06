@@ -3,8 +3,8 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "asioext/open.hpp"
+#include "asioext/error_code.hpp"
 
-#include "asioext/detail/error_code.hpp"
 #include "asioext/detail/throw_error.hpp"
 #include "asioext/detail/move_support.hpp"
 

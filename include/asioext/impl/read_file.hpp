@@ -8,8 +8,8 @@
 #include "asioext/file_handle.hpp"
 #include "asioext/scoped_file_handle.hpp"
 #include "asioext/open.hpp"
+#include "asioext/error_code.hpp"
 
-#include "asioext/detail/error_code.hpp"
 #include "asioext/detail/error.hpp"
 #include "asioext/detail/buffer.hpp"
 

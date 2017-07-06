@@ -11,7 +11,7 @@
 # pragma once
 #endif
 
-#include "asioext/detail/error_code.hpp"
+#include "asioext/error_code.hpp"
 
 ASIOEXT_NS_BEGIN
 

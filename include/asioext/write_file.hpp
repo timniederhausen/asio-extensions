@@ -15,7 +15,8 @@
 # pragma once
 #endif
 
-#include "asioext/detail/error_code.hpp"
+#include "asioext/error_code.hpp"
+
 #include "asioext/detail/asio_version.hpp"
 #include "asioext/detail/buffer.hpp"
 

@@ -19,8 +19,8 @@
 #include "asioext/file_perms.hpp"
 #include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
+#include "asioext/error_code.hpp"
 
-#include "asioext/detail/error_code.hpp"
 #include "asioext/detail/throw_error.hpp"
 #include "asioext/detail/move_support.hpp"
 #include "asioext/detail/async_result.hpp"

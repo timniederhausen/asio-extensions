@@ -154,6 +154,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
   BOOST_CHECK(h.is_open());
   BOOST_CHECK(!ec);
 }
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
 {
   asioext::error_code ec;
