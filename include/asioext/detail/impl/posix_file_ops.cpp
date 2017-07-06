@@ -209,13 +209,13 @@ handle_type get_stderr(error_code& ec)
 uint64_t size(handle_type fd, error_code& ec)
 {
   struct stat st;
-  if (::fstat(fd, &st) != 0) {
-    set_error(ec, errno);
-    return 0;
+  if (::fstat(fd, &st) == 0) {
+    ec = error_code();
+    return st.st_size;
   }
 
-  ec = error_code();
-  return st.st_size;
+  set_error(ec, errno);
+  return 0;
 }
 
 // Make sure our origin mappings match the system headers.
