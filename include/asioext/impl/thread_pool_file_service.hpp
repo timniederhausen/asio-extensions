@@ -30,7 +30,7 @@ class read_some_op : public operation<Handler>
 public:
   read_some_op(const cancellation_token_source& source, file_handle handle,
                const MutableBufferSequence& buffers,
-               ASIOEXT_MOVE_ARG(Handler) handler,
+               Handler& handler,
                asio::io_service& io_service)
     : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
     , handle_(handle)
@@ -54,8 +54,7 @@ class write_some_op : public operation<Handler>
 public:
   write_some_op(const cancellation_token_source& source, file_handle handle,
                 const ConstBufferSequence& buffers,
-                ASIOEXT_MOVE_ARG(Handler) handler,
-                asio::io_service& io_service)
+                Handler& handler, asio::io_service& io_service)
     : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
     , handle_(handle)
     , cancel_token_(source)
@@ -78,8 +77,7 @@ class read_some_at_op : public operation<Handler>
 public:
   read_some_at_op(const cancellation_token_source& source, file_handle handle,
                   uint64_t offset, const MutableBufferSequence& buffers,
-                  ASIOEXT_MOVE_ARG(Handler) handler,
-                  asio::io_service& io_service)
+                  Handler& handler, asio::io_service& io_service)
     : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
     , handle_(handle)
     , cancel_token_(source)
@@ -104,8 +102,7 @@ class write_some_at_op : public operation<Handler>
 public:
   write_some_at_op(const cancellation_token_source& source, file_handle handle,
                    uint64_t offset, const ConstBufferSequence& buffers,
-                   ASIOEXT_MOVE_ARG(Handler) handler,
-                   asio::io_service& io_service)
+                   Handler& handler, asio::io_service& io_service)
     : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
     , handle_(handle)
     , cancel_token_(source)
@@ -226,8 +223,7 @@ thread_pool_file_service::async_read_some(implementation_type& impl,
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
-               this->get_io_service());
+               init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
 }
@@ -244,8 +240,7 @@ thread_pool_file_service::async_write_some(implementation_type& impl,
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
-               this->get_io_service());
+               init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
 }
@@ -263,8 +258,7 @@ thread_pool_file_service::async_read_some_at(
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
-               this->get_io_service());
+               init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
 }
@@ -281,8 +275,7 @@ thread_pool_file_service::async_write_some_at(
 
   async_completion<Handler, void (error_code, std::size_t)> init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
-               ASIOEXT_MOVE_CAST(Handler)(init.completion_handler),
-               this->get_io_service());
+               init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
   return init.result.get();
 }
