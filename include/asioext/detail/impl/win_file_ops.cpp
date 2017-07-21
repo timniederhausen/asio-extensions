@@ -92,7 +92,7 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
     args.attrs |= FILE_ATTRIBUTE_READONLY;
 
   args.flags = 0;
-  if ((flags & open_flags::async) != open_flags::none)
+  if ((flags & open_flags::internal_async) != open_flags::none)
     args.flags |= FILE_FLAG_OVERLAPPED;
 
   // TODO: FILE_SHARE_DELETE?

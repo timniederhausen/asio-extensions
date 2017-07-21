@@ -88,12 +88,14 @@ enum class open_flags
 
   // special
 
+#if !defined(ASIOEXT_IS_DOCUMENTATION)
+  // XXX: Intentionally undocumented, Windows only.
   /// Open the file for asynchronous operations.
   ///
-  /// Setting this option will not prevent synchronous I/O operations
-  /// on the file. However, mixing synchronous and asynchronous operations
-  /// is discouraged.
-  async = 1 << 9,
+  /// @warning A handle created with this flag cannot be used in combination
+  /// with @c file_handle's I/O functions.
+  internal_async = 1 << 9,
+#endif
 };
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(open_flags)
