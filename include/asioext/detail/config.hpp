@@ -28,6 +28,7 @@
 # define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
 # define ASIOEXT_DELETED = delete
 # define ASIOEXT_NOEXCEPT noexcept
+# define ASIOEXT_HAS_ALIAS_TEMPLATES 1
 #endif
 
 #define ASIOEXT_NS_BEGIN namespace asioext {
@@ -165,6 +166,51 @@
 # endif
 # if !defined(ASIOEXT_NOEXCEPT)
 #  define ASIOEXT_NOEXCEPT
+# endif
+#endif
+
+// ASIOEXT_NOEXCEPT_IF: Macro expanding to 'noexcept(pred)' on supported compilers.
+#if !defined(ASIOEXT_NOEXCEPT)
+# if !defined(ASIOEXT_DISABLE_NOEXCEPT)
+#  if (BOOST_VERSION >= 105300)
+#   define ASIOEXT_NOEXCEPT_IF BOOST_NOEXCEPT_IF
+#  elif defined(__clang__)
+#   if __has_feature(__cxx_noexcept__)
+#    define ASIOEXT_NOEXCEPT_IF(pred) noexcept((pred))
+#   endif
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#      define ASIOEXT_NOEXCEPT_IF(pred) noexcept((pred))
+#    endif
+#   endif
+#  elif defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1900)
+#    define ASIOEXT_NOEXCEPT_IF(pred) noexcept((pred))
+#  endif
+# endif
+# if !defined(ASIOEXT_NOEXCEPT_IF)
+#  define ASIOEXT_NOEXCEPT_IF(pred)
+# endif
+#endif
+
+// Support alias templates on compilers known to allow it.
+#if !defined(ASIOEXT_HAS_ALIAS_TEMPLATES)
+# if !defined(ASIOEXT_DISABLE_ALIAS_TEMPLATES)
+#  if defined(__clang__)
+#   if __has_feature(__cxx_alias_templates__)
+#    define ASIOEXT_HAS_ALIAS_TEMPLATES 1
+#   endif
+#  endif
+#  if defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIOEXT_HAS_ALIAS_TEMPLATES 1
+#    endif
+#   endif
+#  endif
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1900)
+#   define ASIOEXT_HAS_ALIAS_TEMPLATES 1
+#  endif
 # endif
 #endif
 
