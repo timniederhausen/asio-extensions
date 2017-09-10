@@ -40,6 +40,7 @@ config("asioext_config") {
     # Implied for asioext_standalone = true
     defines += [ "ASIOEXT_DISABLE_BOOST_FILESYSTEM" ]
   }
+
   # Defines that only control code in the implementation can
   # be omitted here:
   if (asioext_win_use_utf8 && is_win && asioext_header_only) {
@@ -61,6 +62,7 @@ source_set("asioext") {
     "include/asioext/basic_file.hpp",
     "include/asioext/cancellation_token.hpp",
     "include/asioext/composed_operation.hpp",
+    "include/asioext/connect.hpp",
     "include/asioext/detail/asio_version.hpp",
     "include/asioext/detail/async_result.hpp",
     "include/asioext/detail/buffer.hpp",
@@ -88,6 +90,7 @@ source_set("asioext") {
     "include/asioext/file_attrs.hpp",
     "include/asioext/file_handle.hpp",
     "include/asioext/file_perms.hpp",
+    "include/asioext/impl/connect.hpp",
     "include/asioext/impl/file_handle.hpp",
     "include/asioext/impl/file_handle_posix.hpp",
     "include/asioext/impl/file_handle_win.hpp",
@@ -109,6 +112,7 @@ source_set("asioext") {
   if (!asioext_header_only) {
     sources += [
       "include/asioext/impl/cancellation_token.cpp",
+      "include/asioext/impl/connect.cpp",
       "include/asioext/impl/file_handle.cpp",
       "include/asioext/impl/open.cpp",
       "include/asioext/impl/open_flags.cpp",
