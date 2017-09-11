@@ -16,6 +16,7 @@
 #endif
 
 #include "asioext/detail/asio_version.hpp"
+#include "asioext/detail/move_support.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
