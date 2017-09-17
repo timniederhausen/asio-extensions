@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructor, FileService, service_types)
                                       asioext::open_flags::open_always,
                                       asioext::file_perms::create_default,
                                       asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 #if defined(ASIOEXT_WINDOWS)
   test_file_rm_guard rguard2(empty_filenamew);
   asioext::basic_file<FileService> f3(io_service, L"nosuchfile",
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructor, FileService, service_types)
                                       asioext::open_flags::open_always,
                                       asioext::file_perms::create_default,
                                       asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 #endif
 }
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
 
-  BOOST_REQUIRE(!!ec);
+  BOOST_REQUIRE(ec);
   BOOST_CHECK(!file.is_open());
   BOOST_CHECK_NO_THROW(file.close());
 
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
 
-  BOOST_REQUIRE(!!ec);
+  BOOST_REQUIRE(ec);
   BOOST_CHECK(!file.is_open());
   BOOST_CHECK_NO_THROW(file.close());
 #endif
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
 
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(file.is_open());
 
   BOOST_CHECK_NO_THROW(file.close());
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
             open_flags::access_write | open_flags::open_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(file.is_open());
 #endif
 }
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_write, FileService, service_types)
             open_flags::access_write | open_flags::create_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, asio::write(file, asio::buffer(test_data, 0)));
   BOOST_REQUIRE_EQUAL(test_data_size,
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_write, FileService, service_types)
             open_flags::access_read | open_flags::open_existing,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   char buffer[128];
   BOOST_REQUIRE_EQUAL(test_data_size,
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(position_and_size, FileService, service_types)
             open_flags::access_write | open_flags::create_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, file.position());
   BOOST_REQUIRE_EQUAL(test_data_size,
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(seek, FileService, service_types)
             open_flags::access_write | open_flags::create_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, file.seek(asioext::seek_origin::from_current, 0));
   BOOST_REQUIRE_EQUAL(10, file.seek(asioext::seek_origin::from_current, 10));
@@ -222,7 +222,8 @@ struct write_handler
 
   void operator()(const error_code& ec, std::size_t bytes_transferred)
   {
-    BOOST_REQUIRE(!ec);
+    BOOST_REQUIRE_MESSAGE(!ec,
+                          "Operation " << state_ << " failed with: " << ec);
     switch (state_) {
       case 0: {
         state_ = 1;
@@ -295,7 +296,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
             open_flags::access_write | open_flags::create_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_NO_THROW(asio::async_write(file, asio::buffer(test_data, 0),
                                            write_handler<FileService>(file)));
@@ -310,7 +311,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
             open_flags::access_read | open_flags::open_existing,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   char buffer[128];
   BOOST_REQUIRE_NO_THROW(asio::async_read(
@@ -378,7 +379,7 @@ BOOST_AUTO_TEST_CASE(async_read_write_cancel)
             open_flags::access_write | open_flags::create_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_REQUIRE(file.is_open());
 
   svc->get_pool_io_service().post(cancel_handler<FileService>(file));

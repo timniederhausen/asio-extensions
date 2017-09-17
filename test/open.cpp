@@ -104,17 +104,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
                          open_flags::open_existing,
                          asioext::file_perms::create_default,
                          asioext::file_attrs::none, ec);
-
-  BOOST_REQUIRE(!h.is_open());
   BOOST_REQUIRE(ec);
+  BOOST_CHECK(!h.is_open());
 
   h = asioext::open(File::test_filename,
                     open_flags::access_read |
                     open_flags::create_new,
                     asioext::file_perms::create_default,
                     asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
-  BOOST_CHECK(!ec);
 
   h.close();
 
@@ -131,8 +130,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
                     open_flags::open_always,
                     asioext::file_perms::create_default,
                     asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
-  BOOST_CHECK(!ec);
 
   h.close();
 
@@ -141,8 +140,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
                     open_flags::open_existing,
                     asioext::file_perms::create_default,
                     asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
-  BOOST_CHECK(!ec);
 
   h.close();
 
@@ -151,8 +150,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
                     open_flags::create_always,
                     asioext::file_perms::create_default,
                     asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
-  BOOST_CHECK(!ec);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
@@ -190,7 +189,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
                            asioext::file_perms::create_default,
                            asioext::file_attrs::none, ec);
     BOOST_REQUIRE(h.is_open());
-    BOOST_REQUIRE(!ec);
+    BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
     for (file_perms perms : permissions_to_test) {
       BOOST_REQUIRE_NO_THROW(h.permissions(perms));
       BOOST_REQUIRE_EQUAL(h.permissions(), perms);
@@ -206,7 +205,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
                            asioext::file_attrs::none, ec);
 
     BOOST_REQUIRE(h.is_open());
-    BOOST_REQUIRE(!ec);
+    BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
     BOOST_REQUIRE_EQUAL(h.permissions(), perms);
   }
 
@@ -227,7 +226,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
                          asioext::file_attrs::none, ec);
 
   BOOST_REQUIRE(h.is_open());
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_REQUIRE_EQUAL(h.permissions(),
                       (asioext::file_perms::all & ~write_perms));
 
@@ -236,6 +235,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
                       asioext::file_perms::all);
 #endif
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 ASIOEXT_NS_END

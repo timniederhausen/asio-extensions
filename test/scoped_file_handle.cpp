@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(ownership_transfer)
 
   asioext::scoped_file_handle fh2;
   fh2.reset(h, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(!fh.is_open());
   BOOST_CHECK(fh2.is_open());
   BOOST_REQUIRE_EQUAL(fh2.get().native_handle(), h.native_handle());
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(read_write)
                      asioext::open_flags::create_always,
                      asioext::file_perms::create_default,
                      asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, asio::write(fh, asio::buffer(test_data, 0)));
   BOOST_REQUIRE_EQUAL(test_data_size,
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(read_write)
                      asioext::open_flags::open_existing,
                      asioext::file_perms::create_default,
                      asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   asio::mutable_buffers_1 empty_buffer2(nullptr, 0);
   BOOST_REQUIRE_EQUAL(0, fh.read_some_at(0, empty_buffer2));
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(position_and_size)
                      asioext::open_flags::create_always,
                      asioext::file_perms::create_default,
                      asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.position());
   BOOST_REQUIRE_EQUAL(test_data_size,
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(seek)
             asioext::open_flags::create_always,
             asioext::file_perms::create_default,
             asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::seek_origin::from_current, 0));
   BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, 10));
