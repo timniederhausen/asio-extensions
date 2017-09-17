@@ -36,6 +36,20 @@ BOOST_AUTO_TEST_CASE(simple)
   BOOST_CHECK_EQUAL(p2.c_str(), L"D:\\test\\abcdef.ghi");
 }
 
+BOOST_AUTO_TEST_CASE(error_reset)
+{
+  asioext::error_code ec;
+
+  win_path p1("", 0, ec);
+  BOOST_REQUIRE_MESSAGE(ec, "ec: " << ec);
+  BOOST_REQUIRE_EQUAL(ec.value(), ERROR_INVALID_PARAMETER);
+
+  const char s1[] = "hello.gni";
+
+  win_path p2(s1, std::strlen(s1), ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+}
+
 BOOST_AUTO_TEST_CASE(large)
 {
   asioext::error_code ec;

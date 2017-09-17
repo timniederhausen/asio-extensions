@@ -26,9 +26,10 @@ win_path::win_path(const char* s, std::size_t len, error_code& ec)
     buffer_[new_length] = L'\0';
   }
 
-  if (new_length == 0) {
+  if (new_length != 0) {
+    ec = error_code();
+  } else {
     ec.assign(::GetLastError(), asio::error::get_system_category());
-    return;
   }
 }
 
