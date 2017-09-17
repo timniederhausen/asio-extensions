@@ -236,6 +236,72 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
 #endif
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
+{
+  asioext::error_code ec;
+
+#if !defined(ASIOEXT_WINDOWS)
+  // Ensure the process' umask doesn't interfere with our permission tests.
+  scoped_umask umsk(0);
+
+  static constexpr file_attrs attributes_to_test[] = {
+#ifdef UF_HIDDEN
+    file_attrs::hidden,
+#endif
+#ifdef UF_SYSTEM
+    file_attrs::system,
+#endif
+#ifdef UF_ARCHIVE
+    file_attrs::archive,
+#endif
+#ifdef UF_NODUMP
+    file_attrs::no_dump,
+#endif
+#ifdef UF_IMMUTABLE
+    file_attrs::user_immutable,
+#endif
+#ifdef UF_NOUNLINK
+    file_attrs::user_no_unlink,
+#endif
+  };
+#else
+  static constexpr asioext::file_attrs attributes_to_test[] = {
+    file_attrs::hidden,
+    file_attrs::system,
+    // Might already be set by default (if inherited)
+    //file_attrs::not_indexed,
+  };
+#endif
+
+  {
+    File delete_guard;
+    auto h = asioext::open(File::test_filename,
+                           open_flags::access_write |
+                           open_flags::create_new,
+                           asioext::file_perms::create_default,
+                           asioext::file_attrs::none, ec);
+    BOOST_REQUIRE(h.is_open());
+    BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+    for (file_attrs attrs : attributes_to_test) {
+      BOOST_REQUIRE_NO_THROW(h.attributes(attrs));
+      BOOST_REQUIRE_EQUAL(h.attributes() & ~file_attrs::not_indexed, attrs);
+    }
+  }
+
+  for (file_attrs attrs : attributes_to_test) {
+    test_file_rm_guard delete_guard(File::test_filename);
+    auto h = asioext::open(File::test_filename,
+                           open_flags::access_read |
+                           open_flags::create_new,
+                           asioext::file_perms::create_default,
+                           attrs, ec);
+
+    BOOST_REQUIRE(h.is_open());
+    BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+    BOOST_REQUIRE_EQUAL(h.attributes() & ~file_attrs::not_indexed, attrs);
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 ASIOEXT_NS_END

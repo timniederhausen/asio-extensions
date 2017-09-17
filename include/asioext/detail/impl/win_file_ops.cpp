@@ -62,7 +62,6 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
   if (!is_valid(flags))
     return false;
 
-  args.creation_disposition = 0;
   if ((flags & open_flags::create_new) != open_flags::none)
     args.creation_disposition = CREATE_NEW;
   else if ((flags & open_flags::create_always) != open_flags::none)
@@ -73,6 +72,8 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
     args.creation_disposition = OPEN_ALWAYS;
   else if ((flags & open_flags::truncate_existing) != open_flags::none)
     args.creation_disposition = TRUNCATE_EXISTING;
+  else
+    args.creation_disposition = 0;
 
   args.desired_access = 0;
   if ((flags & open_flags::access_read) != open_flags::none)
@@ -374,7 +375,14 @@ void attributes(handle_type fd, file_attrs attrs, error_code& ec)
       info.FileAttributes |= new_attrs;
     else
       info.FileAttributes &= ~new_attrs;
+  } else {
+    info.FileAttributes = new_attrs;
   }
+
+  // 0 means "don't change any attributes" and not "no attributes set"
+  // as one might expect.
+  if (info.FileAttributes == 0)
+    info.FileAttributes = FILE_ATTRIBUTE_NORMAL;
 
   // We deliberately set all the other fields (file times) to zero,
   // so they are ignored by the kernel. Otherwise we'd risk overwriting
