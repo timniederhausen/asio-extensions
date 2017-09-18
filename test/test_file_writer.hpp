@@ -45,7 +45,8 @@ struct test_file_writer
     boost::system::error_code ec;
     boost::filesystem::remove(filename_, ec);
     if (ec) {
-      std::cerr << "Failed to delete " << filename_;
+      std::cerr << "Failed to delete " << filename_ << " with " << ec;
+      std::cerr << std::endl;
       std::abort();
     }
   }
