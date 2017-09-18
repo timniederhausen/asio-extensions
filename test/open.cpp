@@ -286,6 +286,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
       BOOST_REQUIRE_NO_THROW(h.attributes(attrs));
       BOOST_REQUIRE_EQUAL(h.attributes() & ~file_attrs::not_indexed, attrs);
     }
+    // Remove all attributes again. Some (immutable, ...) might otherwise
+    // prevent the file's deletion.
+    BOOST_REQUIRE_NO_THROW(h.attributes(file_attrs::none));
   }
 
   for (file_attrs attrs : attributes_to_test) {
@@ -299,6 +302,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
     BOOST_REQUIRE(h.is_open());
     BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
     BOOST_REQUIRE_EQUAL(h.attributes() & ~file_attrs::not_indexed, attrs);
+    // Remove all attributes again. Some (immutable, ...) might otherwise
+    // prevent the file's deletion.
+    BOOST_REQUIRE_NO_THROW(h.attributes(file_attrs::none));
   }
 }
 
