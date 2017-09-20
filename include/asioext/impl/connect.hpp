@@ -37,7 +37,7 @@ public:
     socket_.open(asio::ip::tcp::v4(), ec);
     if (ec) {
       socket_.get_io_service().post(asio::detail::bind_handler(
-          handler_, ec, asio::ip::tcp::resolver::iterator()));
+          this->handler_, ec, asio::ip::tcp::resolver::iterator()));
       return;
     }
     resolver_.async_resolve(q, ASIOEXT_MOVE_CAST(connect_op)(*this));
@@ -56,7 +56,7 @@ void connect_op<Handler>::operator()(error_code ec,
                                      asio::ip::tcp::resolver::iterator iter)
 {
   if (ec) {
-    handler_(ec, asio::ip::tcp::resolver::iterator());
+    this->handler_(ec, asio::ip::tcp::resolver::iterator());
     return;
   }
   switch (state_) {
@@ -66,7 +66,7 @@ void connect_op<Handler>::operator()(error_code ec,
       return;
     }
     case 1: {
-      handler_(ec, iter);
+      this->handler_(ec, iter);
       return;
     }
   }
@@ -87,7 +87,7 @@ async_connect(asio::ip::tcp::socket::lowest_layer_type& socket,
     void (error_code, asio::ip::tcp::resolver::iterator)
   > completion;
 
-  typedef detail::connect_op<completion::handler_type> operation;
+  typedef detail::connect_op<typename completion::handler_type> operation;
 
   completion init(handler);
   operation op(init.completion_handler, socket, resolver, q);
