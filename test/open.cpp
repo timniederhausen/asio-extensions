@@ -288,13 +288,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
     }
     // Remove all attributes again. Some (immutable, ...) might otherwise
     // prevent the file's deletion.
-    BOOST_REQUIRE_NO_THROW(h.attributes(file_attrs::none));
+    h.attributes(file_attrs::none, ec);
+    BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   }
 
   for (file_attrs attrs : attributes_to_test) {
     test_file_rm_guard delete_guard(File::test_filename);
     auto h = asioext::open(File::test_filename,
-                           open_flags::access_read |
+                           open_flags::access_write |
                            open_flags::create_new,
                            asioext::file_perms::create_default,
                            attrs, ec);
@@ -304,7 +305,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
     BOOST_REQUIRE_EQUAL(h.attributes() & ~file_attrs::not_indexed, attrs);
     // Remove all attributes again. Some (immutable, ...) might otherwise
     // prevent the file's deletion.
-    BOOST_REQUIRE_NO_THROW(h.attributes(file_attrs::none));
+    h.attributes(file_attrs::none, ec);
+    BOOST_CHECK_MESSAGE(!ec, "ec: " << ec);
   }
 }
 
