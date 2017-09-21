@@ -14,7 +14,10 @@
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # include <boost/system/error_code.hpp>
 #else
-# include <asio/error_code.hpp>
+# if !defined(ASIO_HAS_STD_SYSTEM_ERROR)
+#  error Asio's fallback error_code implementation is non-conforming
+# endif
+# include <system_error>
 #endif
 
 ASIOEXT_NS_BEGIN
@@ -24,16 +27,34 @@ ASIOEXT_NS_BEGIN
 ///
 /// If Boost.Asio is used (i.e. @ref ASIOEXT_USE_BOOST_ASIO is defined),
 /// this will be a typedef for @c boost::system::error_code.
-/// Otherwise this'll be a typedef for asio::error_code
-/// (which in turn is a typedef for @c std::error_code if available)
-///
-/// @note If std::error_code is unavailable, asio::error_code is a bundled
-/// custom error_code class, whose interface isn't conforming.
-typedef implementation_defined error_code;
+/// Otherwise this'll be a typedef for @c std::error_code.
+
+/// Either @c boost::system::error_code or @c std::error_code.
+typedef automatically_chosen error_code;
+
+/// Either @c boost::system::error_category or @c std::error_category.
+typedef automatically_chosen error_category;
+
+/// Either @c boost::system::system_category or @c std::system_category.
+typedef automatically_chosen system_category;
+
+/// Either @c boost::system::generic_category or @c std::generic_category.
+typedef automatically_chosen generic_category;
+
+/// Either @c boost::system::errc or @c std::errc.
+typedef automatically_chosen errc;
 #elif defined(ASIOEXT_USE_BOOST_ASIO)
 using boost::system::error_code;
+using boost::system::error_category;
+using boost::system::system_category;
+using boost::system::generic_category;
+namespace errc = boost::system::errc;
 #else
-using asio::error_code;
+using std::error_code;
+using std::error_category;
+using std::system_category;
+using std::generic_category;
+using std::errc;
 #endif
 
 ASIOEXT_NS_END
