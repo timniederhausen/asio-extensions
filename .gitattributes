@@ -8,6 +8,8 @@
 *.py text
 *.txt text
 *.cmake text
+*.gn text
+*.gni text
 
 *.sln text eol=crlf
 
