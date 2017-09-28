@@ -16,6 +16,7 @@
 
 #include "asioext/seek_origin.hpp"
 #include "asioext/error_code.hpp"
+#include "asioext/chrono.hpp"
 
 #if defined(ASIOEXT_WINDOWS)
 # include "asioext/detail/win_file_ops.hpp"
@@ -24,6 +25,26 @@
 #endif
 
 ASIOEXT_NS_BEGIN
+
+/// @brief Container for various times associated with a file.
+///
+/// This struct contains all times commonly tied to a file.
+/// Not all of them might be available on all platforms.
+struct file_times
+{
+  /// @brief The file's creation time.
+  file_time_type ctime;
+  /// @brief The file's last access time.
+  file_time_type atime;
+  /// @brief The file's last modification time.
+  file_time_type mtime;
+};
+
+inline bool operator==(const file_times& a, const file_times& b)
+{ return a.ctime == b.ctime && a.atime == b.atime && a.mtime == b.mtime; }
+
+inline bool operator!=(const file_times& a, const file_times& b)
+{ return !(a == b); }
 
 /// @ingroup files
 /// @brief A thin and lightweight wrapper around a native file handle.
@@ -332,6 +353,57 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void attributes(file_attrs attrs,
                                error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Get the file's time data.
+  ///
+  /// This function retrieves the various times associated with
+  /// a file and copies them into a @c file_times structure.
+  ///
+  /// Times in the file_times struct that are not available for this
+  /// file are zero-initialized.
+  ///
+  /// @return The file's time data.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+  ASIOEXT_DECL file_times times();
+
+  /// @brief Get the file's time data.
+  ///
+  /// This function retrieves the various times associated with
+  /// a file and copies them into a @c file_times structure.
+  ///
+  /// Times in the file_times struct that are not available for this
+  /// file are zero-initialized.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ///
+  /// @return The file's time data.
+  ASIOEXT_DECL file_times times(error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Change a file's time data.
+  ///
+  /// This function replaces a file's time data with the given values.
+  /// File times that are set to zero inside the @c file_times structure
+  /// remain unchanged.
+  ///
+  /// @param new_times The new file times. Zero values are ignored.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+  ASIOEXT_DECL void times(const file_times& new_times);
+
+  /// @brief Change a file's time data.
+  ///
+  /// This function replaces a file's time data with the given values.
+  /// File times that are set to zero inside the @c file_times structure
+  /// remain unchanged.
+  ///
+  /// @param new_times The new file times. Zero values are ignored.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ASIOEXT_DECL void times(const file_times& new_times,
+                          error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 

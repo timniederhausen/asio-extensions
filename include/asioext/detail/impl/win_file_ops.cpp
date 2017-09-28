@@ -5,6 +5,7 @@
 #include "asioext/open_flags.hpp"
 
 #include "asioext/detail/win_file_ops.hpp"
+#include "asioext/detail/chrono.hpp"
 #include "asioext/detail/error.hpp"
 
 #if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES) || defined(ASIOEXT_WINDOWS_APP)
@@ -26,6 +27,26 @@ struct create_file_args
   DWORD attrs;
   DWORD flags;
 };
+
+// these two are not in the header because they use a Windows.h type
+ASIOEXT_DECL file_time_type filetime_to_chrono(FILETIME ft)
+{
+  ULARGE_INTEGER temp;
+  temp.LowPart = ft.dwLowDateTime;
+  temp.HighPart = ft.dwHighDateTime;
+  return file_time_type(file_clock::duration(temp.QuadPart));
+}
+
+ASIOEXT_DECL FILETIME chrono_to_filetime(file_time_type t)
+{
+  ULARGE_INTEGER temp;
+  temp.QuadPart = t.time_since_epoch().count();
+
+  FILETIME ft;
+  ft.dwLowDateTime = temp.LowPart;
+  ft.dwHighDateTime = temp.HighPart;
+  return ft;
+}
 
 void set_error(error_code& ec)
 {
@@ -398,6 +419,33 @@ void attributes(handle_type fd, file_attrs attrs, error_code& ec)
 #else
   ec = asio::error::operation_not_supported;
 #endif
+}
+
+void get_times(handle_type fd, file_time_type& ctime, file_time_type& atime,
+               file_time_type& mtime, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  FILETIME cft, mft, aft;
+  if (::GetFileTime(fd, &cft, &aft, &mft)) {
+    ctime = filetime_to_chrono(cft);
+    atime = filetime_to_chrono(aft);
+    mtime = filetime_to_chrono(mft);
+    ec = error_code();
+    return;
+  }
+  set_error(ec);
+}
+
+void set_times(handle_type fd, file_time_type ctime, file_time_type atime,
+               file_time_type mtime, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  const FILETIME cft = chrono_to_filetime(ctime);
+  const FILETIME aft = chrono_to_filetime(atime);
+  const FILETIME mft = chrono_to_filetime(mtime);
+  if (::SetFileTime(fd, &cft, &aft, &mft)) {
+    ec = error_code();
+    return;
+  }
+  set_error(ec);
 }
 
 uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)

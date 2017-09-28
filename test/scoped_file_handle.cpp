@@ -13,6 +13,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <thread>
+
 ASIOEXT_NS_BEGIN
 
 BOOST_AUTO_TEST_SUITE(asioext_scoped_file_handle)
@@ -45,7 +47,7 @@ BOOST_AUTO_TEST_CASE(ownership_transfer)
                           asioext::open_flags::create_always,
                           asioext::file_perms::create_default,
                           asioext::file_attrs::none, ec);
-  BOOST_REQUIRE(!ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   asioext::file_handle h = fh.release();
 
@@ -126,6 +128,113 @@ BOOST_AUTO_TEST_CASE(position_and_size)
                                                    test_data_size)));
   BOOST_REQUIRE_EQUAL(test_data_size, fh.position());
   BOOST_REQUIRE_EQUAL(test_data_size, fh.size());
+}
+
+BOOST_AUTO_TEST_CASE(get_times)
+{
+  const std::time_t now = std::time(nullptr);
+
+  asioext::error_code ec;
+  asioext::scoped_file_handle fh = asioext::open(test_filename,
+    asioext::open_flags::access_write |
+    asioext::open_flags::create_always,
+    asioext::file_perms::create_default,
+    asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  file_times times1 = fh.times(ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  file_times times2 = fh.times(ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+  BOOST_REQUIRE(times1 == times2);
+
+#if defined(ASIOEXT_WINDOWS)
+  BOOST_CHECK_LE(now, file_clock::to_time_t(times1.ctime));
+#endif
+  BOOST_CHECK_LE(now, file_clock::to_time_t(times1.atime));
+  BOOST_CHECK_LE(now, file_clock::to_time_t(times1.mtime));
+}
+
+BOOST_AUTO_TEST_CASE(set_times_auto)
+{
+  asioext::error_code ec;
+  asioext::scoped_file_handle fh = asioext::open(test_filename,
+    asioext::open_flags::access_write |
+    asioext::open_flags::create_always,
+    asioext::file_perms::create_default,
+    asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  const file_times times1 = fh.times(ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  char buffer[10] = {0, };
+  BOOST_REQUIRE_EQUAL(10, asio::write(fh, asio::buffer(buffer)));
+
+  fh.close();
+
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+
+  fh = asioext::open(test_filename,
+    asioext::open_flags::access_write |
+    asioext::open_flags::open_existing,
+    asioext::file_perms::create_default,
+    asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  char buffer2[20] = {0, };
+  BOOST_REQUIRE_EQUAL(20, asio::write(fh, asio::buffer(buffer2)));
+
+  fh.close();
+
+  fh = asioext::open(test_filename,
+    asioext::open_flags::access_write |
+    asioext::open_flags::open_existing,
+    asioext::file_perms::create_default,
+    asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  const file_times times2 = fh.times(ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  BOOST_CHECK_EQUAL(times1.ctime.time_since_epoch().count(),
+                    times2.ctime.time_since_epoch().count());
+  BOOST_CHECK_LE(times1.atime.time_since_epoch().count(),
+                 times2.atime.time_since_epoch().count());
+  BOOST_CHECK_LE(times1.mtime.time_since_epoch().count(),
+                 times2.mtime.time_since_epoch().count());
+}
+
+BOOST_AUTO_TEST_CASE(set_times_manual)
+{
+  static const std::time_t test_time = 1405706349;
+
+  asioext::error_code ec;
+  asioext::scoped_file_handle fh = asioext::open(test_filename,
+    asioext::open_flags::access_write |
+    asioext::open_flags::create_always,
+    asioext::file_perms::create_default,
+    asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  file_times times1 = fh.times(ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  file_times times2;
+  times2.mtime = file_clock::from_time_t(test_time);
+  fh.times(times2, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  file_times times3 = fh.times(ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  BOOST_CHECK_EQUAL(times2.mtime.time_since_epoch().count(),
+                    times3.mtime.time_since_epoch().count());
+#if defined(ASIOEXT_WINDOWS)
+  BOOST_CHECK_EQUAL(times1.ctime.time_since_epoch().count(),
+                    times3.ctime.time_since_epoch().count());
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(seek)

@@ -90,4 +90,19 @@ void file_handle::attributes(file_attrs attrs)
 #pragma warning(pop)
 #endif
 
+file_times file_handle::times()
+{
+  error_code ec;
+  file_times t = times(ec);
+  detail::throw_error(ec, "times");
+  return t;
+}
+
+void file_handle::times(const file_times& new_times)
+{
+  error_code ec;
+  times(new_times, ec);
+  detail::throw_error(ec, "times");
+}
+
 ASIOEXT_NS_END

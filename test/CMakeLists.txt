@@ -4,6 +4,7 @@
 
 set(sources
 	basic_file.cpp
+	chrono.cpp
 	main.cpp
 	open.cpp
 	open_flags.cpp

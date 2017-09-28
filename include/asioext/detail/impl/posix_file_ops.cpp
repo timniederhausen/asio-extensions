@@ -3,6 +3,7 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "asioext/detail/posix_file_ops.hpp"
+#include "asioext/detail/chrono.hpp"
 #include "asioext/detail/error.hpp"
 
 #ifndef _FILE_OFFSET_BITS
@@ -15,6 +16,18 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h> // for off_t etc.
+#include <sys/time.h> // for utimes
+
+#if !defined(ASIOEXT_USE_FUTIMENS) && !defined(ASIOEXT_DISABLE_FUTIMENS)
+# if defined(__linux__)
+// __USE_XOPEN2K8 should be enough
+#  if defined(__USE_XOPEN2K8)
+#   define ASIOEXT_USE_FUTIMENS 1
+#  endif
+# elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#  define ASIOEXT_USE_FUTIMENS 1
+# endif
+#endif
 
 ASIOEXT_NS_BEGIN
 
@@ -102,6 +115,97 @@ file_attrs native_to_file_attrs(uint32_t native)
     attrs |= file_attrs::system_no_unlink;
 #endif
   return attrs;
+}
+
+#if defined(__linux__) || defined(__FreeBSD__)
+# define ASIOEXT_CTIME_SECONDS st.st_ctim.tv_sec
+# define ASIOEXT_CTIME_NANOSECONDS st.st_ctim.tv_nsec
+# define ASIOEXT_ATIME_SECONDS st.st_atim.tv_sec
+# define ASIOEXT_ATIME_NANOSECONDS st.st_atim.tv_nsec
+# define ASIOEXT_MTIME_SECONDS st.st_mtim.tv_sec
+# define ASIOEXT_MTIME_NANOSECONDS st.st_mtim.tv_nsec
+# if defined(__FreeBSD__) && !defined(_POSIX_SOURCE)
+#  define ASIOEXT_BIRTHTIME_SECONDS st.st_birthtim.tv_sec
+#  define ASIOEXT_BIRTHTIME_NANOSECONDS st.st_birthtim.tv_nsec
+# else
+#  define ASIOEXT_BIRTHTIME_SECONDS 0
+#  define ASIOEXT_BIRTHTIME_NANOSECONDS 0
+# endif
+#elif defined(ANDROID)
+# define ASIOEXT_CTIME_SECONDS st.st_ctime
+# define ASIOEXT_CTIME_NANOSECONDS st.st_ctime_nsec
+# define ASIOEXT_ATIME_SECONDS st.st_atime
+# define ASIOEXT_ATIME_NANOSECONDS st.st_atime_nsec
+# define ASIOEXT_MTIME_SECONDS st.st_mtime
+# define ASIOEXT_MTIME_NANOSECONDS st.st_mtime_nsec
+# define ASIOEXT_BIRTHTIME_SECONDS 0
+# define ASIOEXT_BIRTHTIME_NANOSECONDS 0
+#elif defined(__APPLE__) || defined(__NetBSD__) || defined(__OpenBSD__)
+# define ASIOEXT_CTIME_SECONDS st.st_ctimespec.tv_sec
+# define ASIOEXT_CTIME_NANOSECONDS st.st_ctimespec.tv_nsec
+# define ASIOEXT_ATIME_SECONDS st.st_atimespec.tv_sec
+# define ASIOEXT_ATIME_NANOSECONDS st.st_atimespec.tv_nsec
+# define ASIOEXT_MTIME_SECONDS st.st_mtimespec.tv_sec
+# define ASIOEXT_MTIME_NANOSECONDS st.st_mtimespec.tv_nsec
+# define ASIOEXT_BIRTHTIME_SECONDS st.st_birthtimespec.tv_sec
+# define ASIOEXT_BIRTHTIME_NANOSECONDS st.st_birthtimespec.tv_nsec
+#else
+# define ASIOEXT_CTIME_SECONDS st.st_ctime
+# define ASIOEXT_CTIME_NANOSECONDS 0
+# define ASIOEXT_ATIME_SECONDS st.st_atime
+# define ASIOEXT_ATIME_NANOSECONDS 0
+# define ASIOEXT_MTIME_SECONDS st.st_mtime
+# define ASIOEXT_MTIME_NANOSECONDS 0
+# define ASIOEXT_BIRTHTIME_SECONDS 0
+# define ASIOEXT_BIRTHTIME_NANOSECONDS 0
+#endif
+
+bool stat_to_times(const struct stat& st,
+                   file_time_type& ctime, file_time_type& atime,
+                   file_time_type& mtime) ASIOEXT_NOEXCEPT
+{
+  file_time_type::duration ctim, atim, mtim;
+  if (compose_time(chrono::seconds(ASIOEXT_BIRTHTIME_SECONDS),
+                   chrono::nanoseconds(ASIOEXT_BIRTHTIME_NANOSECONDS),
+                   ctim) &&
+      compose_time(chrono::seconds(ASIOEXT_ATIME_SECONDS),
+                   chrono::nanoseconds(ASIOEXT_ATIME_NANOSECONDS),
+                   atim) &&
+      compose_time(chrono::seconds(ASIOEXT_MTIME_SECONDS),
+                   chrono::nanoseconds(ASIOEXT_MTIME_NANOSECONDS),
+                   mtim)) {
+    ctime = file_time_type(ctim);
+    atime = file_time_type(atim);
+    mtime = file_time_type(mtim);
+    return true;
+  }
+  return false;
+}
+
+template <typename Seconds, typename Nanoseconds>
+bool to_timespec(file_time_type t, Seconds& s, Nanoseconds& ns)
+{
+  chrono::duration<Seconds, chrono::seconds::period> temp_s;
+  chrono::duration<Nanoseconds, chrono::nanoseconds::period> temp_ns;
+  if (decompose_time(t.time_since_epoch(), temp_s, temp_ns)) {
+    s = temp_s.count();
+    ns = temp_ns.count();
+    return true;
+  }
+  return false;
+}
+
+template <typename Seconds, typename Microseconds>
+bool to_timeval(file_time_type t, Seconds& s, Microseconds& us)
+{
+  chrono::duration<Seconds, chrono::seconds::period> temp_s;
+  chrono::duration<Microseconds, chrono::microseconds::period> temp_us;
+  if (decompose_time(t.time_since_epoch(), temp_s, temp_us)) {
+    s = temp_s.count();
+    us = temp_us.count();
+    return true;
+  }
+  return false;
 }
 
 handle_type open(const char* path, open_flags flags,
@@ -313,6 +417,92 @@ void attributes(handle_type fd, file_attrs attrs, error_code& ec)
   // TODO(tim): Silently ignore everything?
   // Seems consistent.
   ec = error_code();
+#endif
+}
+
+void get_times(handle_type fd, file_time_type& ctime, file_time_type& atime,
+               file_time_type& mtime, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  struct stat st;
+  if (::fstat(fd, &st) == 0) {
+    if (stat_to_times(st, ctime, atime, mtime))
+      ec = error_code();
+    else
+      ec = make_error_code(errc::value_too_large);
+    return;
+  }
+  set_error(ec, errno);
+}
+
+void set_times(handle_type fd, file_time_type ctime, file_time_type atime,
+               file_time_type mtime, error_code& ec) ASIOEXT_NOEXCEPT
+{
+#if defined(ASIOEXT_USE_FUTIMENS)
+  struct ::timespec ts[2];
+
+  if (atime.time_since_epoch().count() != 0) {
+    if (!to_timespec(atime, ts[0].tv_sec, ts[0].tv_nsec)) {
+      ec = make_error_code(errc::value_too_large);
+      return;
+    }
+  } else {
+    ts[0].tv_sec = 0;
+    ts[0].tv_nsec = UTIME_OMIT;
+  }
+
+  if (mtime.time_since_epoch().count() != 0) {
+    if (!to_timespec(mtime, ts[1].tv_sec, ts[1].tv_nsec)) {
+      ec = make_error_code(errc::value_too_large);
+      return;
+    }
+  } else {
+    ts[1].tv_sec = 0;
+    ts[1].tv_nsec = UTIME_OMIT;
+  }
+
+  if (::futimens(fd, ts) == 0) {
+    ec = error_code();
+    return;
+  }
+  set_error(ec, errno);
+#else
+  // XXX There's a race condition between ::fstat and ::futimes
+  struct stat st;
+  if (atime.time_since_epoch().count() == 0 ||
+      mtime.time_since_epoch().count() == 0) {
+    if (::fstat(fd, &st) != 0) {
+      set_error(ec, errno);
+      return;
+    }
+  }
+
+  struct ::timeval tv[2];
+  if (atime.time_since_epoch().count() != 0) {
+    if (!to_timeval(atime, tv[0].tv_sec, tv[0].tv_usec)) {
+      ec = make_error_code(errc::value_too_large);
+      return;
+    }
+  } else {
+    tv[0].tv_sec = ASIOEXT_ATIME_SECONDS;
+    tv[0].tv_usec = chrono::duration_cast<chrono::microseconds>(
+        chrono::nanoseconds(ASIOEXT_ATIME_NANOSECONDS)).count();
+  }
+  if (mtime.time_since_epoch().count() != 0) {
+    if (!to_timeval(mtime, tv[1].tv_sec, tv[1].tv_usec)) {
+      ec = make_error_code(errc::value_too_large);
+      return;
+    }
+  } else {
+    tv[1].tv_sec = ASIOEXT_MTIME_SECONDS;
+    tv[1].tv_usec = chrono::duration_cast<chrono::microseconds>(
+        chrono::nanoseconds(ASIOEXT_MTIME_NANOSECONDS)).count();
+  }
+
+  if (::futimes(fd, tv) == 0) {
+    ec = error_code();
+    return;
+  }
+  set_error(ec, errno);
 #endif
 }
 

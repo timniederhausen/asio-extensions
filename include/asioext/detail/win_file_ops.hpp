@@ -16,6 +16,7 @@
 #include "asioext/file_perms.hpp"
 #include "asioext/file_attrs.hpp"
 #include "asioext/error_code.hpp"
+#include "asioext/chrono.hpp"
 
 #include "asioext/detail/cstdint.hpp"
 
@@ -69,6 +70,13 @@ ASIOEXT_DECL void permissions(handle_type fd, file_perms perms, error_code& ec);
 
 ASIOEXT_DECL file_attrs attributes(handle_type fd, error_code& ec);
 ASIOEXT_DECL void attributes(handle_type fd, file_attrs attrs, error_code& ec);
+
+ASIOEXT_DECL void get_times(handle_type fd, file_time_type& ctime,
+                            file_time_type& atime, file_time_type& mtime,
+                            error_code& ec) ASIOEXT_NOEXCEPT;
+ASIOEXT_DECL void set_times(handle_type fd, file_time_type ctime,
+                            file_time_type atime, file_time_type mtime,
+                            error_code& ec) ASIOEXT_NOEXCEPT;
 
 ASIOEXT_DECL uint32_t read(handle_type fd,
                            void* buffer,

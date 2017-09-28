@@ -77,4 +77,19 @@ void file_handle::attributes(file_attrs attrs,
   detail::win_file_ops::attributes(handle_, attrs, ec);
 }
 
+file_times file_handle::times(error_code& ec) ASIOEXT_NOEXCEPT
+{
+  file_times res;
+  detail::win_file_ops::get_times(handle_, res.ctime, res.atime,
+                                  res.mtime, ec);
+  return res;
+}
+
+void file_handle::times(const file_times& new_times,
+                        error_code& ec) ASIOEXT_NOEXCEPT
+{
+  detail::win_file_ops::set_times(handle_, new_times.ctime, new_times.atime,
+                                  new_times.mtime, ec);
+}
+
 ASIOEXT_NS_END

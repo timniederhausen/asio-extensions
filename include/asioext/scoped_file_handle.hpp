@@ -316,6 +316,24 @@ public:
     return handle_.attributes(attrs, ec);
   }
 
+  /// @copydoc file_handle::times()
+  file_times times() { return handle_.times(); }
+
+  /// @copydoc file_handle::times(error_code&)
+  file_times times(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle_.times(ec);
+  }
+
+  /// @copydoc file_handle::times(const file_times&)
+  void times(const file_times& new_times) { handle_.times(new_times); }
+
+  /// @copydoc file_handle::times(const file_times&,error_code&)
+  void times(const file_times& new_times, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    handle_.times(new_times, ec);
+  }
+
   /// @}
 
   /// @name SyncReadStream functions

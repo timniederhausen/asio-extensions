@@ -9,6 +9,7 @@
 #include "asioext/detail/config.hpp"
 
 #include "asioext/impl/cancellation_token.cpp"
+#include "asioext/impl/chrono.cpp"
 #include "asioext/impl/file_handle.cpp"
 #include "asioext/impl/scoped_file_handle.cpp"
 #include "asioext/impl/open.cpp"

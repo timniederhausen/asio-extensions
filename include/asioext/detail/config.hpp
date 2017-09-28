@@ -191,6 +191,63 @@
 # endif
 #endif
 
+
+// ASIOEXT_HAS_CONSTEXPR: Support for C++11 constexpr.
+#if !defined(ASIOEXT_HAS_CONSTEXPR)
+# if !defined(ASIOEXT_DISABLE_CONSTEXPR)
+#  if defined(__clang__)
+#   if __has_feature(__cxx_constexpr__)
+#    define ASIOEXT_HAS_CONSTEXPR 1
+#   endif
+#  endif
+#  if defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIOEXT_HAS_CONSTEXPR 1
+#    endif
+#   endif
+#  endif
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1900)
+#   define ASIOEXT_HAS_CONSTEXPR 1
+#  endif
+# endif
+#endif
+
+// ASIOEXT_CONSTEXPR: Expands to constexpr on supported compilers.
+#if !defined(ASIOEXT_CONSTEXPR)
+# if defined(ASIOEXT_HAS_CONSTEXPR11)
+#  define ASIOEXT_CONSTEXPR constexpr
+# else
+#  define ASIOEXT_CONSTEXPR
+# endif
+#endif
+
+// ASIOEXT_HAS_CONSTEXPR: Support for C++14 relaxed constexpr.
+#if !defined(ASIOEXT_HAS_CONSTEXPR14)
+# if !defined(ASIOEXT_DISABLE_CONSTEXPR14)
+#  if defined(__clang__)
+#   if __has_feature(cxx_relaxed_constexpr)
+#    define ASIOEXT_HAS_CONSTEXPR14 1
+#   endif
+#  endif
+#  if defined(__GNUC__) && (__GNUC__ > 5)
+#   define ASIOEXT_HAS_CONSTEXPR14 1
+#  endif
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1910)
+#   define ASIOEXT_HAS_CONSTEXPR14 1
+#  endif
+# endif
+#endif
+
+// ASIOEXT_CONSTEXPR14: Expands to constexpr on supported compilers.
+#if !defined(ASIOEXT_CONSTEXPR14)
+# if defined(ASIOEXT_HAS_CONSTEXPR11)
+#  define ASIOEXT_CONSTEXPR14 constexpr
+# else
+#  define ASIOEXT_CONSTEXPR14
+# endif
+#endif
+
 // ASIOEXT_HAS_ALIAS_TEMPLATES: Support for alias templates.
 #if !defined(ASIOEXT_HAS_ALIAS_TEMPLATES)
 # if !defined(ASIOEXT_DISABLE_ALIAS_TEMPLATES)

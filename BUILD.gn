@@ -61,18 +61,21 @@ source_set("asioext") {
     "include/asioext/asioext.hpp",
     "include/asioext/basic_file.hpp",
     "include/asioext/cancellation_token.hpp",
+    "include/asioext/chrono.hpp",
     "include/asioext/composed_operation.hpp",
     "include/asioext/connect.hpp",
     "include/asioext/detail/asio_version.hpp",
     "include/asioext/detail/async_result.hpp",
     "include/asioext/detail/buffer.hpp",
     "include/asioext/detail/buffer_sequence_adapter.hpp",
+    "include/asioext/detail/chrono.hpp",
     "include/asioext/detail/config.hpp",
     "include/asioext/detail/cstdint.hpp",
     "include/asioext/detail/enum.hpp",
     "include/asioext/detail/error.hpp",
     "include/asioext/detail/error_code.hpp",
     "include/asioext/detail/handler_type.hpp",
+    "include/asioext/detail/impl/chrono.hpp",
     "include/asioext/detail/memory.hpp",
     "include/asioext/detail/move_support.hpp",
     "include/asioext/detail/mutex.hpp",
@@ -112,6 +115,7 @@ source_set("asioext") {
   if (!asioext_header_only) {
     sources += [
       "include/asioext/impl/cancellation_token.cpp",
+      "include/asioext/impl/chrono.cpp",
       "include/asioext/impl/connect.cpp",
       "include/asioext/impl/file_handle.cpp",
       "include/asioext/impl/open.cpp",
@@ -174,6 +178,7 @@ executable("asioext_unittests") {
 
   sources = [
     "test/basic_file.cpp",
+    "test/chrono.cpp",
     "test/main.cpp",
     "test/open.cpp",
     "test/open_flags.cpp",
