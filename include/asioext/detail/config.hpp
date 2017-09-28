@@ -64,7 +64,7 @@
 # define ASIOEXT_DECL
 #endif
 
-// ASIOEXT_MSVC: Macro expanding to the MSVC version (i.e. the _MSC_VER value).
+// ASIOEXT_MSVC: Expands to the MSVC version (i.e. the _MSC_VER value).
 #if !defined(ASIOEXT_MSVC)
 # if defined(ASIOEXT_HAS_BOOST_CONFIG) && defined(BOOST_MSVC)
 #  define ASIOEXT_MSVC BOOST_MSVC
@@ -86,8 +86,7 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_MOVE: Defined if the compiler supports rvalue references
-// (and ASIOEXT_DISABLE_MOVE isn't defined).
+// ASIOEXT_HAS_MOVE: Support for C++11 rvalue references.
 #if !defined(ASIOEXT_HAS_MOVE) && !defined(ASIOEXT_DISABLE_MOVE)
 # if defined(__clang__)
 #  if __has_feature(__cxx_rvalue_references__)
@@ -106,8 +105,7 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_VARIADIC_TEMPLATES: Defined if the compiler supports variadic templates
-// (and ASIOEXT_DISABLE_VARIADIC_TEMPLATES isn't defined).
+// ASIOEXT_HAS_VARIADIC_TEMPLATES: Support for C++11 variadic templates.
 #if !defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && !defined(ASIOEXT_DISABLE_VARIADIC_TEMPLATES)
 # if defined(__clang__)
 #  if __has_feature(__cxx_variadic_templates__)
@@ -126,7 +124,7 @@
 # endif
 #endif
 
-// ASIOEXT_DELETED: Macro expanding to '= delete' on supported compilers.
+// ASIOEXT_DELETED: Expands to '= delete' on supported compilers.
 #if !defined(ASIOEXT_DELETED)
 # if defined(__GNUC__)
 #  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
@@ -145,7 +143,7 @@
 # endif
 #endif
 
-// ASIOEXT_NOEXCEPT: Macro expanding to 'noexcept' on supported compilers.
+// ASIOEXT_NOEXCEPT: Expands to 'noexcept' on supported compilers.
 #if !defined(ASIOEXT_NOEXCEPT)
 # if !defined(ASIOEXT_DISABLE_NOEXCEPT)
 #  if (BOOST_VERSION >= 105300)
@@ -169,7 +167,7 @@
 # endif
 #endif
 
-// ASIOEXT_NOEXCEPT_IF: Macro expanding to 'noexcept(pred)' on supported compilers.
+// ASIOEXT_NOEXCEPT_IF: Expands to 'noexcept(pred)' on supported compilers.
 #if !defined(ASIOEXT_NOEXCEPT)
 # if !defined(ASIOEXT_DISABLE_NOEXCEPT)
 #  if (BOOST_VERSION >= 105300)
@@ -193,7 +191,7 @@
 # endif
 #endif
 
-// Support alias templates on compilers known to allow it.
+// ASIOEXT_HAS_ALIAS_TEMPLATES: Support for alias templates.
 #if !defined(ASIOEXT_HAS_ALIAS_TEMPLATES)
 # if !defined(ASIOEXT_DISABLE_ALIAS_TEMPLATES)
 #  if defined(__clang__)
@@ -214,7 +212,7 @@
 # endif
 #endif
 
-// Standard library support for shared_ptr and weak_ptr.
+// ASIOEXT_HAS_STD_SHARED_PTR: Standard library support for shared_ptr and weak_ptr.
 #if !defined(ASIOEXT_HAS_STD_SHARED_PTR)
 # if !defined(ASIOEXT_DISABLE_STD_SHARED_PTR)
 #  if defined(__clang__)
@@ -237,7 +235,7 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_PRAGMA_ONCE: Defined if the compiler supports '#pragma once'
+// ASIOEXT_HAS_PRAGMA_ONCE: Support for the '#pragma once' extension.
 #if !defined(ASIOEXT_HAS_PRAGMA_ONCE)
 # if !defined(ASIOEXT_DISABLE_PRAGMA_ONCE)
 #  if defined(__clang__)
@@ -256,7 +254,7 @@
 # endif
 #endif
 
-// Windows App target. Windows but with a limited API.
+// ASIOEXT_WINDOWS_APP: Windows App target. Windows but with a limited API.
 #if !defined(ASIOEXT_WINDOWS_APP)
 # if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0603)
 #  include <winapifamily.h>
@@ -267,6 +265,7 @@
 # endif
 #endif
 
+// ASIOEXT_WINDOWS: Defined on all Windows targets.
 #if !defined(ASIOEXT_WINDOWS)
 # if defined(ASIOEXT_HAS_BOOST_CONFIG) && defined(BOOST_WINDOWS)
 #  define ASIOEXT_WINDOWS 1
@@ -288,7 +287,7 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_PVEC_IO_FUNCTIONS: Defined if the OS supports preadv/pwritev.
+// ASIOEXT_HAS_PVEC_IO_FUNCTIONS: Support for vectored IO functions (preadv/pwritev).
 #if !defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
 # if !defined(__APPLE__) && !defined(__MACH__) && !defined(ASIOEXT_WINDOWS)
 #  define ASIOEXT_HAS_PVEC_IO_FUNCTIONS
