@@ -3,7 +3,6 @@ language: cpp
 addons:
   apt:
     sources: &sources
-      - george-edison55-precise-backports
       - boost-latest
       # this is needed for gcc and clang
       - ubuntu-toolchain-r-test
