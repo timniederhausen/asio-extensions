@@ -85,12 +85,11 @@ async_connect(asio::ip::tcp::socket::lowest_layer_type& socket,
   typedef async_completion<
     ComposedConnectHandler,
     void (error_code, asio::ip::tcp::resolver::iterator)
-  > completion;
+  > init_t;
 
-  typedef detail::connect_op<typename completion::handler_type> operation;
-
-  completion init(handler);
-  operation op(init.completion_handler, socket, resolver, q);
+  init_t init(handler);
+  detail::connect_op<typename init_t::completion_handler_type>(
+    init.completion_handler, socket, resolver, q);
   return init.result.get();
 }
 

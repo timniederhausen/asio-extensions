@@ -20,10 +20,10 @@
 #include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
 #include "asioext/error_code.hpp"
+#include "asioext/async_result.hpp"
 
 #include "asioext/detail/throw_error.hpp"
 #include "asioext/detail/move_support.hpp"
-#include "asioext/detail/async_result.hpp"
 #include "asioext/detail/handler_type.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)

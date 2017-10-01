@@ -16,10 +16,9 @@
 #endif
 
 #include "asioext/error_code.hpp"
+#include "asioext/async_result.hpp"
 
 #include "asioext/detail/move_support.hpp"
-#include "asioext/detail/async_result.hpp"
-#include "asioext/detail/handler_type.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # include <boost/asio/ip/tcp.hpp>

@@ -217,11 +217,12 @@ thread_pool_file_service::async_read_some(implementation_type& impl,
                                           const MutableBufferSequence& buffers,
                                           ASIOEXT_MOVE_ARG(Handler) handler)
 {
+  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
   typedef detail::read_some_op<MutableBufferSequence,
-      ASIOEXT_HANDLER_TYPE(Handler, void (error_code, std::size_t))
+      typename init_t::completion_handler_type
   > operation;
 
-  async_completion<Handler, void (error_code, std::size_t)> init(handler);
+  init_t init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
                init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
@@ -234,11 +235,12 @@ thread_pool_file_service::async_write_some(implementation_type& impl,
                                            const ConstBufferSequence& buffers,
                                            ASIOEXT_MOVE_ARG(Handler) handler)
 {
+  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
   typedef detail::write_some_op<ConstBufferSequence,
-      ASIOEXT_HANDLER_TYPE(Handler, void (error_code, std::size_t))
+      typename init_t::completion_handler_type
   > operation;
 
-  async_completion<Handler, void (error_code, std::size_t)> init(handler);
+  init_t init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
                init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
@@ -252,11 +254,12 @@ thread_pool_file_service::async_read_some_at(
     const MutableBufferSequence& buffers,
     ASIOEXT_MOVE_ARG(Handler) handler)
 {
+  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
   typedef detail::read_some_at_op<MutableBufferSequence,
-      ASIOEXT_HANDLER_TYPE(Handler, void (error_code, std::size_t))
+      typename init_t::completion_handler_type
   > operation;
 
-  async_completion<Handler, void (error_code, std::size_t)> init(handler);
+  init_t init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
                init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
@@ -269,11 +272,12 @@ thread_pool_file_service::async_write_some_at(
     implementation_type& impl, uint64_t offset,
     const ConstBufferSequence& buffers, ASIOEXT_MOVE_ARG(Handler) handler)
 {
+  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
   typedef detail::write_some_at_op<ConstBufferSequence,
-      ASIOEXT_HANDLER_TYPE(Handler, void (error_code, std::size_t))
+      typename init_t::completion_handler_type
   > operation;
 
-  async_completion<Handler, void (error_code, std::size_t)> init(handler);
+  init_t init(handler);
   operation op(impl.cancel_token_, impl.handle_, buffers,
                init.completion_handler, this->get_io_service());
   pool_.post(ASIOEXT_MOVE_CAST(operation)(op));

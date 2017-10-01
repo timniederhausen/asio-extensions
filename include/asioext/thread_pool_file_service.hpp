@@ -20,10 +20,9 @@
 #include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
 #include "asioext/cancellation_token.hpp"
+#include "asioext/async_result.hpp"
 
 #include "asioext/detail/move_support.hpp"
-#include "asioext/detail/async_result.hpp"
-#include "asioext/detail/handler_type.hpp"
 #include "asioext/detail/cstdint.hpp"
 #include "asioext/detail/service_base.hpp"
 #include "asioext/detail/mutex.hpp"
