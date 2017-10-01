@@ -12,44 +12,15 @@
 # pragma once
 #endif
 
-#include "asioext/scoped_file_handle.hpp"
-#include "asioext/open.hpp"
-
 #include <boost/filesystem.hpp>
-
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/write.hpp>
-#else
-# include <asio/write.hpp>
-#endif
-
-#include <iostream>
 
 ASIOEXT_NS_BEGIN
 
 struct test_file_writer
 {
   test_file_writer(const char* filename,
-                   const void* data, std::size_t size)
-    : filename_(filename)
-  {
-    scoped_file_handle fh = open(filename_,
-                                 open_flags::access_write |
-                                 open_flags::create_always);
-    if (size != 0)
-      asio::write(fh, asio::buffer(data, size));
-  }
-
-  ~test_file_writer()
-  {
-    boost::system::error_code ec;
-    boost::filesystem::remove(filename_, ec);
-    if (ec) {
-      std::cerr << "Failed to delete " << filename_ << " with " << ec;
-      std::cerr << std::endl;
-      std::abort();
-    }
-  }
+                   const void* data, std::size_t size);
+  ~test_file_writer();
 
   boost::filesystem::path filename_;
 };

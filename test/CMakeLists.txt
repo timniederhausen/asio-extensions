@@ -10,6 +10,8 @@ set(sources
 	open_flags.cpp
 	read_file.cpp
 	scoped_file_handle.cpp
+	test_file_rm_guard.cpp
+	test_file_writer.cpp
 	write_file.cpp
 )
 

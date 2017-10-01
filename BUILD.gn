@@ -184,6 +184,8 @@ executable("asioext_unittests") {
     "test/open_flags.cpp",
     "test/read_file.cpp",
     "test/scoped_file_handle.cpp",
+    "test/test_file_rm_guard.cpp",
+    "test/test_file_writer.cpp",
     "test/write_file.cpp",
   ]
 
