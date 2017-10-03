@@ -15,7 +15,7 @@
 # pragma once
 #endif
 
-#include "asioext/is_byte_array.hpp"
+#include "asioext/is_raw_byte_container.hpp"
 #include "asioext/error_code.hpp"
 
 #include "asioext/detail/asio_version.hpp"
@@ -35,15 +35,15 @@ ASIOEXT_NS_BEGIN
 ///
 ///@{
 
-/// @name ByteArray overloads
-/// See @ref concept-ByteArray for ByteArray requirements.
+/// @name RawByteContainer overloads
+/// See @ref concept-RawByteContainer for RawByteContainer requirements.
 /// @{
 
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
-# define ASIOEXT_DETAIL_READFILE_BYTE_RET(T) \
-    typename std::enable_if<is_byte_array<T>::value>::type
+# define ASIOEXT_READFILE_RAW_SFINAE(T) \
+    typename std::enable_if<is_raw_byte_container<T>::value>::type
 #else
-# define ASIOEXT_DETAIL_READFILE_BYTE_RET(T) void
+# define ASIOEXT_READFILE_RAW_SFINAE(T) void
 #endif
 
 /// Read a file into a container.
@@ -55,12 +55,12 @@ ASIOEXT_NS_BEGIN
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-ByteArray requirements.
+///  @ref concept-RawByteContainer requirements.
 ///
 /// @throws asio::system_error Thrown on failure.
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const char* filename, ByteArray& c);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const char* filename, RawByteContainer& c);
 
 /// Read a file into a container.
 ///
@@ -71,47 +71,47 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-ByteArray requirements.
+///  @ref concept-RawByteContainer requirements.
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const char* filename, ByteArray& c, error_code& ec);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const char* filename, RawByteContainer& c, error_code& ec);
 
 #if defined(ASIOEXT_WINDOWS)  || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc read_file(const char*,ByteArray&)
+/// @copydoc read_file(const char*,RawByteContainer&)
 ///
 /// @note Only available on Windows.
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const wchar_t* filename, ByteArray& c);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const wchar_t* filename, RawByteContainer& c);
 
-/// @copydoc read_file(const char*,ByteArray&,error_code&)
+/// @copydoc read_file(const char*,RawByteContainer&,error_code&)
 ///
 /// @note Only available on Windows.
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const wchar_t* filename, ByteArray& c, error_code& ec);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const wchar_t* filename, RawByteContainer& c, error_code& ec);
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-/// @copydoc read_file(const char*,ByteArray&)
+/// @copydoc read_file(const char*,RawByteContainer&)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const boost::filesystem::path& filename, ByteArray& c);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const boost::filesystem::path& filename, RawByteContainer& c);
 
-/// @copydoc read_file(const char*,ByteArray&,error_code&)
+/// @copydoc read_file(const char*,RawByteContainer&,error_code&)
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
     read_file(const boost::filesystem::path& filename,
-              ByteArray& c, error_code& ec);
+              RawByteContainer& c, error_code& ec);
 #endif
 
 class file_handle;
@@ -127,12 +127,12 @@ class file_handle;
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-ByteArray requirements.
+///  @ref concept-RawByteContainer requirements.
 ///
 /// @throws asio::system_error Thrown on failure.
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(file_handle file, ByteArray& c);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(file_handle file, RawByteContainer& c);
 
 /// Read a file into a container.
 ///
@@ -145,13 +145,13 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 /// @param c The container object which shall contain the file's
 /// content. The container is resized to the file's size and any previous
 /// data is overwritten. The container type must satisfy the
-///  @ref concept-ByteArray requirements.
+///  @ref concept-RawByteContainer requirements.
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(file_handle file, ByteArray& c, error_code& ec);
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(file_handle file, RawByteContainer& c, error_code& ec);
 
 /// @}
 
@@ -160,14 +160,14 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
 # if ASIOEXT_ASIO_VERSION < 101100
-#  define ASIOEXT_DETAIL_READFILE_BUF_RET(T) \
-    typename std::enable_if<!is_byte_array<T>::value>::type
+#  define ASIOEXT_READFILE_BUF_SFINAE(T) \
+    typename std::enable_if<!is_raw_byte_container<T>::value>::type
 # else
-#  define ASIOEXT_DETAIL_READFILE_BUF_RET(T) \
+#  define ASIOEXT_READFILE_BUF_SFINAE(T) \
     typename std::enable_if<asio::is_mutable_buffer_sequence<T>::value>::type
 # endif
 #else
-# define ASIOEXT_DETAIL_READFILE_BUF_RET(T) void
+# define ASIOEXT_READFILE_BUF_SFINAE(T) void
 #endif
 
 /// Read a file into a sequence of buffers.
@@ -183,7 +183,7 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 ///
 /// @throws asio::system_error Thrown on failure.
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers);
 
 /// Read a file into a sequence of buffers.
@@ -200,7 +200,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
               error_code& ec);
 
@@ -209,14 +209,14 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 ///
 /// @note Only available on Windows.
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers);
 
 /// @copydoc read_file(const char*,const MutableBufferSequence&,error_code&)
 ///
 /// @note Only available on Windows.
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
               error_code& ec);
 #endif
@@ -227,7 +227,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers);
 
@@ -236,7 +236,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers, error_code& ec);
 #endif
@@ -256,7 +256,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 ///
 /// @throws asio::system_error Thrown on failure.
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(file_handle file, const MutableBufferSequence& buffers);
 
 /// Read a file into a sequence of buffers.
@@ -275,7 +275,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(file_handle file, const MutableBufferSequence& buffers,
               error_code& ec);
 

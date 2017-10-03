@@ -23,18 +23,18 @@
 
 ASIOEXT_NS_BEGIN
 
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const char* filename, ByteArray& c)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const char* filename, RawByteContainer& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const char* filename, ByteArray& c, error_code& ec)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const char* filename, RawByteContainer& c, error_code& ec)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -46,18 +46,18 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 }
 
 #if defined(ASIOEXT_WINDOWS)
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const wchar_t* filename, ByteArray& c)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const wchar_t* filename, RawByteContainer& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const wchar_t* filename, ByteArray& c, error_code& ec)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const wchar_t* filename, RawByteContainer& c, error_code& ec)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -70,19 +70,19 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(const boost::filesystem::path& filename, ByteArray& c)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(const boost::filesystem::path& filename, RawByteContainer& c)
 {
   error_code ec;
   read_file(filename, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
     read_file(const boost::filesystem::path& filename,
-              ByteArray& c, error_code& ec)
+              RawByteContainer& c, error_code& ec)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -94,30 +94,30 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 }
 #endif
 
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(file_handle file, ByteArray& c)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(file_handle file, RawByteContainer& c)
 {
   error_code ec;
   read_file(file, c, ec);
   detail::throw_error(ec, "read_file");
 }
 
-template <class ByteArray>
-ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
-    read_file(file_handle file, ByteArray& c, error_code& ec)
+template <class RawByteContainer>
+ASIOEXT_READFILE_RAW_SFINAE(RawByteContainer)
+    read_file(file_handle file, RawByteContainer& c, error_code& ec)
 {
   const uint64_t size = file.size(ec);
   if (ec) return;
 
-  if (size > std::numeric_limits<typename ByteArray::size_type>::max() ||
+  if (size > std::numeric_limits<typename RawByteContainer::size_type>::max() ||
       size > c.max_size()) {
     ec = asio::error::message_size;
     return;
   }
 
   if (size != 0) {
-    c.resize(static_cast<typename ByteArray::size_type>(size));
+    c.resize(static_cast<typename RawByteContainer::size_type>(size));
     asio::read(file, asio::buffer(&c[0], c.size()), ec);
   } else {
     c.clear();
@@ -127,7 +127,7 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
 // MutableBufferSequence overloads
 
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers)
 {
   error_code ec;
@@ -136,7 +136,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 }
 
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
@@ -151,7 +151,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 
 #if defined(ASIOEXT_WINDOWS)  || defined(ASIOEXT_IS_DOCUMENTATION)
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers)
 {
   error_code ec;
@@ -160,7 +160,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 }
 
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
@@ -176,7 +176,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers)
 {
@@ -186,7 +186,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 }
 
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers, error_code& ec)
 {
@@ -201,7 +201,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 #endif
 
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(file_handle file, const MutableBufferSequence& buffers)
 {
   error_code ec;
@@ -210,7 +210,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
 }
 
 template <class MutableBufferSequence>
-ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
+ASIOEXT_READFILE_BUF_SFINAE(MutableBufferSequence)
     read_file(file_handle file, const MutableBufferSequence& buffers,
               error_code& ec)
 {
