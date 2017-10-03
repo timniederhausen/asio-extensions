@@ -1,6 +1,6 @@
 #include "test_file_rm_guard.hpp"
 
-#include "asioext/scoped_file_handle.hpp"
+#include "asioext/unique_file_handle.hpp"
 #include "asioext/open.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
@@ -17,7 +17,7 @@
 
 ASIOEXT_NS_BEGIN
 
-BOOST_AUTO_TEST_SUITE(asioext_scoped_file_handle)
+BOOST_AUTO_TEST_SUITE(asioext_file_handle)
 
 // BOOST_AUTO_TEST_SUITE() gives us a unique NS, so we don't need to
 // prefix our variables.
@@ -32,7 +32,7 @@ static const std::size_t test_data_size = sizeof(test_data) - 1;
 
 BOOST_AUTO_TEST_CASE(empty)
 {
-  asioext::scoped_file_handle fh;
+  asioext::unique_file_handle fh;
   BOOST_CHECK(!fh.is_open());
   BOOST_CHECK_NO_THROW(fh.close());
 }
@@ -51,14 +51,14 @@ BOOST_AUTO_TEST_CASE(ownership_transfer)
 
   asioext::file_handle h = fh.release();
 
-  asioext::scoped_file_handle fh2;
+  asioext::unique_file_handle fh2;
   fh2.reset(h, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(!fh.is_open());
   BOOST_CHECK(fh2.is_open());
   BOOST_REQUIRE_EQUAL(fh2.get().native_handle(), h.native_handle());
 
-  asioext::scoped_file_handle fh3(fh2.release());
+  asioext::unique_file_handle fh3(fh2.release());
   BOOST_CHECK(!fh2.is_open());
   BOOST_CHECK(fh3.is_open());
   BOOST_REQUIRE_EQUAL(fh3.get().native_handle(), h.native_handle());
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(read_write)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asioext::scoped_file_handle fh;
+  asioext::unique_file_handle fh;
 
   asioext::error_code ec;
   fh = asioext::open(test_filename,
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(position_and_size)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asioext::scoped_file_handle fh;
+  asioext::unique_file_handle fh;
 
   asioext::error_code ec;
   fh = asioext::open(test_filename,
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(get_times)
   const std::time_t now = std::time(nullptr);
 
   asioext::error_code ec;
-  asioext::scoped_file_handle fh = asioext::open(test_filename,
+  asioext::unique_file_handle fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
     asioext::open_flags::create_always,
     asioext::file_perms::create_default,
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(get_times)
 BOOST_AUTO_TEST_CASE(set_times_auto)
 {
   asioext::error_code ec;
-  asioext::scoped_file_handle fh = asioext::open(test_filename,
+  asioext::unique_file_handle fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
     asioext::open_flags::create_always,
     asioext::file_perms::create_default,
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(set_times_manual)
   static const std::time_t test_time = 1405706349;
 
   asioext::error_code ec;
-  asioext::scoped_file_handle fh = asioext::open(test_filename,
+  asioext::unique_file_handle fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
     asioext::open_flags::create_always,
     asioext::file_perms::create_default,
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(seek)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asioext::scoped_file_handle fh;
+  asioext::unique_file_handle fh;
 
   asioext::error_code ec;
   fh = open(test_filename,

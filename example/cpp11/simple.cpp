@@ -2,7 +2,7 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <asioext/scoped_file_handle.hpp>
+#include <asioext/unique_file_handle.hpp>
 #include <asioext/read_file.hpp>
 #include <asioext/write_file.hpp>
 #include <asioext/open.hpp>
@@ -29,10 +29,10 @@ int main(int argc, const char* argv[])
 
     assert(read_content == test_content + test_content);
 
-    // (scoped_)file_handle simply wraps a native file handle.
+    // (unique_)file_handle simply wraps a native file handle.
     // (There's also basic_file, which needs an asio::io_service and provides
     // asynchronous I/O.)
-    asioext::scoped_file_handle file =
+    asioext::unique_file_handle file =
         asioext::open("myfile.txt", asioext::open_flags::access_read |
                                     asioext::open_flags::open_existing);
 

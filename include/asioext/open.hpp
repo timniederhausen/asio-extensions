@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-#include "asioext/scoped_file_handle.hpp"
+#include "asioext/unique_file_handle.hpp"
 #include "asioext/open_flags.hpp"
 #include "asioext/file_attrs.hpp"
 #include "asioext/file_perms.hpp"
@@ -42,8 +42,8 @@ ASIOEXT_NS_BEGIN
 /// wide character version of the API instead.
 
 /// @ingroup files
-/// @defgroup open open() family of functions
-/// These functions open handles to files.
+/// @defgroup open asioext::open
+/// Open handles to files.
 ///
 /// @{
 
@@ -70,7 +70,7 @@ ASIOEXT_NS_BEGIN
 ///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL scoped_file_handle open(
+ASIOEXT_DECL unique_file_handle open(
     const char* filename, open_flags flags,
     file_perms perms = file_perms::create_default,
     file_attrs attrs = file_attrs::none);
@@ -102,7 +102,7 @@ ASIOEXT_DECL scoped_file_handle open(
 ///
 /// @see open_flags
 /// @see filenames
-ASIOEXT_DECL scoped_file_handle open(
+ASIOEXT_DECL unique_file_handle open(
     const char* filename, open_flags flags,
     file_perms perms, file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT;
 
@@ -110,7 +110,7 @@ ASIOEXT_DECL scoped_file_handle open(
 /// @copydoc open(const char*,open_flags,file_perms,file_attrs)
 ///
 /// @note Only available on Windows.
-ASIOEXT_DECL scoped_file_handle open(
+ASIOEXT_DECL unique_file_handle open(
     const wchar_t* filename, open_flags flags,
     file_perms perms = file_perms::create_default,
     file_attrs attrs = file_attrs::none);
@@ -118,7 +118,7 @@ ASIOEXT_DECL scoped_file_handle open(
 /// @copydoc open(const char*,open_flags,file_perms,file_attrs,error_code&)
 ///
 /// @note Only available on Windows.
-ASIOEXT_DECL scoped_file_handle open(
+ASIOEXT_DECL unique_file_handle open(
     const wchar_t* filename, open_flags flags,
     file_perms perms, file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
@@ -128,7 +128,7 @@ ASIOEXT_DECL scoped_file_handle open(
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-ASIOEXT_DECL scoped_file_handle open(
+ASIOEXT_DECL unique_file_handle open(
     const boost::filesystem::path& filename, open_flags flags,
     file_perms perms = file_perms::create_default,
     file_attrs attrs = file_attrs::none);
@@ -137,7 +137,7 @@ ASIOEXT_DECL scoped_file_handle open(
 ///
 /// @note Only available if using Boost.Filesystem
 /// (i.e. if @c ASIOEXT_HAS_BOOST_FILESYSTEM is defined)
-ASIOEXT_DECL scoped_file_handle open(
+ASIOEXT_DECL unique_file_handle open(
     const boost::filesystem::path& filename, open_flags flags,
     file_perms perms, file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT;
 #endif

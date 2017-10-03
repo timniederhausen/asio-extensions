@@ -14,7 +14,7 @@
 # pragma once
 #endif
 
-#include "asioext/scoped_file_handle.hpp"
+#include "asioext/unique_file_handle.hpp"
 #include "asioext/error_code.hpp"
 
 ASIOEXT_NS_BEGIN
@@ -29,36 +29,36 @@ ASIOEXT_NS_BEGIN
 /// @brief Duplicate the given file_handle's native handle.
 ///
 /// This function duplicates the native handle and returns a
-/// scoped_file_handle object wrapping it.
+/// unique_file_handle object wrapping it.
 ///
 /// @param handle The file_handle containing the native handle to duplicate.
 ///
-/// @return A new scoped_file_handle referring to the same file as this
-/// scoped_file_handle.
+/// @return A new unique_file_handle referring to the same file as this
+/// unique_file_handle.
 ///
 /// @throws asio::system_error Thrown on failure.
 ///
 /// @note This is provided as a function instead of a
 /// copy-contructor/assignment-operator since copying a file_handle is a
 /// non-trivial operation which is rarely desired.
-ASIOEXT_DECL scoped_file_handle duplicate(file_handle handle);
+ASIOEXT_DECL unique_file_handle duplicate(file_handle handle);
 
 /// @brief Duplicate the given file_handle's native handle.
 ///
 /// This function duplicates the native handle and returns a
-/// scoped_file_handle object wrapping it.
+/// unique_file_handle object wrapping it.
 ///
 /// @param handle The file_handle containing the native handle to duplicate.
 ///
 /// @param ec Set to indicate what error occurred. If no error occurred,
 /// the object is reset.
 ///
-/// @return A new scoped_file_handle referring to the same file as @c handle.
+/// @return A new unique_file_handle referring to the same file as @c handle.
 ///
 /// @note This is provided as a function instead of a
 /// copy-contructor/assignment-operator since copying a file_handle is a
 /// non-trivial operation which is rarely desired.
-ASIOEXT_DECL scoped_file_handle duplicate(file_handle handle,
+ASIOEXT_DECL unique_file_handle duplicate(file_handle handle,
                                           error_code& ec) ASIOEXT_NOEXCEPT;
 
 /// @}

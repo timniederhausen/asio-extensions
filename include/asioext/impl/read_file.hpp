@@ -6,7 +6,7 @@
 #define ASIOEXT_IMPL_READFILE_HPP
 
 #include "asioext/file_handle.hpp"
-#include "asioext/scoped_file_handle.hpp"
+#include "asioext/unique_file_handle.hpp"
 #include "asioext/open.hpp"
 #include "asioext/error_code.hpp"
 
@@ -36,7 +36,7 @@ template <class ByteArray>
 ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
     read_file(const char* filename, ByteArray& c, error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_read |
                                  open_flags::open_existing,
                                  file_perms::create_default,
@@ -59,7 +59,7 @@ template <class ByteArray>
 ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
     read_file(const wchar_t* filename, ByteArray& c, error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_read |
                                  open_flags::open_existing,
                                  file_perms::create_default,
@@ -84,7 +84,7 @@ ASIOEXT_DETAIL_READFILE_BYTE_RET(ByteArray)
     read_file(const boost::filesystem::path& filename,
               ByteArray& c, error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_read |
                                  open_flags::open_existing,
                                  file_perms::create_default,
@@ -140,7 +140,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_read |
                                  open_flags::open_existing,
                                  file_perms::create_default,
@@ -164,7 +164,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_read |
                                  open_flags::open_existing,
                                  file_perms::create_default,
@@ -190,7 +190,7 @@ ASIOEXT_DETAIL_READFILE_BUF_RET(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
               const MutableBufferSequence& buffers, error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_read |
                                  open_flags::open_existing,
                                  file_perms::create_default,

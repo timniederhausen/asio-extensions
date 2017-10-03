@@ -108,6 +108,7 @@ source_set("asioext") {
     "include/asioext/seek_origin.hpp",
     "include/asioext/standard_streams.hpp",
     "include/asioext/thread_pool_file_service.hpp",
+    "include/asioext/unique_file_handle.hpp",
     "include/asioext/version.hpp",
     "include/asioext/write_file.hpp",
   ]
@@ -120,9 +121,9 @@ source_set("asioext") {
       "include/asioext/impl/file_handle.cpp",
       "include/asioext/impl/open.cpp",
       "include/asioext/impl/open_flags.cpp",
-      "include/asioext/impl/scoped_file_handle.cpp",
       "include/asioext/impl/standard_streams.cpp",
       "include/asioext/impl/thread_pool_file_service.cpp",
+      "include/asioext/impl/unique_file_handle.cpp",
     ]
   }
 
@@ -179,11 +180,11 @@ executable("asioext_unittests") {
   sources = [
     "test/basic_file.cpp",
     "test/chrono.cpp",
+    "test/file_handle.cpp",
     "test/main.cpp",
     "test/open.cpp",
     "test/open_flags.cpp",
     "test/read_file.cpp",
-    "test/scoped_file_handle.cpp",
     "test/test_file_rm_guard.cpp",
     "test/test_file_writer.cpp",
     "test/write_file.cpp",

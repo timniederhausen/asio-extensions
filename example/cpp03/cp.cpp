@@ -6,7 +6,7 @@
 // Either set it on the command-line or #define it before #including any
 // AsioExt headers.
 
-#include <asioext/scoped_file_handle.hpp>
+#include <asioext/unique_file_handle.hpp>
 #include <asioext/file_handle.hpp>
 #include <asioext/open.hpp>
 
@@ -49,7 +49,7 @@ bool copy_file(const boost::filesystem::path& src_path,
                const boost::filesystem::path& dst_path)
 {
   // Exercise for the reader: Add support for '-' (i.e. stdout/stdin)
-  asioext::scoped_file_handle src;
+  asioext::unique_file_handle src;
 
   try {
     src.reset(asioext::open(src_path,
@@ -61,7 +61,7 @@ bool copy_file(const boost::filesystem::path& src_path,
     return false;
   }
 
-  asioext::scoped_file_handle dst;
+  asioext::unique_file_handle dst;
 
   try {
     dst.reset(asioext::open(dst_path,

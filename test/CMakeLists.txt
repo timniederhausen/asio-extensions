@@ -5,11 +5,11 @@
 set(sources
 	basic_file.cpp
 	chrono.cpp
+	file_handle.cpp
 	main.cpp
 	open.cpp
 	open_flags.cpp
 	read_file.cpp
-	scoped_file_handle.cpp
 	test_file_rm_guard.cpp
 	test_file_writer.cpp
 	write_file.cpp

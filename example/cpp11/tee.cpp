@@ -3,7 +3,7 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at
 /// http://www.boost.org/LICENSE_1_0.txt)
 
-#include <asioext/scoped_file_handle.hpp>
+#include <asioext/unique_file_handle.hpp>
 #include <asioext/file_handle.hpp>
 #include <asioext/open.hpp>
 #include <asioext/standard_streams.hpp>
@@ -13,7 +13,7 @@
 #include <iostream>
 #include <cstdio>
 
-using file_handles = std::vector<asioext::scoped_file_handle>;
+using file_handles = std::vector<asioext::unique_file_handle>;
 
 bool tee_file(asioext::file_handle source, file_handles& destinations)
 {

@@ -2,7 +2,7 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <asioext/scoped_file_handle.hpp>
+#include <asioext/unique_file_handle.hpp>
 #include <asioext/open.hpp>
 #include <asioext/standard_streams.hpp>
 
@@ -41,7 +41,7 @@ void copy_file_aux(asioext::file_handle src, asioext::file_handle dst)
 bool copy_file(const std::string& src_path, const std::string& dst_path)
 {
   asioext::file_handle src, dst;
-  asioext::scoped_file_handle src_file, dst_file;
+  asioext::unique_file_handle src_file, dst_file;
 
   try {
     if (src_path != "-") {

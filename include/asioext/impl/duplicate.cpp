@@ -15,21 +15,21 @@
 
 ASIOEXT_NS_BEGIN
 
-scoped_file_handle duplicate(file_handle handle)
+unique_file_handle duplicate(file_handle handle)
 {
   error_code ec;
   close(ec);
   detail::throw_error(ec);
 }
 
-scoped_file_handle duplicate(file_handle handle,
+unique_file_handle duplicate(file_handle handle,
                              error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
-  return scoped_file_handle(detail::win_file_ops::duplicate(
+  return unique_file_handle(detail::win_file_ops::duplicate(
       handle.native_handle(), ec));
 #else
-  return scoped_file_handle(detail::posix_file_ops::duplicate(
+  return unique_file_handle(detail::posix_file_ops::duplicate(
       handle.native_handle(), ec));
 #endif
 }

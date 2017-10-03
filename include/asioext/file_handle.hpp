@@ -55,7 +55,7 @@ inline bool operator!=(const file_times& a, const file_times& b)
 ///
 /// file_handle doesn't assume ownership of the contained handle.
 /// If handle management is desired as well, take a look at the
-/// @c scoped_file_handle class.
+/// @c unique_file_handle class.
 ///
 /// file_handle models the following asio concepts:
 /// * SyncRandomAccessReadDevice
@@ -67,7 +67,7 @@ inline bool operator!=(const file_times& a, const file_times& b)
 /// @e Distinct @e objects: Safe.@n
 /// @e Shared @e objects: Unsafe.
 ///
-/// @note This is a low-level component. Most of the time scoped_file_handle
+/// @note This is a low-level component. Most of the time unique_file_handle
 /// is a better fit.
 class file_handle
 {

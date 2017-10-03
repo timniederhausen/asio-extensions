@@ -7,7 +7,7 @@
 // Either set it on the command-line or #define it before #including any
 // AsioExt headers.
 
-#include <asioext/scoped_file_handle.hpp>
+#include <asioext/unique_file_handle.hpp>
 #include <asioext/file_handle.hpp>
 #include <asioext/open.hpp>
 #include <asioext/standard_streams.hpp>
@@ -27,7 +27,7 @@ class file_handles
 {
 public:
   file_handles(std::size_t n)
-    : handles_(new asioext::scoped_file_handle[n])
+    : handles_(new asioext::unique_file_handle[n])
     , size_(n)
   {
     // ctor
@@ -40,7 +40,7 @@ public:
 
   std::size_t size() const { return size_; }
 
-  asioext::scoped_file_handle& operator[](std::size_t i)
+  asioext::unique_file_handle& operator[](std::size_t i)
   {
     assert(i < size_ && "Out of bounds");
     return handles_[i];
@@ -50,7 +50,7 @@ private:
   file_handles(const file_handles&);
   file_handles& operator=(const file_handles&);
 
-  asioext::scoped_file_handle* handles_;
+  asioext::unique_file_handle* handles_;
   std::size_t size_;
 };
 

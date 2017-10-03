@@ -7,7 +7,7 @@
 #define ASIOEXT_IMPL_WRITEFILE_HPP
 
 #include "asioext/file_handle.hpp"
-#include "asioext/scoped_file_handle.hpp"
+#include "asioext/unique_file_handle.hpp"
 #include "asioext/open.hpp"
 #include "asioext/error_code.hpp"
 
@@ -38,7 +38,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const char* filename, const ConstBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_write |
                                  open_flags::create_always,
                                  file_perms::create_default,
@@ -62,7 +62,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const wchar_t* filename, const ConstBufferSequence& buffers,
               error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_write |
                                  open_flags::create_always,
                                  file_perms::create_default,
@@ -88,7 +88,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const boost::filesystem::path& filename,
               const ConstBufferSequence& buffers, error_code& ec)
 {
-  scoped_file_handle file = open(filename,
+  unique_file_handle file = open(filename,
                                  open_flags::access_write |
                                  open_flags::create_always,
                                  file_perms::create_default,
