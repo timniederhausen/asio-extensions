@@ -180,6 +180,7 @@ executable("asioext_unittests") {
   sources = [
     "test/basic_file.cpp",
     "test/chrono.cpp",
+    "test/composed_operation.cpp",
     "test/file_handle.cpp",
     "test/main.cpp",
     "test/open.cpp",

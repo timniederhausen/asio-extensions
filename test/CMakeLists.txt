@@ -5,6 +5,7 @@
 set(sources
 	basic_file.cpp
 	chrono.cpp
+	composed_operation.cpp
 	file_handle.cpp
 	main.cpp
 	open.cpp

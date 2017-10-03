@@ -19,16 +19,69 @@
 #include "asioext/detail/move_support.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
+# include <boost/asio/detail/handler_alloc_helpers.hpp>
+# include <boost/asio/detail/handler_cont_helpers.hpp>
+# include <boost/asio/detail/handler_invoke_helpers.hpp>
 # define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
 # define ASIOEXT_HANDLER_CONT_HELPERS_NS boost_asio_handler_cont_helpers
 # define ASIOEXT_HANDLER_INVOKE_HELPERS_NS boost_asio_handler_invoke_helpers
 #else
+# include <asio/detail/handler_alloc_helpers.hpp>
+# include <asio/detail/handler_cont_helpers.hpp>
+# include <asio/detail/handler_invoke_helpers.hpp>
 # define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
 # define ASIOEXT_HANDLER_CONT_HELPERS_NS asio_handler_cont_helpers
 # define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
 #endif
 
 ASIOEXT_NS_BEGIN
+
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
+template <typename Handler>
+class composed_operation;
+
+namespace detail {
+
+template <typename>
+struct associated_type_check
+{
+  typedef void type;
+};
+
+template <typename T, typename = void>
+struct executor_wrapper_impl
+{ };
+
+template <typename T>
+struct executor_wrapper_impl<T,
+  typename associated_type_check<typename T::executor_type>::type>
+{
+  typedef typename T::executor_type executor_type;
+  executor_type get_executor() const ASIOEXT_NOEXCEPT
+  {
+    return static_cast<const composed_operation<T>&>(*this).handler_.
+        get_executor();
+  }
+};
+
+template <typename T, typename = void>
+struct allocator_wrapper_impl
+{ };
+
+template <typename T>
+struct allocator_wrapper_impl<T,
+  typename associated_type_check<typename T::allocator_type>::type>
+{
+  typedef typename T::allocator_type allocator_type;
+  allocator_type get_allocator() const ASIOEXT_NOEXCEPT
+  {
+    return static_cast<const composed_operation<T>&>(*this).handler_.
+        get_allocator();
+  }
+};
+
+}
+#endif
 
 /// @ingroup service
 /// @brief Base class for composed operations.
@@ -37,8 +90,9 @@ ASIOEXT_NS_BEGIN
 /// composed operation types that wrap a user-provided handler.
 /// As such, it expects child classes to implement <code>operator()</code>.
 ///
-/// All this class does is wrap the given handler object and provide
-/// overloads for asio's hooks that forward to the real handler's hooks.
+/// It wraps the given handler object and provides
+/// overloads for asio's hooks that forward to the real handler's hooks
+/// (if implemented).
 ///
 /// For a detailed description of `composed operations`, see
 /// [async.reqmts.async.composed] inside the Networking TS.
@@ -50,8 +104,10 @@ ASIOEXT_NS_BEGIN
 /// * asio_handler_invoke()
 ///
 /// On Asio 1.11.0+
-/// * asio::associated_allocator<>
-/// * asio::associated_executor<>
+/// * asio::associated_allocator<> support via
+///   @c executor_type / @c get_executor
+/// * asio::associated_executor<> support via
+///   @c allocator_type / @c get_allocator
 ///
 /// @note This type's <code>operator()</code> is executed by the
 /// user-specified executor / invocation hook (see above).
@@ -59,6 +115,10 @@ ASIOEXT_NS_BEGIN
 /// in a service-provided context (e.g. a private io_service).
 template <typename Handler>
 class composed_operation
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
+  : public detail::executor_wrapper_impl<Handler>
+  , public detail::allocator_wrapper_impl<Handler>
+#endif
 {
 public:
   composed_operation(ASIOEXT_MOVE_ARG(Handler) handler)
@@ -115,41 +175,5 @@ inline void asio_handler_invoke(const Function& function,
 #endif
 
 ASIOEXT_NS_END
-
-#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
-# if defined(ASIOEXT_USE_BOOST_ASIO)
-namespace boost {
-# endif
-namespace asio {
-
-template <typename Handler, typename Allocator>
-struct associated_allocator<asioext::composed_operation<Handler>, Allocator>
-{
-  typedef typename associated_allocator<Handler, Allocator>::type type;
-
-  static type get(const asioext::composed_operation<Handler>& h,
-                  const Allocator& a = Allocator()) ASIOEXT_NOEXCEPT
-  {
-    return associated_allocator<Handler, Allocator>::get(h.handler_, a);
-  }
-};
-
-template <typename Handler, typename Executor>
-struct associated_executor<asioext::composed_operation<Handler>, Executor>
-{
-  typedef typename associated_executor<Handler, Executor>::type type;
-
-  static type get(const asioext::composed_operation<Handler>& h,
-                  const Executor& ex = Executor()) ASIOEXT_NOEXCEPT
-  {
-    return associated_executor<Handler, Executor>::get(h.handler_, ex);
-  }
-};
-
-}
-# if defined(ASIOEXT_USE_BOOST_ASIO)
-}
-# endif
-#endif
 
 #endif
