@@ -30,7 +30,7 @@ void connect(asio::ip::tcp::socket::lowest_layer_type& socket,
 
   // Try each endpoint until we successfully establish a connection.
   ec = asio::error::host_not_found;
-  while (ec && iter != boost::asio::ip::tcp::resolver::iterator()) {
+  while (ec && iter != asio::ip::tcp::resolver::iterator()) {
     socket.close(ec);
     socket.connect(*iter++, ec);
   }
