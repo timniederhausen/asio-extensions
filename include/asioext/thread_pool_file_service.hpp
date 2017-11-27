@@ -104,7 +104,8 @@ public:
 #ifdef ASIOEXT_HAS_MOVE
   /// Move-construct a new file implementation.
   ASIOEXT_DECL void move_construct(implementation_type& impl,
-                                   implementation_type& other_impl);
+                                   implementation_type& other_impl)
+    ASIOEXT_NOEXCEPT;
 
   /// Move-assign from another file implementation.
   ASIOEXT_DECL void move_assign(implementation_type& impl,
@@ -120,7 +121,7 @@ public:
                          const char* filename,
                          open_flags flags,
                          file_perms perms, file_attrs attrs,
-                         error_code& ec);
+                         error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// Open a handle to the given file.
@@ -128,7 +129,7 @@ public:
                          const wchar_t* filename,
                          open_flags flags,
                          file_perms perms, file_attrs attrs,
-                         error_code& ec);
+                         error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -137,32 +138,29 @@ public:
                          const boost::filesystem::path& filename,
                          open_flags flags,
                          file_perms perms, file_attrs attrs,
-                         error_code& ec);
+                         error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
   /// Assign a native handle to a file implementation.
   ASIOEXT_DECL void assign(implementation_type& impl,
                            const native_handle_type& handle,
-                           error_code& ec);
+                           error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Determine whether the file handle is open.
-  bool is_open(const implementation_type& impl) const
+  bool is_open(const implementation_type& impl) const ASIOEXT_NOEXCEPT
   {
     return impl.handle_.is_open();
   }
 
   /// Destroy a file implementation.
-  ASIOEXT_DECL void close(implementation_type& impl, error_code& ec);
+  ASIOEXT_DECL void close(implementation_type& impl, error_code& ec)
+    ASIOEXT_NOEXCEPT;
 
   /// Get the native file handle representation.
   native_handle_type native_handle(implementation_type& impl) ASIOEXT_NOEXCEPT
   {
     return impl.handle_.native_handle();
   }
-
-  /// Get the file size.
-  ASIOEXT_DECL uint64_t size(implementation_type& impl,
-                             error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Get the current file pointer position.
   ASIOEXT_DECL uint64_t position(implementation_type& impl,
@@ -173,6 +171,41 @@ public:
                              seek_origin origin,
                              int64_t offset,
                              error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Get the file size.
+  ASIOEXT_DECL uint64_t size(implementation_type& impl,
+                             error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Set the file size.
+  ASIOEXT_DECL void size(implementation_type& impl, uint64_t new_size,
+                         error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Get the file permissions.
+  ASIOEXT_DECL file_perms permissions(implementation_type& impl,
+                                      error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Set the file permissions.
+  ASIOEXT_DECL void permissions(implementation_type& impl,
+                                file_perms new_perms,
+                                error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Get the file attributes.
+  ASIOEXT_DECL file_attrs attributes(implementation_type& impl,
+                                     error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Set the file attributes.
+  ASIOEXT_DECL void attributes(implementation_type& impl,
+                               file_attrs new_attrs,
+                               error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Get the file times.
+  ASIOEXT_DECL file_times times(implementation_type& impl,
+                                error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Set the file times.
+  ASIOEXT_DECL void times(implementation_type& impl,
+                          const file_times& new_times,
+                          error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Cancel all operations associated with the handle.
   ASIOEXT_DECL void cancel(implementation_type& impl, error_code& ec);

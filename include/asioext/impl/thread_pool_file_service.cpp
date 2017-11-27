@@ -17,6 +17,7 @@ ASIOEXT_NS_BEGIN
 void thread_pool_file_service::thread_function::operator()()
 {
   error_code ec;
+  // TODO: what to do about exceptions/errors?
   service_->run(ec);
 }
 
@@ -40,6 +41,7 @@ void thread_pool_file_service::shutdown_service()
     close_for_destruction(*cur);
 
   work_.on_work_finished();
+  pool_.stop();
 }
 
 void thread_pool_file_service::construct(implementation_type& impl)
@@ -56,8 +58,8 @@ void thread_pool_file_service::construct(implementation_type& impl)
 }
 
 #ifdef ASIOEXT_HAS_MOVE
-void thread_pool_file_service::move_construct(implementation_type& impl,
-                                              implementation_type& other_impl)
+void thread_pool_file_service::move_construct(
+    implementation_type& impl, implementation_type& other_impl) ASIOEXT_NOEXCEPT
 {
   impl.handle_ = other_impl.handle_;
   other_impl.handle_.clear();
@@ -127,7 +129,7 @@ void thread_pool_file_service::open(implementation_type& impl,
                                     const char* filename,
                                     open_flags flags,
                                     file_perms perms, file_attrs attrs,
-                                    error_code& ec)
+                                    error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
@@ -141,7 +143,7 @@ void thread_pool_file_service::open(implementation_type& impl,
                                     const wchar_t* filename,
                                     open_flags flags,
                                     file_perms perms, file_attrs attrs,
-                                    error_code& ec)
+                                    error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
@@ -156,7 +158,7 @@ void thread_pool_file_service::open(implementation_type& impl,
                                     const boost::filesystem::path& filename,
                                     open_flags flags,
                                     file_perms perms, file_attrs attrs,
-                                    error_code& ec)
+                                    error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
@@ -168,7 +170,7 @@ void thread_pool_file_service::open(implementation_type& impl,
 
 void thread_pool_file_service::assign(implementation_type& impl,
                                       const native_handle_type& handle,
-                                      error_code& ec)
+                                      error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
@@ -179,15 +181,10 @@ void thread_pool_file_service::assign(implementation_type& impl,
   ec = error_code();
 }
 
-void thread_pool_file_service::close(implementation_type& impl, error_code& ec)
+void thread_pool_file_service::close(implementation_type& impl,
+                                     error_code& ec) ASIOEXT_NOEXCEPT
 {
   impl.handle_.close(ec);
-}
-
-uint64_t thread_pool_file_service::size(implementation_type& impl,
-                                        error_code& ec) ASIOEXT_NOEXCEPT
-{
-  return impl.handle_.size(ec);
 }
 
 uint64_t thread_pool_file_service::position(implementation_type& impl,
@@ -202,6 +199,58 @@ uint64_t thread_pool_file_service::seek(implementation_type& impl,
                                         error_code& ec) ASIOEXT_NOEXCEPT
 {
   return impl.handle_.seek(origin, offset, ec);
+}
+
+uint64_t thread_pool_file_service::size(implementation_type& impl,
+                                        error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return impl.handle_.size(ec);
+}
+
+void thread_pool_file_service::size(implementation_type& impl,
+                                    uint64_t new_size,
+                                    error_code& ec) ASIOEXT_NOEXCEPT
+{
+  impl.handle_.size(new_size, ec);
+}
+
+file_perms thread_pool_file_service::permissions(
+    implementation_type& impl, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return impl.handle_.permissions(ec);
+}
+
+void thread_pool_file_service::permissions(
+    implementation_type& impl, file_perms new_perms,
+    error_code& ec) ASIOEXT_NOEXCEPT
+{
+  impl.handle_.permissions(new_perms, ec);
+}
+
+file_attrs thread_pool_file_service::attributes(
+    implementation_type& impl, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return impl.handle_.attributes(ec);
+}
+
+void thread_pool_file_service::attributes(
+    implementation_type& impl, file_attrs new_attrs,
+    error_code& ec) ASIOEXT_NOEXCEPT
+{
+  impl.handle_.attributes(new_attrs, ec);
+}
+
+file_times thread_pool_file_service::times(implementation_type& impl,
+                                           error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return impl.handle_.times(ec);
+}
+
+void thread_pool_file_service::times(implementation_type& impl,
+                                     const file_times& new_times,
+                                     error_code& ec) ASIOEXT_NOEXCEPT
+{
+  impl.handle_.times(new_times, ec);
 }
 
 void thread_pool_file_service::cancel(implementation_type& impl,

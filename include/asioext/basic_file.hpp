@@ -452,36 +452,8 @@ public:
 
   /// @}
 
-  /// @name Size/positioning functions
+  /// @name Positioning functions
   /// @{
-
-  /// @brief Get the size of a file.
-  ///
-  /// This function retrieves the size of a file, in bytes.
-  ///
-  /// @return The total number of bytes in this file.
-  ///
-  /// @throws asio::system_error Thrown on failure.
-  uint64_t size()
-  {
-    error_code ec;
-    uint64_t s = this->get_service().size(this->get_implementation(), ec);
-    detail::throw_error(ec);
-    return s;
-  }
-
-  /// @brief Get the size of a file.
-  ///
-  /// This function retrieves the size of a file, in bytes.
-  ///
-  /// @return The total number of bytes in this file.
-  ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
-  uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT
-  {
-    return this->get_service().size(this->get_implementation(), ec);
-  }
 
   /// @brief Get the current file position.
   ///
@@ -554,6 +526,137 @@ public:
   {
     return this->get_service().seek(this->get_implementation(), origin, offset,
                                     ec);
+  }
+
+  /// @}
+
+  /// @name Metadata functions
+  /// @{
+
+  /// @copydoc file_handle::size()
+  uint64_t size()
+  {
+    error_code ec;
+    uint64_t s = this->get_service().size(this->get_implementation(), ec);
+    detail::throw_error(ec);
+    return s;
+  }
+
+  /// @copydoc file_handle::size(error_code&)
+  uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return this->get_service().size(this->get_implementation(), ec);
+  }
+
+  /// @copydoc file_handle::size(uint64_t)
+  void size(uint64_t new_size)
+  {
+    error_code ec;
+    this->get_service().size(this->get_implementation(), new_size, ec);
+    detail::throw_error(ec);
+  }
+
+  /// @copydoc file_handle::size(uint64_t,error_code&)
+  void size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    this->get_service().size(this->get_implementation(), new_size, ec);
+  }
+
+  /// @copydoc file_handle::permissions()
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_perms permissions()
+  {
+    error_code ec;
+    file_perms p = this->get_service().permissions(this->get_implementation(),
+                                                   ec);
+    detail::throw_error(ec);
+    return p;
+  }
+
+  /// @copydoc file_handle::permissions(error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_perms permissions(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return this->get_service().permissions(this->get_implementation(), ec);
+  }
+
+  /// @copydoc file_handle::permissions(file_perms)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void permissions(file_perms perms)
+  {
+    error_code ec;
+    this->get_service().permissions(this->get_implementation(), perms, ec);
+    detail::throw_error(ec);
+  }
+
+  /// @copydoc file_handle::permissions(file_perms,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void permissions(file_perms perms, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    this->get_service().permissions(this->get_implementation(), perms, ec);
+  }
+
+  /// @copydoc file_handle::attributes()
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_attrs attributes()
+  {
+    error_code ec;
+    file_attrs a = this->get_service().attributes(this->get_implementation(), ec);
+    detail::throw_error(ec);
+    return a;
+  }
+
+  /// @copydoc file_handle::attributes(error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  file_attrs attributes(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return this->get_service().attributes(this->get_implementation(), ec);
+  }
+
+  /// @copydoc file_handle::attributes(file_attrs)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void attributes(file_attrs attrs)
+  {
+    error_code ec;
+    this->get_service().attributes(this->get_implementation(), attrs, ec);
+    detail::throw_error(ec);
+  }
+
+  /// @copydoc file_handle::attributes(file_attrs,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void attributes(file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    this->get_service().attributes(this->get_implementation(),
+                                   attrs, ec);
+  }
+
+  /// @copydoc file_handle::times()
+  file_times times()
+  {
+    error_code ec;
+    file_times t = this->get_service().times(this->get_implementation(), ec);
+    detail::throw_error(ec);
+    return t;
+  }
+
+  /// @copydoc file_handle::times(error_code&)
+  file_times times(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return this->get_service().times(this->get_implementation(), ec);
+  }
+
+  /// @copydoc file_handle::times(const file_times&)
+  void times(const file_times& new_times)
+  {
+    error_code ec;
+    this->get_service().times(this->get_implementation(), new_times, ec);
+    detail::throw_error(ec);
+  }
+
+  /// @copydoc file_handle::times(const file_times&,error_code&)
+  void times(const file_times& new_times, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    this->get_service().times(this->get_implementation(), new_times, ec);
   }
 
   /// @}
