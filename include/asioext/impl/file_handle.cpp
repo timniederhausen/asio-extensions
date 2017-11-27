@@ -25,14 +25,6 @@ void file_handle::close()
   detail::throw_error(ec);
 }
 
-uint64_t file_handle::size()
-{
-  error_code ec;
-  uint64_t s = size(ec);
-  detail::throw_error(ec);
-  return s;
-}
-
 uint64_t file_handle::position()
 {
   error_code ec;
@@ -47,6 +39,21 @@ uint64_t file_handle::seek(seek_origin origin, int64_t offset)
   uint64_t s = seek(origin, offset, ec);
   detail::throw_error(ec);
   return s;
+}
+
+uint64_t file_handle::size()
+{
+  error_code ec;
+  uint64_t s = size(ec);
+  detail::throw_error(ec);
+  return s;
+}
+
+void file_handle::size(uint64_t new_size)
+{
+  error_code ec;
+  size(new_size, ec);
+  detail::throw_error(ec, "set_size");
 }
 
 #if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \

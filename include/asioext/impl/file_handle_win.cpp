@@ -38,11 +38,6 @@ void file_handle::clear() ASIOEXT_NOEXCEPT
   handle_ = INVALID_HANDLE_VALUE;
 }
 
-uint64_t file_handle::size(error_code& ec) ASIOEXT_NOEXCEPT
-{
-  return detail::win_file_ops::size(handle_, ec);
-}
-
 uint64_t file_handle::position(error_code& ec) ASIOEXT_NOEXCEPT
 {
   return seek(seek_origin::from_current, 0, ec);
@@ -53,6 +48,16 @@ uint64_t file_handle::seek(seek_origin origin,
                            error_code& ec) ASIOEXT_NOEXCEPT
 {
   return detail::win_file_ops::seek(handle_, origin, offset, ec);
+}
+
+uint64_t file_handle::size(error_code& ec) ASIOEXT_NOEXCEPT
+{
+  return detail::win_file_ops::size(handle_, ec);
+}
+
+void file_handle::size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  detail::win_file_ops::size(handle_, new_size, ec);
 }
 
 file_perms file_handle::permissions(error_code& ec) ASIOEXT_NOEXCEPT

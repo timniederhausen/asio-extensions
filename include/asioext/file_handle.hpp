@@ -171,27 +171,8 @@ public:
 
   /// @}
 
-  /// @name Size/positioning functions
+  /// @name Positioning functions
   /// @{
-
-  /// @brief Get the size of a file.
-  ///
-  /// This function retrieves the size of a file, in bytes.
-  ///
-  /// @return The total number of bytes in this file.
-  ///
-  /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL uint64_t size();
-
-  /// @brief Get the size of a file.
-  ///
-  /// This function retrieves the size of a file, in bytes.
-  ///
-  /// @return The total number of bytes in this file.
-  ///
-  /// @param ec Set to indicate what error occurred. If no error occurred,
-  /// the object is reset.
-  ASIOEXT_DECL uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Get the current file position.
   ///
@@ -251,6 +232,44 @@ public:
 
   /// @name Metadata functions
   /// @{
+
+  /// @brief Get the size of a file.
+  ///
+  /// This function retrieves the size of a file, in bytes.
+  ///
+  /// @return The total number of bytes in this file.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+  ASIOEXT_DECL uint64_t size();
+
+  /// @brief Get the size of a file.
+  ///
+  /// This function retrieves the size of a file, in bytes.
+  ///
+  /// @return The total number of bytes in this file.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ASIOEXT_DECL uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Set the size of a file.
+  ///
+  /// This function resizes the file so its new size matches @c new_size.
+  ///
+  /// @param new_size The new total size of the file (in bytes).
+  ///
+  /// @throws asio::system_error Thrown on failure.
+  ASIOEXT_DECL void size(uint64_t new_size);
+
+  /// @brief Set the size of a file.
+  ///
+  /// This function resizes the file so its new size matches @c new_size.
+  ///
+  /// @param new_size The new total size of the file (in bytes).
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ASIOEXT_DECL void size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Get the file's current access permissions.
   ///

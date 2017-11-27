@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(read_write)
   BOOST_REQUIRE_EQUAL(0, std::memcmp(test_data, buffer, test_data_size));
 }
 
-BOOST_AUTO_TEST_CASE(position_and_size)
+BOOST_AUTO_TEST_CASE(position)
 {
   test_file_rm_guard rguard1(test_filename);
 
@@ -127,7 +127,81 @@ BOOST_AUTO_TEST_CASE(position_and_size)
                       asio::write(fh, asio::buffer(test_data,
                                                    test_data_size)));
   BOOST_REQUIRE_EQUAL(test_data_size, fh.position());
+}
+
+BOOST_AUTO_TEST_CASE(seek)
+{
+  test_file_rm_guard rguard1(test_filename);
+
+  asioext::unique_file_handle fh;
+
+  asioext::error_code ec;
+  fh = open(test_filename,
+            asioext::open_flags::access_write |
+            asioext::open_flags::create_always,
+            asioext::file_perms::create_default,
+            asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::seek_origin::from_current, 0));
+  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, 10));
+  BOOST_REQUIRE_EQUAL(10, fh.position());
+  BOOST_REQUIRE_EQUAL(20, fh.seek(asioext::seek_origin::from_current, 10));
+  BOOST_REQUIRE_EQUAL(20, fh.position());
+  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, -10));
+
+  char buffer[10] = {0, };
+  BOOST_REQUIRE_EQUAL(10, asio::write(fh, asio::buffer(buffer)));
+
+  // size is now 20
+  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_end, -10));
+}
+
+BOOST_AUTO_TEST_CASE(get_size)
+{
+  test_file_rm_guard rguard1(test_filename);
+
+  asioext::unique_file_handle fh;
+
+  asioext::error_code ec;
+  fh = asioext::open(test_filename,
+                     asioext::open_flags::access_write |
+                     asioext::open_flags::create_always,
+                     asioext::file_perms::create_default,
+                     asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  BOOST_REQUIRE_EQUAL(0, fh.size());
+  BOOST_REQUIRE_EQUAL(test_data_size,
+                      asio::write(fh, asio::buffer(test_data,
+                                                   test_data_size)));
   BOOST_REQUIRE_EQUAL(test_data_size, fh.size());
+}
+
+BOOST_AUTO_TEST_CASE(set_size)
+{
+  test_file_rm_guard rguard1(test_filename);
+
+  asioext::unique_file_handle fh;
+
+  asioext::error_code ec;
+  fh = asioext::open(test_filename,
+                     asioext::open_flags::access_write |
+                     asioext::open_flags::create_always,
+                     asioext::file_perms::create_default,
+                     asioext::file_attrs::none, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  BOOST_REQUIRE_EQUAL(0, fh.size());
+  fh.size(128, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+  BOOST_REQUIRE_EQUAL(128, fh.size());
+  BOOST_REQUIRE_EQUAL(0, fh.position());
+
+  BOOST_REQUIRE_EQUAL(test_data_size,
+                      asio::write(fh, asio::buffer(test_data,
+                                                   test_data_size)));
+  BOOST_REQUIRE_EQUAL(128, fh.size());
 }
 
 BOOST_AUTO_TEST_CASE(get_times)
@@ -235,34 +309,6 @@ BOOST_AUTO_TEST_CASE(set_times_manual)
   BOOST_CHECK_EQUAL(times1.ctime.time_since_epoch().count(),
                     times3.ctime.time_since_epoch().count());
 #endif
-}
-
-BOOST_AUTO_TEST_CASE(seek)
-{
-  test_file_rm_guard rguard1(test_filename);
-
-  asioext::unique_file_handle fh;
-
-  asioext::error_code ec;
-  fh = open(test_filename,
-            asioext::open_flags::access_write |
-            asioext::open_flags::create_always,
-            asioext::file_perms::create_default,
-            asioext::file_attrs::none, ec);
-  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
-
-  BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::seek_origin::from_current, 0));
-  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, 10));
-  BOOST_REQUIRE_EQUAL(10, fh.position());
-  BOOST_REQUIRE_EQUAL(20, fh.seek(asioext::seek_origin::from_current, 10));
-  BOOST_REQUIRE_EQUAL(20, fh.position());
-  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_current, -10));
-
-  char buffer[10] = {0, };
-  BOOST_REQUIRE_EQUAL(10, asio::write(fh, asio::buffer(buffer)));
-
-  // size is now 20
-  BOOST_REQUIRE_EQUAL(10, fh.seek(asioext::seek_origin::from_end, -10));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

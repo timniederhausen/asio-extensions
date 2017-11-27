@@ -322,6 +322,14 @@ uint64_t size(handle_type fd, error_code& ec)
   return 0;
 }
 
+void size(handle_type fd, uint64_t new_size, error_code& ec)
+{
+  if (::ftruncate(fd, static_cast<off_t>(new_size)) == 0)
+    ec = error_code();
+  else
+    set_error(ec, errno);
+}
+
 // Make sure our origin mappings match the system headers.
 static_assert(static_cast<int>(seek_origin::from_begin) == SEEK_SET &&
               static_cast<int>(seek_origin::from_current) == SEEK_CUR &&

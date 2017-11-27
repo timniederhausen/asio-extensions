@@ -212,20 +212,8 @@ public:
   /// the object is reset.
   ASIOEXT_DECL void reset(file_handle handle, error_code& ec) ASIOEXT_NOEXCEPT;
 
-  /// @name Size/positioning functions
+  /// @name Positioning functions
   /// @{
-
-  /// @copydoc file_handle::size()
-  uint64_t size()
-  {
-    return handle_.size();
-  }
-
-  /// @copydoc file_handle::size(error_code&)
-  uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT
-  {
-    return handle_.size(ec);
-  }
 
   /// @copydoc file_handle::position()
   uint64_t position()
@@ -257,6 +245,30 @@ public:
 
   /// @name Metadata functions
   /// @{
+
+  /// @copydoc file_handle::size()
+  uint64_t size()
+  {
+    return handle_.size();
+  }
+
+  /// @copydoc file_handle::size(error_code&)
+  uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle_.size(ec);
+  }
+
+  /// @copydoc file_handle::size(uint64_t)
+  void size(uint64_t new_size)
+  {
+    handle_.size(new_size);
+  }
+
+  /// @copydoc file_handle::size(uint64_t,error_code&)
+  void size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    handle_.size(new_size, ec);
+  }
 
   /// @copydoc file_handle::permissions()
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING

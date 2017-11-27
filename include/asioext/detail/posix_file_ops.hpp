@@ -52,6 +52,7 @@ ASIOEXT_DECL handle_type get_stdout(error_code& ec);
 ASIOEXT_DECL handle_type get_stderr(error_code& ec);
 
 ASIOEXT_DECL uint64_t size(handle_type fd, error_code& ec);
+ASIOEXT_DECL void size(handle_type fd, uint64_t new_size, error_code& ec);
 
 ASIOEXT_DECL uint64_t seek(handle_type fd,
                            seek_origin origin,

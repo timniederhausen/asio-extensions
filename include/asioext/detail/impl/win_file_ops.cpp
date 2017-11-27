@@ -282,6 +282,46 @@ uint64_t size(handle_type fd, error_code& ec)
   return 0;
 }
 
+void size(handle_type fd, uint64_t new_size, error_code& ec)
+{
+#if (_WIN32_WINNT >= 0x0600)
+  // On Vista+ we can avoid having to modify the file pointer.
+  FILE_ALLOCATION_INFO ai;
+  FILE_END_OF_FILE_INFO ei;
+
+  ai.AllocationSize.QuadPart = new_size;
+  ei.EndOfFile.QuadPart = new_size;
+
+  if (::SetFileInformationByHandle(fd, FileEndOfFileInfo, &ei, sizeof(ei)) &&
+      // Explicitly deallocate space for |new_size| < |old size|
+      ::SetFileInformationByHandle(fd, FileAllocationInfo, &ai, sizeof(ai))) {
+    ec = error_code();
+  } else {
+    set_error(ec);
+  }
+#else
+  LARGE_INTEGER old_pointer, zero, size;
+
+  zero.QuadPart = 0;
+  size.QuadPart = new_size;
+
+  if (::SetFilePointerEx(fd, zero, &old_pointer, FILE_CURRENT) &&
+      ::SetFilePointerEx(fd, size, NULL, FILE_BEGIN)) {
+    if (::SetEndOfFile(fd)) {
+      if (::SetFilePointerEx(fd, old_pointer, NULL, FILE_BEGIN)) {
+        ec = error_code();
+        return;
+      }
+    } else {
+      // We failed to set the new size, but we can still reset the file
+      // pointer to avoid surprising the user.
+      ::SetFilePointerEx(fd, old_pointer, NULL, FILE_BEGIN);
+    }
+  }
+  set_error(ec);
+#endif
+}
+
 // Make sure our origin mappings match the system headers.
 static_assert(static_cast<DWORD>(seek_origin::from_begin) == FILE_BEGIN &&
               static_cast<DWORD>(seek_origin::from_current) == FILE_CURRENT &&
@@ -327,7 +367,7 @@ void permissions(handle_type fd, file_perms perms, error_code& ec)
                                      file_perms::group_write |
                                      file_perms::others_write;
 
-  // Exit early if the changed values are without effect (i.e. not implemented)
+  // Quit early if the changed values are without effect (i.e. not implemented)
   if ((perms & (file_perms::add_perms | file_perms::remove_perms)) !=
       file_perms::none && (perms & write_perms) == file_perms::none) {
     ec = error_code();
@@ -349,7 +389,7 @@ void permissions(handle_type fd, file_perms perms, error_code& ec)
     return;
   }
 
-  // We deliberately set all the other fields (file times) to zero,
+  // We deliberately set all the other fields (i.e. file times) to zero,
   // so they are ignored by the kernel. Otherwise we'd risk overwriting
   // changes that happened in the meantime.
   info.CreationTime.QuadPart = 0;
