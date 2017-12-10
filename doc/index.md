@@ -27,20 +27,23 @@ AsioExt requires a compiler that supports at least some C++11 features:
 * `constexpr` functions
 * Scoped enumerations (`enum class`)
 * C++11 `<type_traits>`
-* R-value references (optional, if unavailable, objects will not be movable).
+* rvalue references (optional, if unavailable, objects will not be movable).
+
+AsioExt's behavior can be customized by defining certain macros.
+See @ref buildopts for a full list of possible build options.
 
 Like Asio, AsioExt is header-only by default.
 However, it is also possible to build AsioExt as a separate compilation unit.
 
-See @ref buildopts for a full list of possible build options.
+Currently, AsioExt has support for CMake as well as GN.
 
 ## Supported platforms
 
 Currently, AsioExt is being tested on the following platforms:
 
-* Linux (GCC 4.8, Clang 3.6)
-* mac OS (Xcode 7.3.1 - Apple Clang 7.3.0)
-* Windows (MSVC 2015)
+* Linux
+* mac OS
+* Windows + Universal Windows
 
 ## Dependencies
 

@@ -169,14 +169,17 @@ bool operator!=(const asio_hook_allocator<T, Handler>& a,
 { return std::addressof(a.handler_) != std::addressof(b.handler_); }
 
 /// @ingroup service
-/// @brief Trait type to obtain the hook allocator associated with a handler.
+/// @brief Helper trait to obtain the allocator associated with a handler.
 ///
 /// Retrieves an @c Allocator that is used to allocate memory tied to the
 /// handler's asynchronous operation.
 ///
-/// @note This is compatibility trait for asio::associated_allocator.
-/// Before Asio 1.11.0, it will wrap Asio's memory allocation hooks in a
-/// @c asio_hook_allocator.
+/// Supports the @c associated_allocator trait introduced by
+/// the Networking TS / Asio 1.11.0+, as well as Asio's memory allocation
+/// hooks (which this trait will wrap in a @c asio_hook_allocator)
+///
+/// @note This trait is useful for libraries / applications that need to
+/// deal with both types of allocation customizations.
 template <typename Handler>
 class hook_allocator
 {
@@ -209,7 +212,7 @@ public:
 };
 
 /// @ingroup service
-/// @brief Get the handler's associated hook allocator.
+/// @brief Get the handler's associated allocator.
 ///
 /// Calling this function is equivalent to calling
 /// <code>hook_allocator<Handler>::get(handler)</code>.

@@ -15,7 +15,7 @@
 # include <boost/system/error_code.hpp>
 #else
 # if !defined(ASIO_HAS_STD_SYSTEM_ERROR)
-#  error Asio's fallback error_code implementation is non-conforming
+#  error Missing standard library error codes (<system_error>)
 # endif
 # include <system_error>
 #endif
