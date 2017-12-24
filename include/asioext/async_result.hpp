@@ -147,7 +147,7 @@ using async_result_t = typename async_result<
 /// This alias template refers to the @c async_result::completion_handler_type
 /// type for the specified CompletionToken and Signature.
 template <typename CompletionToken, typename Signature>
-using handler_type_t = typename async_result<
+using completion_handler_t = typename async_result<
   typename std::decay<CompletionToken>::type>::completion_handler_type;
 #endif
 
