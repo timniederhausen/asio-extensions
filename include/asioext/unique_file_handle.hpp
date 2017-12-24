@@ -288,14 +288,14 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   void permissions(file_perms perms)
   {
-    return handle_.permissions(perms);
+    handle_.permissions(perms);
   }
 
   /// @copydoc file_handle::permissions(file_perms,error_code&)
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   void permissions(file_perms perms, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return handle_.permissions(perms, ec);
+    handle_.permissions(perms, ec);
   }
 
   /// @copydoc file_handle::attributes()
@@ -316,14 +316,14 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   void attributes(file_attrs attrs)
   {
-    return handle_.attributes(attrs);
+    handle_.attributes(attrs);
   }
 
   /// @copydoc file_handle::attributes(file_attrs,error_code&)
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   void attributes(file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return handle_.attributes(attrs, ec);
+    handle_.attributes(attrs, ec);
   }
 
   /// @copydoc file_handle::times()
