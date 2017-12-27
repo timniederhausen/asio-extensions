@@ -20,6 +20,8 @@
 # include <asio/async_result.hpp>
 #endif
 
+#include <type_traits>
+
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 /// @brief An initiating function's return type.
 ///
@@ -33,8 +35,6 @@
 #else
 # define ASIOEXT_INITFN_RESULT_TYPE ASIO_INITFN_RESULT_TYPE
 #endif
-
-#include <type_traits>
 
 ASIOEXT_NS_BEGIN
 
@@ -140,7 +140,8 @@ struct async_completion
 /// type for the specified CompletionToken and Signature.
 template <typename CompletionToken, typename Signature>
 using async_result_t = typename async_result<
-  typename std::decay<CompletionToken>::type>::return_type;
+  typename std::decay<CompletionToken>::type, Signature
+>::return_type;
 
 /// @brief The real handler type to be used for the asynchronous operation.
 ///
@@ -148,7 +149,8 @@ using async_result_t = typename async_result<
 /// type for the specified CompletionToken and Signature.
 template <typename CompletionToken, typename Signature>
 using completion_handler_t = typename async_result<
-  typename std::decay<CompletionToken>::type>::completion_handler_type;
+  typename std::decay<CompletionToken>::type, Signature
+>::completion_handler_type;
 #endif
 
 ASIOEXT_NS_END
