@@ -63,10 +63,10 @@ file_perms file_handle::permissions(error_code& ec) ASIOEXT_NOEXCEPT
   return detail::posix_file_ops::permissions(handle_, ec);
 }
 
-void file_handle::permissions(file_perms perms,
+void file_handle::permissions(file_perms perms, file_perm_options opts,
                               error_code& ec) ASIOEXT_NOEXCEPT
 {
-  detail::posix_file_ops::permissions(handle_, perms, ec);
+  detail::posix_file_ops::permissions(handle_, perms, opts, ec);
 }
 
 file_attrs file_handle::attributes(error_code& ec) ASIOEXT_NOEXCEPT
@@ -74,10 +74,10 @@ file_attrs file_handle::attributes(error_code& ec) ASIOEXT_NOEXCEPT
   return detail::posix_file_ops::attributes(handle_, ec);
 }
 
-void file_handle::attributes(file_attrs attrs,
+void file_handle::attributes(file_attrs attrs, file_attr_options opts,
                              error_code& ec) ASIOEXT_NOEXCEPT
 {
-  detail::posix_file_ops::attributes(handle_, attrs, ec);
+  detail::posix_file_ops::attributes(handle_, attrs, opts, ec);
 }
 
 file_times file_handle::times(error_code& ec) ASIOEXT_NOEXCEPT

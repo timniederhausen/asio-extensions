@@ -246,7 +246,7 @@ handle_type open(const char* path, open_flags flags,
       // Unfortunately there's no way to atomically set file
       // flags as part of the open() call.
       if (attrs != file_attrs::none) {
-        attributes(fd, attrs, ec);
+        attributes(fd, attrs, file_attr_options::replace, ec);
         if (ec) {
           ::close(fd);
           return -1;
@@ -361,17 +361,18 @@ file_perms permissions(handle_type fd, error_code& ec)
   return file_perms::none;
 }
 
-void permissions(handle_type fd, file_perms perms, error_code& ec)
+void permissions(handle_type fd, file_perms perms, file_perm_options opts,
+                 error_code& ec)
 {
   mode_t mode = static_cast<mode_t>(perms & file_perms::all);
-  if ((perms & (file_perms::add_perms | file_perms::remove_perms)) !=
-      file_perms::none) {
+  if ((opts & (file_perm_options::add | file_perm_options::remove)) !=
+      file_perm_options::none) {
     struct stat st;
     if (::fstat(fd, &st) != 0) {
       set_error(ec, errno);
       return;
     }
-    if ((perms & file_perms::add_perms) != file_perms::none)
+    if ((opts & file_perm_options::add) != file_perm_options::none)
       mode |= st.st_mode;
     else
       mode = st.st_mode & ~mode;
@@ -400,18 +401,19 @@ file_attrs attributes(handle_type fd, error_code& ec)
   return file_attrs::none;
 }
 
-void attributes(handle_type fd, file_attrs attrs, error_code& ec)
+void attributes(handle_type fd, file_attrs attrs, file_attr_options opts,
+                error_code& ec)
 {
 #if ASIOEXT_HAS_FILE_FLAGS
   uint32_t new_attrs = file_attrs_to_native(attrs);
-  if ((attrs & (file_attrs::add_attrs | file_attrs::remove_attrs)) !=
-      file_attrs::none) {
+  if ((opts & (file_attr_options::add | file_attr_options::remove)) !=
+      file_attr_options::none) {
     struct stat st;
     if (::fstat(fd, &st) != 0) {
       set_error(ec, errno);
       return;
     }
-    if ((attrs & file_attrs::add_attrs) != file_attrs::none)
+    if ((opts & file_attr_options::add) != file_attr_options::none)
       new_attrs = st.st_flags | new_attrs;
     else
       new_attrs = st.st_flags & ~new_attrs;

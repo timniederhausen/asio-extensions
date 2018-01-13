@@ -9,11 +9,6 @@ ASIOEXT_NS_BEGIN
 
 bool is_valid(file_perms flags)
 {
-  int count = int((flags & file_perms::add_perms) != file_perms::none) +
-              int((flags & file_perms::remove_perms) != file_perms::none);
-  if (count > 1)
-    return false;
-
   return true;
 }
 

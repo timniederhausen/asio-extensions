@@ -297,22 +297,27 @@ public:
   /// @brief Change file access permissions.
   ///
   /// This function changes the file's access permissions.
-  /// Depending on whether @c file_perms::add_perms,
-  /// @c file_perms::remove_perms are set, permissions are either added,
-  /// removed or replaced.
+  /// Depending on whether @c file_perm_options::add_perms,
+  /// @c file_perm_options::remove_perms are set,
+  /// permissions are either added, removed or replaced.
   ///
   /// @param perms Permissions to set, add or remove.
   ///
+  /// @param opts Options controlling this function's
+  /// behavior.
+  ///
   /// @throws asio::system_error Thrown on failure.
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
-  ASIOEXT_DECL void permissions(file_perms perms);
+  ASIOEXT_DECL void permissions(file_perms perms,
+                                file_perm_options opts =
+                                  file_perm_options::replace);
 
   /// @brief Change file access permissions.
   ///
   /// This function changes the file's access permissions.
-  /// Depending on whether @c file_perms::add_perms,
-  /// @c file_perms::remove_perms are set, permissions are either added,
-  /// removed or replaced.
+  /// Depending on whether @c file_perm_options::add_perms,
+  /// @c file_perm_options::remove_perms are set,
+  /// permissions are either added, removed or replaced.
   ///
   /// @param perms Permissions to set, add or remove.
   ///
@@ -320,6 +325,25 @@ public:
   /// the object is reset.
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void permissions(file_perms perms,
+                                error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Change file access permissions.
+  ///
+  /// This function changes the file's access permissions.
+  /// Depending on whether @c file_perm_options::add_perms,
+  /// @c file_perm_options::remove_perms are set,
+  /// permissions are either added, removed or replaced.
+  ///
+  /// @param perms Permissions to set, add or remove.
+  ///
+  /// @param opts Options controlling this function's
+  /// behavior.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  ASIOEXT_DECL void permissions(file_perms perms,
+                                file_perm_options opts,
                                 error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Get the file's attributes.
@@ -348,21 +372,26 @@ public:
   /// @brief Change the file's attributes.
   ///
   /// This function changes the file's attributes.
-  /// Depending on whether @c file_attrs::add_attrs,
-  /// @c file_attrs::remove_attrs are set, attributes are either added,
+  /// Depending on whether @c file_attr_options::add_attrs,
+  /// @c file_attr_options::remove_attrs are set, attributes are either added,
   /// removed or replaced.
   ///
   /// @param attrs Attributes to set, add or remove.
   ///
+  /// @param opts Options controlling this function's
+  /// behavior.
+  ///
   /// @throws asio::system_error Thrown on failure.
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
-  ASIOEXT_DECL void attributes(file_attrs attrs);
+  ASIOEXT_DECL void attributes(file_attrs attrs,
+                               file_attr_options opts =
+                                file_attr_options::replace);
 
   /// @brief Change the file's attributes.
   ///
   /// This function changes the file's attributes.
-  /// Depending on whether @c file_attrs::add_attrs,
-  /// @c file_attrs::remove_attrs are set, attributes are either added,
+  /// Depending on whether @c file_attr_options::add_attrs,
+  /// @c file_attr_options::remove_attrs are set, attributes are either added,
   /// removed or replaced.
   ///
   /// @param attrs Attributes to set, add or remove.
@@ -371,6 +400,25 @@ public:
   /// the object is reset.
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   ASIOEXT_DECL void attributes(file_attrs attrs,
+                               error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// @brief Change the file's attributes.
+  ///
+  /// This function changes the file's attributes.
+  /// Depending on whether @c file_attr_options::add_attrs,
+  /// @c file_attr_options::remove_attrs are set, attributes are either added,
+  /// removed or replaced.
+  ///
+  /// @param attrs Attributes to set, add or remove.
+  ///
+  /// @param opts Options controlling this function's
+  /// behavior.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  ASIOEXT_DECL void attributes(file_attrs attrs,
+                               file_attr_options opts,
                                error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Get the file's time data.

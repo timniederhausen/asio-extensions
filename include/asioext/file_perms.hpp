@@ -104,20 +104,34 @@ enum class file_perms
 
   /// Unknown permissions
   unknown = 0xFFFF,
-
-  /// Control bit to add, but not clear permission bits
-  add_perms = 0x10000,
-
-  /// Control bit to clear, but not add permission bits
-  remove_perms = 0x20000,
-
-  /// Control bit to not resolve symlinks
-  ///
-  /// @note Implied on Windows.
-  resolve_symlinks = 0x4000,
 };
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perms)
+
+/// @ingroup files
+/// @brief Options to control the behavior of
+/// @ref asioext::file_handle::permissions(file_perms,file_perm_options)
+///
+/// This enum represents options for the file permissions modifier.
+/// @c file_attr_options meets the requirements
+/// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
+enum class file_perm_options
+{
+  none = 0,
+
+  /// Replace existing permissions.
+  replace = 1 << 0,
+
+  /// Replace permissions with the bitwise OR
+  /// of the argument and the current permissions.
+  add = 1 << 1,
+
+  /// Replace permissions with the bitwise AND
+  /// of the negated argument and the current permissions.
+  remove = 1 << 2,
+};
+
+ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perm_options)
 
 /// @brief Check whether a set of perms is valid.
 ///

@@ -360,7 +360,8 @@ file_perms permissions(handle_type fd, error_code& ec)
   return file_perms::none;
 }
 
-void permissions(handle_type fd, file_perms perms, error_code& ec)
+void permissions(handle_type fd, file_perms perms, file_perm_options opts,
+                 error_code& ec)
 {
 #if (_WIN32_WINNT >= 0x0600)
   constexpr file_perms write_perms = file_perms::owner_write |
@@ -368,17 +369,17 @@ void permissions(handle_type fd, file_perms perms, error_code& ec)
                                      file_perms::others_write;
 
   // Quit early if the changed values are without effect (i.e. not implemented)
-  if ((perms & (file_perms::add_perms | file_perms::remove_perms)) !=
-      file_perms::none && (perms & write_perms) == file_perms::none) {
+  if ((opts & (file_perm_options::add | file_perm_options::remove)) !=
+      file_perm_options::none && (perms & write_perms) == file_perms::none) {
     ec = error_code();
     return;
   }
 
   FILE_BASIC_INFO info;
   if (::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
-    if ((perms & file_perms::add_perms) != file_perms::none)
+    if ((opts & file_perm_options::add) != file_perm_options::none)
       info.FileAttributes &= ~FILE_ATTRIBUTE_READONLY;
-    else if ((perms & file_perms::remove_perms) != file_perms::none)
+    else if ((opts & file_perm_options::remove) != file_perm_options::none)
       info.FileAttributes |= FILE_ATTRIBUTE_READONLY;
     else if ((perms & write_perms) != file_perms::none)
       info.FileAttributes &= ~FILE_ATTRIBUTE_READONLY;
@@ -420,7 +421,8 @@ file_attrs attributes(handle_type fd, error_code& ec)
   return file_attrs::none;
 }
 
-void attributes(handle_type fd, file_attrs attrs, error_code& ec)
+void attributes(handle_type fd, file_attrs attrs, file_attr_options opts,
+                error_code& ec)
 {
 #if (_WIN32_WINNT >= 0x0600)
   FILE_BASIC_INFO info;
@@ -430,9 +432,9 @@ void attributes(handle_type fd, file_attrs attrs, error_code& ec)
   }
 
   const uint32_t new_attrs = file_attrs_to_native(attrs);
-  if ((attrs & (file_attrs::add_attrs | file_attrs::remove_attrs)) !=
-      file_attrs::none) {
-    if ((attrs & file_attrs::add_attrs) != file_attrs::none)
+  if ((opts & (file_attr_options::add | file_attr_options::remove)) !=
+      file_attr_options::none) {
+    if ((opts & file_attr_options::add) != file_attr_options::none)
       info.FileAttributes |= new_attrs;
     else
       info.FileAttributes &= ~new_attrs;

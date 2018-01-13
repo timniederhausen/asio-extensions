@@ -25,8 +25,8 @@ ASIOEXT_NS_BEGIN
 /// This enum represents file attributes. @c file_attrs meets the requirements
 /// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
 ///
-/// @note The file's attributes are replaced if neither add_attrs nor
-/// remove_attrs has been set.
+/// @note The file's attributes are replaced if neither
+/// @ref file_attr_options::add nor @ref file_attr_options::remove has been set.
 enum class file_attrs : uint32_t
 {
   none = 0,
@@ -84,17 +84,34 @@ enum class file_attrs : uint32_t
 
   // reserved for the future...
   // --------------------------
-
-  /// Control bit to add the given attributes to the file's
-  /// current attributes.
-  add_attrs = 1 << 30,
-
-  /// Control bit to remove the given attributes from the file's
-  /// current attributes.
-  remove_attrs = uint32_t(1) << 31,
 };
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attrs)
+
+/// @ingroup files
+/// @brief Options to control the behavior of
+/// @ref asioext::file_handle::attributes(file_attrs,file_attr_options)
+///
+/// This enum represents options for the file attributes modifier.
+/// @c file_attr_options meets the requirements
+/// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
+enum class file_attr_options
+{
+  none = 0,
+
+  /// Replace all current attributes.
+  replace = 1 << 0,
+
+  /// Replace attributes with the bitwise OR
+  /// of the argument and the current attributes.
+  add = 1 << 1,
+
+  /// Replace attributes with the bitwise AND
+  /// of the negated argument and the current attributes.
+  remove = 1 << 2,
+};
+
+ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attr_options)
 
 /// @brief Check whether a set of file_attrs is valid.
 ///

@@ -189,6 +189,11 @@ public:
                                 file_perms new_perms,
                                 error_code& ec) ASIOEXT_NOEXCEPT;
 
+  /// Set the file permissions.
+  ASIOEXT_DECL void permissions(implementation_type& impl,
+                                file_perms new_perms, file_perm_options opts,
+                                error_code& ec) ASIOEXT_NOEXCEPT;
+
   /// Get the file attributes.
   ASIOEXT_DECL file_attrs attributes(implementation_type& impl,
                                      error_code& ec) ASIOEXT_NOEXCEPT;
@@ -196,6 +201,11 @@ public:
   /// Set the file attributes.
   ASIOEXT_DECL void attributes(implementation_type& impl,
                                file_attrs new_attrs,
+                               error_code& ec) ASIOEXT_NOEXCEPT;
+
+  /// Set the file attributes.
+  ASIOEXT_DECL void attributes(implementation_type& impl,
+                               file_attrs new_attrs, file_attr_options opts,
                                error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Get the file times.

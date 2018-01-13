@@ -284,11 +284,12 @@ public:
     return handle_.permissions(ec);
   }
 
-  /// @copydoc file_handle::permissions(file_perms)
+  /// @copydoc file_handle::permissions(file_perms,file_perm_options)
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
-  void permissions(file_perms perms)
+  void permissions(file_perms perms, file_perm_options opts =
+                    file_perm_options::replace)
   {
-    handle_.permissions(perms);
+    handle_.permissions(perms, opts);
   }
 
   /// @copydoc file_handle::permissions(file_perms,error_code&)
@@ -296,6 +297,14 @@ public:
   void permissions(file_perms perms, error_code& ec) ASIOEXT_NOEXCEPT
   {
     handle_.permissions(perms, ec);
+  }
+
+  /// @copydoc file_handle::permissions(file_perms,file_perm_options,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void permissions(file_perms perms, file_perm_options opts,
+                   error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    handle_.permissions(perms, opts, ec);
   }
 
   /// @copydoc file_handle::attributes()
@@ -312,11 +321,20 @@ public:
     return handle_.attributes(ec);
   }
 
-  /// @copydoc file_handle::attributes(file_attrs)
+  /// @copydoc file_handle::attributes(file_attrs,file_attr_options)
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
-  void attributes(file_attrs attrs)
+  void attributes(file_attrs attrs, file_attr_options opts =
+                    file_attr_options::replace)
   {
-    handle_.attributes(attrs);
+    handle_.attributes(attrs, opts);
+  }
+
+  /// @copydoc file_handle::attributes(file_attrs,file_attr_options,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void attributes(file_attrs attrs, file_attr_options opts,
+                  error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    handle_.attributes(attrs, opts, ec);
   }
 
   /// @copydoc file_handle::attributes(file_attrs,error_code&)

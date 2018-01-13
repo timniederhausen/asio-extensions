@@ -580,12 +580,14 @@ public:
     return this->get_service().permissions(this->get_implementation(), ec);
   }
 
-  /// @copydoc file_handle::permissions(file_perms)
+  /// @copydoc file_handle::permissions(file_perms,file_perm_options)
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
-  void permissions(file_perms perms)
+  void permissions(file_perms perms, file_perm_options opts =
+                    file_perm_options::replace)
   {
     error_code ec;
-    this->get_service().permissions(this->get_implementation(), perms, ec);
+    this->get_service().permissions(this->get_implementation(), perms,
+                                    opts, ec);
     detail::throw_error(ec);
   }
 
@@ -594,6 +596,15 @@ public:
   void permissions(file_perms perms, error_code& ec) ASIOEXT_NOEXCEPT
   {
     this->get_service().permissions(this->get_implementation(), perms, ec);
+  }
+
+  /// @copydoc file_handle::permissions(file_perms,file_perm_options,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void permissions(file_perms perms, file_perm_options opts,
+                   error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    this->get_service().permissions(this->get_implementation(), perms,
+                                    opts, ec);
   }
 
   /// @copydoc file_handle::attributes()
@@ -613,12 +624,14 @@ public:
     return this->get_service().attributes(this->get_implementation(), ec);
   }
 
-  /// @copydoc file_handle::attributes(file_attrs)
+  /// @copydoc file_handle::attributes(file_attrs,file_attr_options)
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
-  void attributes(file_attrs attrs)
+  void attributes(file_attrs attrs, file_attr_options opts =
+                    file_attr_options::replace)
   {
     error_code ec;
-    this->get_service().attributes(this->get_implementation(), attrs, ec);
+    this->get_service().attributes(this->get_implementation(),
+                                   attrs, opts, ec);
     detail::throw_error(ec);
   }
 
@@ -628,6 +641,15 @@ public:
   {
     this->get_service().attributes(this->get_implementation(),
                                    attrs, ec);
+  }
+
+  /// @copydoc file_handle::attributes(file_attrs,file_attr_options,error_code&)
+  ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
+  void attributes(file_attrs attrs, file_attr_options opts,
+                  error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    this->get_service().attributes(this->get_implementation(),
+                                   attrs, opts, ec);
   }
 
   /// @copydoc file_handle::times()

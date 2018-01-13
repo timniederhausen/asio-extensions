@@ -70,11 +70,18 @@ file_perms file_handle::permissions()
   return p;
 }
 
-void file_handle::permissions(file_perms perms)
+void file_handle::permissions(file_perms perms,
+                              file_perm_options opts)
 {
   error_code ec;
-  permissions(perms, ec);
+  permissions(perms, opts, ec);
   detail::throw_error(ec, "set_permissions");
+}
+
+void file_handle::permissions(file_perms perms,
+                              error_code& ec) ASIOEXT_NOEXCEPT
+{
+  permissions(perms, file_perm_options::replace, ec);
 }
 
 file_attrs file_handle::attributes()
@@ -85,11 +92,18 @@ file_attrs file_handle::attributes()
   return a;
 }
 
-void file_handle::attributes(file_attrs attrs)
+void file_handle::attributes(file_attrs attrs,
+                             file_attr_options opts)
 {
   error_code ec;
-  attributes(attrs, ec);
+  attributes(attrs, opts, ec);
   detail::throw_error(ec, "set_attributes");
+}
+
+void file_handle::attributes(file_attrs attrs,
+                             error_code& ec) ASIOEXT_NOEXCEPT
+{
+  attributes(attrs, file_attr_options::replace, ec);
 }
 
 #if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \

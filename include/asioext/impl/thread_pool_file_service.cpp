@@ -227,6 +227,13 @@ void thread_pool_file_service::permissions(
   impl.handle_.permissions(new_perms, ec);
 }
 
+void thread_pool_file_service::permissions(
+    implementation_type& impl, file_perms new_perms,
+    file_perm_options opts, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  impl.handle_.permissions(new_perms, opts, ec);
+}
+
 file_attrs thread_pool_file_service::attributes(
     implementation_type& impl, error_code& ec) ASIOEXT_NOEXCEPT
 {
@@ -238,6 +245,13 @@ void thread_pool_file_service::attributes(
     error_code& ec) ASIOEXT_NOEXCEPT
 {
   impl.handle_.attributes(new_attrs, ec);
+}
+
+void thread_pool_file_service::attributes(
+    implementation_type& impl, file_attrs new_attrs,
+    file_attr_options opts, error_code& ec) ASIOEXT_NOEXCEPT
+{
+  impl.handle_.attributes(new_attrs, opts, ec);
 }
 
 file_times thread_pool_file_service::times(implementation_type& impl,

@@ -67,10 +67,12 @@ ASIOEXT_DECL uint64_t seek(handle_type fd,
                            error_code& ec);
 
 ASIOEXT_DECL file_perms permissions(handle_type fd, error_code& ec);
-ASIOEXT_DECL void permissions(handle_type fd, file_perms perms, error_code& ec);
+ASIOEXT_DECL void permissions(handle_type fd, file_perms perms,
+                              file_perm_options opts, error_code& ec);
 
 ASIOEXT_DECL file_attrs attributes(handle_type fd, error_code& ec);
-ASIOEXT_DECL void attributes(handle_type fd, file_attrs attrs, error_code& ec);
+ASIOEXT_DECL void attributes(handle_type fd, file_attrs attrs,
+                             file_attr_options opts, error_code& ec);
 
 ASIOEXT_DECL void get_times(handle_type fd, file_time_type& ctime,
                             file_time_type& atime, file_time_type& mtime,
