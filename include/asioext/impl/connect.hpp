@@ -95,4 +95,40 @@ async_connect(asio::ip::tcp::socket::lowest_layer_type& socket,
 
 ASIOEXT_NS_END
 
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+namespace boost {
+# endif
+namespace asio {
+
+template <typename Handler, typename Allocator>
+struct associated_allocator<asioext::detail::connect_op<Handler>, Allocator>
+{
+  typedef typename associated_allocator<Handler, Allocator>::type type;
+
+  static type get(const asioext::detail::connect_op<Handler>& h,
+                  const Allocator& a = Allocator()) ASIOEXT_NOEXCEPT
+  {
+    return associated_allocator<Handler, Allocator>::get(h.handler_, a);
+  }
+};
+
+template <typename Handler, typename Executor>
+struct associated_executor<asioext::detail::connect_op<Handler>, Executor>
+{
+  typedef typename associated_executor<Handler, Executor>::type type;
+
+  static type get(const asioext::detail::connect_op<Handler>& h,
+                  const Executor& ex = Executor()) ASIOEXT_NOEXCEPT
+  {
+    return associated_executor<Handler, Executor>::get(h.handler_, ex);
+  }
+};
+
+}
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+}
+# endif
+#endif
+
 #endif
