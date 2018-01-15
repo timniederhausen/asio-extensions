@@ -20,7 +20,9 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_meta
+/// @{
+
 /// @brief Names for permissions.
 ///
 /// This type represents file access permissions.
@@ -108,7 +110,6 @@ enum class file_perms
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perms)
 
-/// @ingroup files
 /// @brief Options to control the behavior of
 /// @ref asioext::file_handle::permissions(file_perms,file_perm_options)
 ///
@@ -138,6 +139,8 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perm_options)
 /// This function checks whether the given @c flags are valid, i.e.
 /// no mutually exclusive or unsupported flags have been specified.
 ASIOEXT_DECL bool is_valid(file_perms flags);
+
+/// @}
 
 ASIOEXT_NS_END
 

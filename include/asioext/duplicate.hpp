@@ -19,8 +19,10 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
-/// @defgroup duplicate duplicate() family of functions
+/// @ingroup files_handle
+/// @defgroup duplicate asioext::duplicate()
+/// @brief Duplicate a native file handle.
+///
 /// Duplicate a file handle, resulting in a new native handle referring to
 /// the same file.
 ///
@@ -39,7 +41,7 @@ ASIOEXT_NS_BEGIN
 /// @throws asio::system_error Thrown on failure.
 ///
 /// @note This is provided as a function instead of a
-/// copy-contructor/assignment-operator since copying a file_handle is a
+/// copy-contructor/assignment-operator since copying a native handle is a
 /// non-trivial operation which is rarely desired.
 ASIOEXT_DECL unique_file_handle duplicate(file_handle handle);
 
@@ -56,7 +58,7 @@ ASIOEXT_DECL unique_file_handle duplicate(file_handle handle);
 /// @return A new unique_file_handle referring to the same file as @c handle.
 ///
 /// @note This is provided as a function instead of a
-/// copy-contructor/assignment-operator since copying a file_handle is a
+/// copy-contructor/assignment-operator since copying a native handle is a
 /// non-trivial operation which is rarely desired.
 ASIOEXT_DECL unique_file_handle duplicate(file_handle handle,
                                           error_code& ec) ASIOEXT_NOEXCEPT;

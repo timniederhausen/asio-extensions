@@ -14,11 +14,6 @@
 ///
 /// @c CreateFileA and @c CreateFileW are used to open file handles.
 ///
-/// @subsection Filenames
-///
-/// If @ref ASIOEXT_WINDOWS_USE_UTF8_FILENAMES is defined, a `const char*`
-/// filename is allowed to contain at most 260 characters (MAX_PATH).
-///
 /// @subsection win_file_io File I/O
 ///
 /// At most one buffer may be transferred in a single operation.

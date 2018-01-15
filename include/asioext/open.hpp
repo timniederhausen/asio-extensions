@@ -41,9 +41,9 @@ ASIOEXT_NS_BEGIN
 /// encoded. AsioExt will then convert them to UTF-16 and call the appropriate
 /// wide character version of the API instead.
 
-/// @ingroup files
-/// @defgroup open asioext::open
-/// Open handles to files.
+/// @ingroup files_handle
+/// @defgroup open asioext::open()
+/// @brief Open a handle to a file.
 ///
 /// @{
 

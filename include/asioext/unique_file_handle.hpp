@@ -22,7 +22,7 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_handle
 /// @brief RAII wrapper around file_handle.
 ///
 /// The unique_file_handle class provides a std::unique_ptr<>-like wrapper

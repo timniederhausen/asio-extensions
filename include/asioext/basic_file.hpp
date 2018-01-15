@@ -40,7 +40,7 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_handle
 /// @brief Basic interface for (a)synchronous file I/O.
 ///
 /// This class template provides a generic interface for (a)synchronous

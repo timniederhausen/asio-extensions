@@ -82,10 +82,10 @@ GENERATE_DEPRECATEDLIST= YES
 ENABLED_SECTIONS       =
 MAX_INITIALIZER_LINES  = 30
 SHOW_USED_FILES        = NO
-SHOW_FILES             = YES
-SHOW_NAMESPACES        = YES
+SHOW_FILES             = NO
+SHOW_NAMESPACES        = NO
 FILE_VERSION_FILTER    =
-LAYOUT_FILE            =
+LAYOUT_FILE            = @asioext_SOURCE_DIR@/doc/layout.xml
 CITE_BIB_FILES         =
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -266,13 +266,16 @@ INCLUDE_PATH           = @asioext_SOURCE_DIR@/include
 INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = ASIOEXT_IS_DOCUMENTATION \
                          ASIOEXT_MOVE_ARG(a)=a&& \
-                         ASIOEXT_INITFN_RESULT_TYPE(t,a)=void_or_deduced
+                         ASIOEXT_INITFN_RESULT_TYPE(t,a)=void_or_deduced \
+                         ASIOEXT_NS_BEGIN="namespace asioext"{ \
+                         ASIOEXT_NS_END=}
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = NO
 #---------------------------------------------------------------------------
 # Configuration options related to external references
 #---------------------------------------------------------------------------
-TAGFILES               =
+TAGFILES               = "@asioext_SOURCE_DIR@/doc/cppreference-doxygen-web.tag.xml=http://en.cppreference.com/w/" \
+                         "@asioext_SOURCE_DIR@/doc/asio-web.tag.xml=http://think-async.com/Asio/asio-1.11.0/doc/"
 GENERATE_TAGFILE       =
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES

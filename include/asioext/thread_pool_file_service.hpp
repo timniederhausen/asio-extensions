@@ -35,7 +35,7 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_handle
 /// @brief A FileService utilizing a thread-pool for async operations.
 ///
 /// This FileService class uses a thread-pool to emulate asynchronous file I/O.

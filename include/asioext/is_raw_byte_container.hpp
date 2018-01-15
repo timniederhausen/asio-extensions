@@ -45,8 +45,7 @@ ASIOEXT_NS_BEGIN
 /// | expression | return type | effects | precondition | postcondition |
 /// | ---------- | ----------- | ------- | ------------ | ------------- |
 /// | `a.resize(n)` | void | erases or appends elements to meet `size() == n` | | `a.size() == n` |
-
-/// @ingroup traits
+///
 /// @{
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)

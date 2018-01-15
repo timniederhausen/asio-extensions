@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<tagfile>
+  <compound kind="namespace">
+    <name>asio</name>
+    <filename></filename>
+    <class kind="class">asio::error_code</class>
+  </compound>
+  <compound kind="class">
+    <name>asio::error_code</name>
+    <filename>asio/reference/error_code</filename>
+  </compound>
+  <compound kind="class">
+    <name>ConstBufferSequence</name>
+    <filename>asio/reference/ConstBufferSequence</filename>
+  </compound>
+  <compound kind="class">
+    <name>MutableBufferSequence</name>
+    <filename>asio/reference/MutableBufferSequence</filename>
+  </compound>
+</tagfile>

@@ -26,6 +26,7 @@
 
 ASIOEXT_NS_BEGIN
 
+/// @ingroup files_time
 /// @brief Container for various times associated with a file.
 ///
 /// This struct contains all times commonly tied to a file.
@@ -46,7 +47,7 @@ inline bool operator==(const file_times& a, const file_times& b)
 inline bool operator!=(const file_times& a, const file_times& b)
 { return !(a == b); }
 
-/// @ingroup files
+/// @ingroup files_handle
 /// @brief A thin and lightweight wrapper around a native file handle.
 ///
 /// The file_handle class provides uniform access to

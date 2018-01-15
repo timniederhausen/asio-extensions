@@ -19,7 +19,12 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_handle
+/// @defgroup open_flags asioext::open_flags
+/// @brief Specifies semantics for opening files.
+///
+/// @{
+
 /// @brief Specifies semantics for opening files.
 ///
 /// This enum of bitmask values controls the behaviour of the @ref open.
@@ -100,12 +105,13 @@ enum class open_flags
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(open_flags)
 
-/// @ingroup files
 /// @brief Check whether a set of open flags is valid.
 ///
 /// This function checks whether the given @c flags are valid, i.e.
 /// no mutually exclusive or unsupported flags have been specified.
 ASIOEXT_DECL bool is_valid(open_flags flags);
+
+/// @}
 
 ASIOEXT_NS_END
 

@@ -16,14 +16,41 @@
 #pragma once
 #endif
 
-/// @defgroup concepts Concepts
-/// Type requirements.
+/// @defgroup concepts Type requirements
+/// @brief Type requirements and traits.
+///
+/// Type requirements and associated traits provided by this library.
 
-/// @defgroup traits Type traits
-/// Type traits provided by this library.
+/// @defgroup files Filesystem
+/// @brief Provide access to file data and metadata.
+///
+/// This module contains classes and non-member functions that deal with
+/// filesystem operations. Specifically, it aims to:
+///
+/// * Allow access to file data in a manner compatible with Asio and the Networking TS.
+///   * This includes support for Asio's `*Stream` type requirements
+///     (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
+///   * as well as an asynchronous I/O interface for files (@ref asioext::basic_file),
+///     with several underlying implementations:
+///     * @ref asioext::thread_pool_file_service : Blocking I/O operations are performed on the
+///       thread-pool.
+/// * Provide accessors and modifiers for file metadata, including:
+///   * File size
+///   * File permissions
+///   * File attributes
+///   * File time info (ctime, mtime, ...)
+/// * Utilities for reading/writing files:
+///   * @ref asioext::read_file
+///   * @ref asioext::write_file
 
-/// @defgroup files Files
-/// Classes and functions for working with files.
+/// @ingroup files
+/// @defgroup files_handle File handles
+
+/// @ingroup files
+/// @defgroup files_meta File metadata
+
+/// @ingroup files
+/// @defgroup files_time File times
 
 /// @defgroup service Service utilities
 /// Utility classes and functions for the implementation of

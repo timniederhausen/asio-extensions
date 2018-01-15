@@ -5,6 +5,12 @@
 #ifndef ASIOEXT_DETAIL_CONFIG_HPP
 #define ASIOEXT_DETAIL_CONFIG_HPP
 
+#if !defined(_FILE_OFFSET_BITS)
+# define _FILE_OFFSET_BITS 64
+#elif _FILE_OFFSET_BITS != 64
+# error Invalid _FILE_OFFSET_BITS (!= 64)
+#endif
+
 #if defined(ASIOEXT_STANDALONE)
 # define ASIOEXT_DISABLE_BOOST_FILESYSTEM 1
 #else
@@ -190,7 +196,6 @@
 #  define ASIOEXT_NOEXCEPT_IF(pred)
 # endif
 #endif
-
 
 // ASIOEXT_HAS_CONSTEXPR: Support for C++11 constexpr.
 #if !defined(ASIOEXT_HAS_CONSTEXPR)

@@ -20,7 +20,7 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_handle
 /// Typedef for a basic_file using the default
 /// FileService (thread_pool_file_service)
 typedef basic_file<thread_pool_file_service> file;

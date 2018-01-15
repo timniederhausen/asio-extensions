@@ -27,7 +27,7 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files
-/// @defgroup write_file write_file() family of functions
+/// @defgroup write_file asioext::write_file()
 /// Writes a sequence of buffers to a file.
 ///
 /// @par Example

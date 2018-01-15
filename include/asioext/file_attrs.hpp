@@ -19,7 +19,9 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup files
+/// @ingroup files_meta
+/// @{
+
 /// @brief Names for file attributes.
 ///
 /// This enum represents file attributes. @c file_attrs meets the requirements
@@ -88,7 +90,6 @@ enum class file_attrs : uint32_t
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attrs)
 
-/// @ingroup files
 /// @brief Options to control the behavior of
 /// @ref asioext::file_handle::attributes(file_attrs,file_attr_options)
 ///
@@ -118,6 +119,8 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attr_options)
 /// This function checks whether the given @c flags are valid, i.e.
 /// no mutually exclusive or unsupported flags have been specified.
 ASIOEXT_DECL bool is_valid(file_attrs flags);
+
+/// @}
 
 ASIOEXT_NS_END
 

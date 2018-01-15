@@ -30,7 +30,7 @@ namespace chrono = boost::chrono;
 namespace chrono = std::chrono;
 #endif
 
-/// @ingroup files
+/// @ingroup files_time
 /// @brief Special clock for filesystem time points.
 ///
 /// Special clock with the same epoch and accuracy the filesystem
@@ -99,7 +99,7 @@ public:
 #endif
 };
 
-/// @ingroup files
+/// @ingroup files_time
 /// @brief Representation of a file time (e.g. mtime)
 typedef chrono::time_point<file_clock> file_time_type;
 
