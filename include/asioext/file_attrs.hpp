@@ -114,12 +114,6 @@ enum class file_attr_options
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attr_options)
 
-/// @brief Check whether a set of file_attrs is valid.
-///
-/// This function checks whether the given @c flags are valid, i.e.
-/// no mutually exclusive or unsupported flags have been specified.
-ASIOEXT_DECL bool is_valid(file_attrs flags);
-
 /// @}
 
 ASIOEXT_NS_END

@@ -134,12 +134,6 @@ enum class file_perm_options
 
 ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perm_options)
 
-/// @brief Check whether a set of perms is valid.
-///
-/// This function checks whether the given @c flags are valid, i.e.
-/// no mutually exclusive or unsupported flags have been specified.
-ASIOEXT_DECL bool is_valid(file_perms flags);
-
 /// @}
 
 ASIOEXT_NS_END
