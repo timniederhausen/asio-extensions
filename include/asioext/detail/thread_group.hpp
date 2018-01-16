@@ -21,7 +21,7 @@ namespace detail {
 class thread_group
 {
 public:
-  thread_group()
+  thread_group() ASIOEXT_NOEXCEPT
     : last_(0)
   {
   }

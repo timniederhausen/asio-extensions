@@ -36,7 +36,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 template <class ConstBufferSequence>
 ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const char* filename, const ConstBufferSequence& buffers,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_write |
@@ -60,7 +60,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 template <class ConstBufferSequence>
 ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const wchar_t* filename, const ConstBufferSequence& buffers,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_write |
@@ -86,7 +86,8 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 template <class ConstBufferSequence>
 ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const boost::filesystem::path& filename,
-              const ConstBufferSequence& buffers, error_code& ec)
+              const ConstBufferSequence& buffers,
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_write |

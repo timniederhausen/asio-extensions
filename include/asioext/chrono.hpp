@@ -74,25 +74,29 @@ public:
   ASIOEXT_DECL static time_point now() ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS)
-  static std::time_t to_time_t(const time_point& t)
+  static ASIOEXT_CONSTEXPR14 std::time_t to_time_t(
+      const time_point& t) ASIOEXT_NOEXCEPT
   {
     return static_cast<std::time_t>(chrono::duration_cast<chrono::seconds>(
         t.time_since_epoch() - chrono::seconds(epoch_difference_secs)).count());
   }
 
-  static time_point from_time_t(std::time_t t)
+  static ASIOEXT_CONSTEXPR14 time_point from_time_t(
+      std::time_t t) ASIOEXT_NOEXCEPT
   {
     return time_point(chrono::duration_cast<duration>(
         chrono::seconds(t) + chrono::seconds(epoch_difference_secs)));
   }
 #else
-  static std::time_t to_time_t(const time_point& t)
+  static ASIOEXT_CONSTEXPR14 std::time_t to_time_t(
+      const time_point& t) ASIOEXT_NOEXCEPT
   {
     return static_cast<std::time_t>(chrono::duration_cast<chrono::seconds>(
         t.time_since_epoch()).count());
   }
 
-  static time_point from_time_t(std::time_t t)
+  static ASIOEXT_CONSTEXPR14 time_point from_time_t(
+      std::time_t t) ASIOEXT_NOEXCEPT
   {
     return time_point(chrono::duration_cast<duration>(chrono::seconds(t)));
   }

@@ -6,7 +6,7 @@
 
 ASIOEXT_NS_BEGIN
 
-bool is_valid(open_flags flags)
+bool is_valid(open_flags flags) ASIOEXT_NOEXCEPT
 {
   int count = ((flags & open_flags::create_new) != open_flags::none) +
               ((flags & open_flags::create_always) != open_flags::none) +

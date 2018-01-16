@@ -31,7 +31,7 @@ public:
   /// Construct a cancellation_token_source.
   ASIOEXT_DECL cancellation_token_source();
 
-#ifdef ASIOEXT_HAS_MOVE
+#if defined(ASIOEXT_HAS_MOVE)
   /// @brief Move-construct a cancellation_token_source.
   ///
   /// This constructor moves the token source.
@@ -54,7 +54,7 @@ public:
   /// @note Following the move, the moved-from object is in the same state as if
   /// destroy() had been called on it.
   ASIOEXT_DECL cancellation_token_source& operator=(
-      cancellation_token_source&& other);
+      cancellation_token_source&& other) ASIOEXT_NOEXCEPT;
 #endif
 
   /// @brief Cancel all currently issued cancellation_tokens.
@@ -74,7 +74,7 @@ public:
   /// in the cancelled state.
   ///
   /// @see reset()
-  ASIOEXT_DECL void destroy();
+  ASIOEXT_DECL void destroy() ASIOEXT_NOEXCEPT;
 
   /// @brief Reset a destroyed token source.
   ///
@@ -88,10 +88,12 @@ public:
   ASIOEXT_DECL void reset();
 
 private:
+#if !defined(ASIOEXT_HAS_MOVE)
   // Prevent copying
   cancellation_token_source(const cancellation_token_source&) ASIOEXT_DELETED;
   cancellation_token_source& operator=(
       const cancellation_token_source&) ASIOEXT_DELETED;
+#endif
 
   detail::shared_ptr<void> ptr_;
 };
@@ -108,7 +110,8 @@ private:
 class cancellation_token
 {
 public:
-  ASIOEXT_DECL cancellation_token(const cancellation_token_source& source);
+  ASIOEXT_DECL cancellation_token(
+      const cancellation_token_source& source) ASIOEXT_NOEXCEPT;
 
   /// @brief Check whether this operation is cancelled.
   ///
@@ -116,7 +119,7 @@ public:
   /// whether cancel() has been called after this token was created).
   ///
   /// @return @c true if the operation was cancelled, @c false otherwise.
-  ASIOEXT_DECL bool cancelled() const;
+  ASIOEXT_DECL bool cancelled() const ASIOEXT_NOEXCEPT;
 
 private:
   detail::weak_ptr<void> ptr_;

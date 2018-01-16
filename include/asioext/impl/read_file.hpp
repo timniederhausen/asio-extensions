@@ -105,7 +105,8 @@ ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
 
 template <class RawByteContainer>
 ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
-    read_file(file_handle file, RawByteContainer& c, error_code& ec)
+    read_file(file_handle file, RawByteContainer& c,
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   const uint64_t size = file.size(ec);
   if (ec) return;
@@ -138,7 +139,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -162,7 +163,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -188,7 +189,8 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
-              const MutableBufferSequence& buffers, error_code& ec)
+              const MutableBufferSequence& buffers,
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
@@ -212,7 +214,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(file_handle file, const MutableBufferSequence& buffers,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   // rather easy, right?
   asio::read(file, buffers, ec);

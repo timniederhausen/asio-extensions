@@ -109,7 +109,7 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(open_flags)
 ///
 /// This function checks whether the given @c flags are valid, i.e.
 /// no mutually exclusive or unsupported flags have been specified.
-ASIOEXT_DECL bool is_valid(open_flags flags);
+ASIOEXT_DECL bool is_valid(open_flags flags) ASIOEXT_NOEXCEPT;
 
 /// @}
 

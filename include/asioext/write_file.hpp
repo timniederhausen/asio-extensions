@@ -90,7 +90,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 template <class ConstBufferSequence>
 ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const char* filename, const ConstBufferSequence& buffers,
-              error_code& ec);
+              error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS)  || defined(ASIOEXT_IS_DOCUMENTATION)
 /// @copydoc write_file(const char*,const ConstBufferSequence&)
@@ -106,7 +106,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 template <class ConstBufferSequence>
 ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const wchar_t* filename, const ConstBufferSequence& buffers,
-              error_code& ec);
+              error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -126,7 +126,8 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 template <class ConstBufferSequence>
 ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
     write_file(const boost::filesystem::path& filename,
-              const ConstBufferSequence& buffers, error_code& ec);
+              const ConstBufferSequence& buffers,
+              error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 // TODO(tim): Add support for asio's dynamic buffers,

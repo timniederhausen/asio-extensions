@@ -21,7 +21,7 @@ file_handle get_stdin()
   return h;
 }
 
-file_handle get_stdin(error_code& ec)
+file_handle get_stdin(error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
   return detail::win_file_ops::get_stdin(ec);
@@ -37,7 +37,7 @@ file_handle get_stdout()
   return h;
 }
 
-file_handle get_stdout(error_code& ec)
+file_handle get_stdout(error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
   return detail::win_file_ops::get_stdout(ec);
@@ -53,7 +53,7 @@ file_handle get_stderr()
   return h;
 }
 
-file_handle get_stderr(error_code& ec)
+file_handle get_stderr(error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
   return detail::win_file_ops::get_stderr(ec);

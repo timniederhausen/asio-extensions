@@ -36,12 +36,12 @@ static_assert(sizeof(int64_t) == sizeof(off_t), "off_t must be 64 bits");
 namespace detail {
 namespace posix_file_ops {
 
-void set_error(error_code& ec, int e)
+void set_error(error_code& ec, int e) ASIOEXT_NOEXCEPT
 {
   ec = error_code(e, asio::error::get_system_category());
 }
 
-uint32_t file_attrs_to_native(file_attrs attrs)
+uint32_t file_attrs_to_native(file_attrs attrs) ASIOEXT_NOEXCEPT
 {
   uint32_t native = 0;
 #ifdef UF_HIDDEN
@@ -79,7 +79,7 @@ uint32_t file_attrs_to_native(file_attrs attrs)
   return native;
 }
 
-file_attrs native_to_file_attrs(uint32_t native)
+file_attrs native_to_file_attrs(uint32_t native) ASIOEXT_NOEXCEPT
 {
   file_attrs attrs = file_attrs::none;
 #ifdef UF_HIDDEN
@@ -183,7 +183,8 @@ bool stat_to_times(const struct stat& st,
 }
 
 template <typename Seconds, typename Nanoseconds>
-bool to_timespec(file_time_type t, Seconds& s, Nanoseconds& ns)
+bool to_timespec(file_time_type t, Seconds& s,
+                 Nanoseconds& ns) ASIOEXT_NOEXCEPT
 {
   chrono::duration<Seconds, chrono::seconds::period> temp_s;
   chrono::duration<Nanoseconds, chrono::nanoseconds::period> temp_ns;
@@ -196,7 +197,8 @@ bool to_timespec(file_time_type t, Seconds& s, Nanoseconds& ns)
 }
 
 template <typename Seconds, typename Microseconds>
-bool to_timeval(file_time_type t, Seconds& s, Microseconds& us)
+bool to_timeval(file_time_type t, Seconds& s,
+                Microseconds& us) ASIOEXT_NOEXCEPT
 {
   chrono::duration<Seconds, chrono::seconds::period> temp_s;
   chrono::duration<Microseconds, chrono::microseconds::period> temp_us;
@@ -210,7 +212,7 @@ bool to_timeval(file_time_type t, Seconds& s, Microseconds& us)
 
 handle_type open(const char* path, open_flags flags,
                  file_perms perms, file_attrs attrs,
-                 error_code& ec)
+                 error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (!is_valid(flags)) {
     ec = asio::error::invalid_argument;
@@ -267,7 +269,7 @@ handle_type open(const char* path, open_flags flags,
   }
 }
 
-void close(handle_type fd, error_code& ec)
+void close(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   // By the time close() returns, the fd is already gone
   // and could be re-used by another thread. Retrying the call would then
@@ -283,7 +285,7 @@ void close(handle_type fd, error_code& ec)
     set_error(ec, errno);
 }
 
-handle_type duplicate(handle_type fd, error_code& ec)
+handle_type duplicate(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   const int new_fd = ::dup(fd);
   if (new_fd != -1) {
@@ -295,22 +297,22 @@ handle_type duplicate(handle_type fd, error_code& ec)
   return -1;
 }
 
-handle_type get_stdin(error_code& ec)
+handle_type get_stdin(error_code& ec) ASIOEXT_NOEXCEPT
 {
   return STDIN_FILENO;
 }
 
-handle_type get_stdout(error_code& ec)
+handle_type get_stdout(error_code& ec) ASIOEXT_NOEXCEPT
 {
   return STDOUT_FILENO;
 }
 
-handle_type get_stderr(error_code& ec)
+handle_type get_stderr(error_code& ec) ASIOEXT_NOEXCEPT
 {
   return STDERR_FILENO;
 }
 
-uint64_t size(handle_type fd, error_code& ec)
+uint64_t size(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   struct stat st;
   if (::fstat(fd, &st) == 0) {
@@ -322,7 +324,7 @@ uint64_t size(handle_type fd, error_code& ec)
   return 0;
 }
 
-void size(handle_type fd, uint64_t new_size, error_code& ec)
+void size(handle_type fd, uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (::ftruncate(fd, static_cast<off_t>(new_size)) == 0)
     ec = error_code();
@@ -337,7 +339,7 @@ static_assert(static_cast<int>(seek_origin::from_begin) == SEEK_SET &&
               "whence mapping must match the system headers");
 
 uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   const off_t res = ::lseek(fd, static_cast<off_t>(offset),
                             static_cast<int>(origin));
@@ -350,7 +352,7 @@ uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
   return 0;
 }
 
-file_perms permissions(handle_type fd, error_code& ec)
+file_perms permissions(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   struct stat st;
   if (::fstat(fd, &st) == 0) {
@@ -362,7 +364,7 @@ file_perms permissions(handle_type fd, error_code& ec)
 }
 
 void permissions(handle_type fd, file_perms perms, file_perm_options opts,
-                 error_code& ec)
+                 error_code& ec) ASIOEXT_NOEXCEPT
 {
   mode_t mode = static_cast<mode_t>(perms & file_perms::all);
   if ((opts & (file_perm_options::add | file_perm_options::remove)) !=
@@ -384,7 +386,7 @@ void permissions(handle_type fd, file_perms perms, file_perm_options opts,
     set_error(ec, errno);
 }
 
-file_attrs attributes(handle_type fd, error_code& ec)
+file_attrs attributes(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if ASIOEXT_HAS_FILE_FLAGS
   struct stat st;
@@ -402,7 +404,7 @@ file_attrs attributes(handle_type fd, error_code& ec)
 }
 
 void attributes(handle_type fd, file_attrs attrs, file_attr_options opts,
-                error_code& ec)
+                error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if ASIOEXT_HAS_FILE_FLAGS
   uint32_t new_attrs = file_attrs_to_native(attrs);
@@ -516,7 +518,8 @@ void set_times(handle_type fd, file_time_type ctime, file_time_type atime,
 #endif
 }
 
-std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
+std::size_t readv(handle_type fd, iovec* bufs, int count,
+                  error_code& ec) ASIOEXT_NOEXCEPT
 {
   while (true) {
     const ssize_t r = ::readv(fd, bufs, count);
@@ -547,7 +550,8 @@ std::size_t readv(handle_type fd, iovec* bufs, int count, error_code& ec)
   return 0;
 }
 
-std::size_t writev(handle_type fd, const iovec* bufs, int count, error_code& ec)
+std::size_t writev(handle_type fd, const iovec* bufs, int count,
+                   error_code& ec) ASIOEXT_NOEXCEPT
 {
   while (true) {
     const ssize_t r = ::writev(fd, bufs, count);
@@ -565,10 +569,8 @@ std::size_t writev(handle_type fd, const iovec* bufs, int count, error_code& ec)
   }
 }
 
-std::size_t pread(handle_type fd,
-                  void* buffer, std::size_t size,
-                  uint64_t offset,
-                  error_code& ec)
+std::size_t pread(handle_type fd, void* buffer, std::size_t size,
+                  uint64_t offset, error_code& ec) ASIOEXT_NOEXCEPT
 {
   while (true) {
     const ssize_t r = ::pread(fd, buffer, size,
@@ -595,10 +597,8 @@ std::size_t pread(handle_type fd,
   }
 }
 
-std::size_t pwrite(handle_type fd,
-                   const void* buffer, std::size_t size,
-                   uint64_t offset,
-                   error_code& ec)
+std::size_t pwrite(handle_type fd, const void* buffer, std::size_t size,
+                   uint64_t offset, error_code& ec) ASIOEXT_NOEXCEPT
 {
   while (true) {
     const ssize_t r = ::pwrite(fd, buffer, size,
@@ -618,11 +618,8 @@ std::size_t pwrite(handle_type fd,
 }
 
 #if defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
-std::size_t preadv(handle_type fd,
-                   iovec* bufs,
-                   int count,
-                   uint64_t offset,
-                   error_code& ec)
+std::size_t preadv(handle_type fd, iovec* bufs, int count, uint64_t offset,
+                   error_code& ec) ASIOEXT_NOEXCEPT
 {
   while (true) {
     const ssize_t r = ::preadv(fd, bufs, count, static_cast<off_t>(offset));
@@ -653,11 +650,8 @@ std::size_t preadv(handle_type fd,
   return 0;
 }
 
-std::size_t pwritev(handle_type fd,
-                    const iovec* bufs,
-                    int count,
-                    uint64_t offset,
-                    error_code& ec)
+std::size_t pwritev(handle_type fd, const iovec* bufs, int count,
+                    uint64_t offset, error_code& ec) ASIOEXT_NOEXCEPT
 {
   while (true) {
     const ssize_t r = ::pwritev(fd, bufs, count, static_cast<off_t>(offset));

@@ -182,7 +182,7 @@ void write_some_at_op<ConstBufferSequence, Handler>::operator()()
 template <typename MutableBufferSequence>
 size_t thread_pool_file_service::read_some(
     implementation_type& impl, const MutableBufferSequence& buffers,
-    error_code& ec)
+    error_code& ec) ASIOEXT_NOEXCEPT
 {
   return impl.handle_.read_some(buffers, ec);
 }
@@ -190,7 +190,7 @@ size_t thread_pool_file_service::read_some(
 template <typename ConstBufferSequence>
 size_t thread_pool_file_service::write_some(implementation_type& impl,
                                             const ConstBufferSequence& buffers,
-                                            error_code& ec)
+                                            error_code& ec) ASIOEXT_NOEXCEPT
 {
   return impl.handle_.write_some(buffers, ec);
 }
@@ -198,7 +198,7 @@ size_t thread_pool_file_service::write_some(implementation_type& impl,
 template <typename MutableBufferSequence>
 size_t thread_pool_file_service::read_some_at(
     implementation_type& impl, uint64_t offset,
-    const MutableBufferSequence& buffers, error_code& ec)
+    const MutableBufferSequence& buffers, error_code& ec) ASIOEXT_NOEXCEPT
 {
   return impl.handle_.read_some_at(offset, buffers, ec);
 }
@@ -206,7 +206,7 @@ size_t thread_pool_file_service::read_some_at(
 template <typename ConstBufferSequence>
 size_t thread_pool_file_service::write_some_at(
     implementation_type& impl, uint64_t offset,
-    const ConstBufferSequence& buffers, error_code& ec)
+    const ConstBufferSequence& buffers, error_code& ec) ASIOEXT_NOEXCEPT
 {
   return impl.handle_.write_some_at(offset, buffers, ec);
 }

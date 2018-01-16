@@ -44,7 +44,7 @@ struct hook_allocator_aux
 {
   typedef Allocator type;
 
-  static type get(Handler&, const Allocator& a)
+  static type get(Handler&, const Allocator& a) ASIOEXT_NOEXCEPT
   {
     return a;
   }
@@ -55,7 +55,7 @@ struct hook_allocator_aux<Handler, std::allocator<T> >
 {
   typedef asio_hook_allocator<T, Handler> type;
 
-  static type get(Handler& handler, const std::allocator<T>&)
+  static type get(Handler& handler, const std::allocator<T>&) ASIOEXT_NOEXCEPT
   {
     return type(handler);
   }
@@ -101,8 +101,8 @@ public:
   }
 
   template <typename U>
-  asio_hook_allocator(const asio_hook_allocator<U, Handler>& a)
-      ASIOEXT_NOEXCEPT
+  asio_hook_allocator(
+      const asio_hook_allocator<U, Handler>& a) ASIOEXT_NOEXCEPT
     : handler_(a.handler_)
   {
   }
@@ -142,13 +142,13 @@ class asio_hook_allocator<void, Handler>
 public:
   typedef void value_type;
 
-  explicit asio_hook_allocator(Handler& h)
+  explicit asio_hook_allocator(Handler& h) ASIOEXT_NOEXCEPT
     : handler_(h)
   {
   }
 
   template <typename U>
-  asio_hook_allocator(const asio_hook_allocator<U, Handler>& a)
+  asio_hook_allocator(const asio_hook_allocator<U, Handler>& a) ASIOEXT_NOEXCEPT
     : handler_(a.handler_)
   {
   }

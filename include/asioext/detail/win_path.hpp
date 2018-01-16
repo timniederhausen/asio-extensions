@@ -24,7 +24,7 @@ public:
   static const std::size_t kMaxPath = 260;
 
   ASIOEXT_DECL win_path(const char* s, std::size_t len,
-                        error_code& ec);
+                        error_code& ec) ASIOEXT_NOEXCEPT;
   ASIOEXT_DECL ~win_path();
 
   const wchar_t* c_str() const ASIOEXT_NOEXCEPT

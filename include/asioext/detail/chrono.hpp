@@ -25,15 +25,15 @@ namespace detail {
 template <class RepIn, class PeriodIn, class RepOut, class PeriodOut>
 ASIOEXT_CONSTEXPR14 bool safe_duration_cast(
     const chrono::duration<RepIn, PeriodIn>& in,
-    chrono::duration<RepOut, PeriodOut>& out);
+    chrono::duration<RepOut, PeriodOut>& out) ASIOEXT_NOEXCEPT;
 
 template <class Duration, class FirstDuration, class SecondDuration>
 bool decompose_time(const Duration& in, FirstDuration& first,
-                    SecondDuration& second);
+                    SecondDuration& second) ASIOEXT_NOEXCEPT;
 
 template <class Duration, class FirstDuration, class SecondDuration>
 bool compose_time(const FirstDuration& first, const SecondDuration& second,
-                  Duration& out);
+                  Duration& out) ASIOEXT_NOEXCEPT;
 
 }
 

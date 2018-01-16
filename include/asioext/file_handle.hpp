@@ -528,7 +528,8 @@ public:
   /// that the requested amount of data is read before the blocking operation
   /// completes.
   template <typename MutableBufferSequence>
-  std::size_t read_some(const MutableBufferSequence& buffers, error_code& ec);
+  std::size_t read_some(const MutableBufferSequence& buffers,
+                        error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -581,7 +582,8 @@ public:
   /// peer. Consider using the @c asio::write function if you need to ensure
   /// that all data is written before the blocking operation completes.
   template <typename ConstBufferSequence>
-  std::size_t write_some(const ConstBufferSequence& buffers, error_code& ec);
+  std::size_t write_some(const ConstBufferSequence& buffers,
+                         error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -645,7 +647,7 @@ public:
   template <typename MutableBufferSequence>
   std::size_t read_some_at(uint64_t offset,
                            const MutableBufferSequence& buffers,
-                           error_code& ec);
+                           error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 
@@ -705,7 +707,7 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some_at(uint64_t offset,
                             const ConstBufferSequence& buffers,
-                            error_code& ec);
+                            error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @}
 

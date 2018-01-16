@@ -297,7 +297,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  void cancel(error_code& ec)
+  void cancel(error_code& ec) ASIOEXT_NOEXCEPT
   {
     return this->get_service().cancel(this->get_implementation(), ec);
   }
@@ -743,7 +743,8 @@ public:
   /// that the requested amount of data is read before the blocking operation
   /// completes.
   template <typename MutableBufferSequence>
-  std::size_t read_some(const MutableBufferSequence& buffers, error_code& ec)
+  std::size_t read_some(const MutableBufferSequence& buffers,
+                        error_code& ec) ASIOEXT_NOEXCEPT
   {
     return this->get_service().read_some(this->get_implementation(), buffers,
                                          ec);
@@ -807,7 +808,8 @@ public:
   /// Consider using the @c asio::write function if you need to ensure
   /// that all data is written before the blocking operation completes.
   template <typename ConstBufferSequence>
-  std::size_t write_some(const ConstBufferSequence& buffers, error_code& ec)
+  std::size_t write_some(const ConstBufferSequence& buffers,
+                         error_code& ec) ASIOEXT_NOEXCEPT
   {
     return this->get_service().write_some(this->get_implementation(), buffers,
                                           ec);
@@ -882,7 +884,7 @@ public:
   template <typename MutableBufferSequence>
   std::size_t read_some_at(uint64_t offset,
                            const MutableBufferSequence& buffers,
-                           error_code& ec)
+                           error_code& ec) ASIOEXT_NOEXCEPT
   {
     return this->get_service().read_some_at(this->get_implementation(), offset,
                                             buffers, ec);
@@ -952,7 +954,7 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some_at(uint64_t offset,
                             const ConstBufferSequence& buffers,
-                            error_code& ec)
+                            error_code& ec) ASIOEXT_NOEXCEPT
   {
     return this->get_service().write_some_at(this->get_implementation(), offset,
                                              buffers, ec);

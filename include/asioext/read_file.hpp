@@ -151,7 +151,8 @@ ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
 /// the object is reset.
 template <class RawByteContainer>
 ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
-    read_file(file_handle file, RawByteContainer& c, error_code& ec);
+    read_file(file_handle file, RawByteContainer& c,
+              error_code& ec) ASIOEXT_NOEXCEPT;
 
 /// @}
 
@@ -202,7 +203,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(const char* filename, const MutableBufferSequence& buffers,
-              error_code& ec);
+              error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS)  || defined(ASIOEXT_IS_DOCUMENTATION)
 /// @copydoc read_file(const char*,const MutableBufferSequence&)
@@ -218,7 +219,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(const wchar_t* filename, const MutableBufferSequence& buffers,
-              error_code& ec);
+              error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -238,7 +239,8 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(const boost::filesystem::path& filename,
-              const MutableBufferSequence& buffers, error_code& ec);
+              const MutableBufferSequence& buffers,
+              error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
 /// Read a file into a sequence of buffers.
@@ -277,7 +279,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 template <class MutableBufferSequence>
 ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
     read_file(file_handle file, const MutableBufferSequence& buffers,
-              error_code& ec);
+              error_code& ec) ASIOEXT_NOEXCEPT;
 
 /// @}
 

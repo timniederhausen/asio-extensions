@@ -218,28 +218,33 @@ public:
                           error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Cancel all operations associated with the handle.
-  ASIOEXT_DECL void cancel(implementation_type& impl, error_code& ec);
+  ASIOEXT_DECL void cancel(implementation_type& impl,
+                           error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Read some data. Returns the number of bytes received.
   template <typename MutableBufferSequence>
   size_t read_some(implementation_type& impl,
-                   const MutableBufferSequence& buffers, error_code& ec);
+                   const MutableBufferSequence& buffers,
+                   error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Write the given data. Returns the number of bytes written.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
-                    const ConstBufferSequence& buffers, error_code& ec);
+                    const ConstBufferSequence& buffers,
+                    error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Read some data at a specified offset. Returns the number of bytes received.
   template <typename MutableBufferSequence>
   size_t read_some_at(implementation_type& impl, uint64_t offset,
-                      const MutableBufferSequence& buffers, error_code& ec);
+                      const MutableBufferSequence& buffers,
+                      error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Write the given data at the specified offset. Returns the number of bytes
   /// written.
   template <typename ConstBufferSequence>
   size_t write_some_at(implementation_type& impl, uint64_t offset,
-                       const ConstBufferSequence& buffers, error_code& ec);
+                       const ConstBufferSequence& buffers,
+                       error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Start an asynchronous read. The buffer for the data being received must be
   /// valid for the lifetime of the asynchronous operation.

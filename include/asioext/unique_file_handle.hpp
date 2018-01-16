@@ -382,7 +382,8 @@ public:
 
   /// @copydoc file_handle::read_some(const MutableBufferSequence&,error_code&)
   template <typename MutableBufferSequence>
-  std::size_t read_some(const MutableBufferSequence& buffers, error_code& ec)
+  std::size_t read_some(const MutableBufferSequence& buffers,
+                        error_code& ec) ASIOEXT_NOEXCEPT
   {
     return handle_.read_some(buffers, ec);
   }
@@ -401,7 +402,8 @@ public:
 
   /// @copydoc file_handle::write_some(const ConstBufferSequence&,error_code&)
   template <typename ConstBufferSequence>
-  std::size_t write_some(const ConstBufferSequence& buffers, error_code& ec)
+  std::size_t write_some(const ConstBufferSequence& buffers,
+                         error_code& ec) ASIOEXT_NOEXCEPT
   {
     return handle_.write_some(buffers, ec);
   }
@@ -423,7 +425,7 @@ public:
   template <typename MutableBufferSequence>
   std::size_t read_some_at(uint64_t offset,
                            const MutableBufferSequence& buffers,
-                           error_code& ec)
+                           error_code& ec) ASIOEXT_NOEXCEPT
   {
     return handle_.read_some_at(offset, buffers, ec);
   }
@@ -444,7 +446,7 @@ public:
   template <typename ConstBufferSequence>
   std::size_t write_some_at(uint64_t offset,
                             const ConstBufferSequence& buffers,
-                            error_code& ec)
+                            error_code& ec) ASIOEXT_NOEXCEPT
   {
     return handle_.write_some_at(offset, buffers, ec);
   }

@@ -53,7 +53,7 @@ public:
   }
 
   /// Get a reference to the assigned io_service.
-  asio::io_service& get_executor() { return executor_; }
+  asio::io_service& get_executor() ASIOEXT_NOEXCEPT { return executor_; }
 
 private:
   asio::io_service& executor_;

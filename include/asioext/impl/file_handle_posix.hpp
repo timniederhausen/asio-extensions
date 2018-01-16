@@ -15,7 +15,7 @@ ASIOEXT_NS_BEGIN
 
 template <typename MutableBufferSequence>
 std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
-                                   error_code& ec)
+                                   error_code& ec) ASIOEXT_NOEXCEPT
 {
   detail::buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence>
       bufs(buffers);
@@ -25,7 +25,7 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
 
 template <typename ConstBufferSequence>
 std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
-                                    error_code& ec)
+                                    error_code& ec) ASIOEXT_NOEXCEPT
 {
   detail::buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence>
       bufs(buffers);
@@ -36,7 +36,7 @@ std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
 template <typename MutableBufferSequence>
 std::size_t file_handle::read_some_at(uint64_t offset,
                                       const MutableBufferSequence& buffers,
-                                      error_code& ec)
+                                      error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
   detail::buffer_sequence_adapter<asio::mutable_buffer, MutableBufferSequence>
@@ -55,7 +55,7 @@ std::size_t file_handle::read_some_at(uint64_t offset,
 template <typename ConstBufferSequence>
 std::size_t file_handle::write_some_at(uint64_t offset,
                                        const ConstBufferSequence& buffers,
-                                       error_code& ec)
+                                       error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_HAS_PVEC_IO_FUNCTIONS)
   detail::buffer_sequence_adapter<asio::const_buffer, ConstBufferSequence>

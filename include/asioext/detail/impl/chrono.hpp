@@ -15,7 +15,7 @@ namespace detail {
 template <class RepIn, class PeriodIn, class RepOut, class PeriodOut>
 ASIOEXT_CONSTEXPR14 bool safe_duration_cast(
     const chrono::duration<RepIn, PeriodIn>& in,
-    chrono::duration<RepOut, PeriodOut>& out)
+    chrono::duration<RepOut, PeriodOut>& out) ASIOEXT_NOEXCEPT
 {
   typedef typename std::common_type<RepIn, RepOut, intmax_t>::type
       conv_type;
@@ -76,24 +76,26 @@ struct time_fragment_values
   >::type common_type;
 
   static ASIOEXT_CONSTEXPR typename FirstDuration::rep first_rep_min()
+      ASIOEXT_NOEXCEPT
   { return (std::numeric_limits<typename FirstDuration::rep>::min)(); }
 
   static ASIOEXT_CONSTEXPR typename SecondDuration::rep second_rep_min()
+      ASIOEXT_NOEXCEPT
   { return (std::numeric_limits<typename SecondDuration::rep>::min)(); }
 
-  static ASIOEXT_CONSTEXPR common_type max_first()
+  static ASIOEXT_CONSTEXPR common_type max_first() ASIOEXT_NOEXCEPT
   { return chrono::duration_cast<FirstDuration>((Duration::max)()).count(); }
 
-  static ASIOEXT_CONSTEXPR common_type min_first()
+  static ASIOEXT_CONSTEXPR common_type min_first() ASIOEXT_NOEXCEPT
   { return chrono::duration_cast<FirstDuration>((Duration::min)()).count(); }
 
-  static ASIOEXT_CONSTEXPR common_type max_second()
+  static ASIOEXT_CONSTEXPR common_type max_second() ASIOEXT_NOEXCEPT
   {
     return chrono::duration_cast<SecondDuration>(
         (Duration::max)() - FirstDuration(max_first())).count();
   }
 
-  static ASIOEXT_CONSTEXPR common_type min_second()
+  static ASIOEXT_CONSTEXPR common_type min_second() ASIOEXT_NOEXCEPT
   {
     // For negative |first|s, we use (first + 1f) - (1f - |second|)
     // so the smallest |second| we can accept for |min_f - 1| is
@@ -106,7 +108,7 @@ struct time_fragment_values
 
 template <class Duration, class FirstDuration, class SecondDuration>
 bool decompose_time(const Duration& in, FirstDuration& first,
-                    SecondDuration& second)
+                    SecondDuration& second) ASIOEXT_NOEXCEPT
 {
   typedef time_fragment_values<Duration, FirstDuration, SecondDuration>
       values_type;
@@ -140,7 +142,7 @@ bool decompose_time(const Duration& in, FirstDuration& first,
 
 template <class Duration, class FirstDuration, class SecondDuration>
 bool compose_time(const FirstDuration& first, const SecondDuration& second,
-                  Duration& out)
+                  Duration& out) ASIOEXT_NOEXCEPT
 {
   typedef time_fragment_values<Duration, FirstDuration, SecondDuration>
       values_type;

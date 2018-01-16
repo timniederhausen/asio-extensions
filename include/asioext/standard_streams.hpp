@@ -49,7 +49,7 @@ ASIOEXT_DECL file_handle get_stdin();
 /// @return A handle to the standard input (or an empty handle in case
 /// of failure). Ownership is *not* transferred to the caller.
 /// Closing the handle returned by this function leads to undefined behavior.
-ASIOEXT_DECL file_handle get_stdin(error_code& ec);
+ASIOEXT_DECL file_handle get_stdin(error_code& ec) ASIOEXT_NOEXCEPT;
 
 /// @brief Get a handle to the standard output.
 ///
@@ -72,7 +72,7 @@ ASIOEXT_DECL file_handle get_stdout();
 /// @return A handle to the standard output (or an empty handle in case
 /// of failure). Ownership is *not* transferred to the caller.
 /// Closing the handle returned by this function leads to undefined behavior.
-ASIOEXT_DECL file_handle get_stdout(error_code& ec);
+ASIOEXT_DECL file_handle get_stdout(error_code& ec) ASIOEXT_NOEXCEPT;
 
 /// @brief Get a handle to the standard error.
 ///
@@ -95,7 +95,7 @@ ASIOEXT_DECL file_handle get_stderr();
 /// @return A handle to the standard error (or an empty handle in case
 /// of failure). Ownership is *not* transferred to the caller.
 /// Closing the handle returned by this function leads to undefined behavior.
-ASIOEXT_DECL file_handle get_stderr(error_code& ec);
+ASIOEXT_DECL file_handle get_stderr(error_code& ec) ASIOEXT_NOEXCEPT;
 
 /// @}
 

@@ -29,7 +29,7 @@ struct create_file_args
 };
 
 // these two are not in the header because they use a Windows.h type
-ASIOEXT_DECL file_time_type filetime_to_chrono(FILETIME ft)
+ASIOEXT_DECL file_time_type filetime_to_chrono(FILETIME ft) ASIOEXT_NOEXCEPT
 {
   ULARGE_INTEGER temp;
   temp.LowPart = ft.dwLowDateTime;
@@ -37,7 +37,7 @@ ASIOEXT_DECL file_time_type filetime_to_chrono(FILETIME ft)
   return file_time_type(file_clock::duration(temp.QuadPart));
 }
 
-ASIOEXT_DECL FILETIME chrono_to_filetime(file_time_type t)
+ASIOEXT_DECL FILETIME chrono_to_filetime(file_time_type t) ASIOEXT_NOEXCEPT
 {
   ULARGE_INTEGER temp;
   temp.QuadPart = t.time_since_epoch().count();
@@ -48,12 +48,12 @@ ASIOEXT_DECL FILETIME chrono_to_filetime(file_time_type t)
   return ft;
 }
 
-void set_error(error_code& ec)
+void set_error(error_code& ec) ASIOEXT_NOEXCEPT
 {
   ec = error_code(::GetLastError(), asio::error::get_system_category());
 }
 
-uint32_t file_attrs_to_native(file_attrs attrs)
+uint32_t file_attrs_to_native(file_attrs attrs) ASIOEXT_NOEXCEPT
 {
   uint32_t native = 0;
   if ((attrs & file_attrs::hidden) != file_attrs::none)
@@ -65,7 +65,7 @@ uint32_t file_attrs_to_native(file_attrs attrs)
   return native;
 }
 
-file_attrs native_to_file_attrs(uint32_t native)
+file_attrs native_to_file_attrs(uint32_t native) ASIOEXT_NOEXCEPT
 {
   file_attrs attrs = file_attrs::none;
   if (native & FILE_ATTRIBUTE_HIDDEN)
@@ -78,7 +78,7 @@ file_attrs native_to_file_attrs(uint32_t native)
 }
 
 bool parse_open_flags(create_file_args& args, open_flags flags,
-                      file_perms perms, file_attrs attrs)
+                      file_perms perms, file_attrs attrs) ASIOEXT_NOEXCEPT
 {
   if (!is_valid(flags))
     return false;
@@ -104,9 +104,9 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
 
   args.attrs = file_attrs_to_native(attrs);
 
-  constexpr file_perms write_perms = file_perms::owner_write |
-                                     file_perms::group_write |
-                                     file_perms::others_write;
+  ASIOEXT_CONSTEXPR file_perms write_perms = file_perms::owner_write |
+                                             file_perms::group_write |
+                                             file_perms::others_write;
 
   if ((perms & write_perms) != file_perms::none)
     args.attrs &= ~FILE_ATTRIBUTE_READONLY;
@@ -127,7 +127,8 @@ bool parse_open_flags(create_file_args& args, open_flags flags,
 }
 
 handle_type open(const char* filename, open_flags flags,
-                 file_perms perms, file_attrs attrs, error_code& ec)
+                 file_perms perms, file_attrs attrs,
+                 error_code& ec) ASIOEXT_NOEXCEPT
 {
   create_file_args args;
   if (!parse_open_flags(args, flags, perms, attrs)) {
@@ -170,7 +171,8 @@ handle_type open(const char* filename, open_flags flags,
 }
 
 handle_type open(const wchar_t* filename, open_flags flags,
-                 file_perms perms, file_attrs attrs, error_code& ec)
+                 file_perms perms, file_attrs attrs,
+                 error_code& ec) ASIOEXT_NOEXCEPT
 {
   create_file_args args;
   if (!parse_open_flags(args, flags, perms, attrs)) {
@@ -200,7 +202,7 @@ handle_type open(const wchar_t* filename, open_flags flags,
   return h;
 }
 
-void close(handle_type fd, error_code& ec)
+void close(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (::CloseHandle(fd))
     ec = error_code();
@@ -208,7 +210,7 @@ void close(handle_type fd, error_code& ec)
     set_error(ec);
 }
 
-handle_type duplicate(handle_type fd, error_code& ec)
+handle_type duplicate(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   const handle_type current_process = ::GetCurrentProcess();
   handle_type new_fd = INVALID_HANDLE_VALUE;
@@ -222,7 +224,7 @@ handle_type duplicate(handle_type fd, error_code& ec)
   return new_fd;
 }
 
-handle_type get_stdin(error_code& ec)
+handle_type get_stdin(error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h = ::GetStdHandle(STD_INPUT_HANDLE);
@@ -238,7 +240,7 @@ handle_type get_stdin(error_code& ec)
 #endif
 }
 
-handle_type get_stdout(error_code& ec)
+handle_type get_stdout(error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h = ::GetStdHandle(STD_OUTPUT_HANDLE);
@@ -254,7 +256,7 @@ handle_type get_stdout(error_code& ec)
 #endif
 }
 
-handle_type get_stderr(error_code& ec)
+handle_type get_stderr(error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h = ::GetStdHandle(STD_ERROR_HANDLE);
@@ -270,7 +272,7 @@ handle_type get_stderr(error_code& ec)
 #endif
 }
 
-uint64_t size(handle_type fd, error_code& ec)
+uint64_t size(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
   LARGE_INTEGER size;
   if (::GetFileSizeEx(fd, &size)) {
@@ -282,7 +284,7 @@ uint64_t size(handle_type fd, error_code& ec)
   return 0;
 }
 
-void size(handle_type fd, uint64_t new_size, error_code& ec)
+void size(handle_type fd, uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if (_WIN32_WINNT >= 0x0600)
   // On Vista+ we can avoid having to modify the file pointer.
@@ -329,7 +331,7 @@ static_assert(static_cast<DWORD>(seek_origin::from_begin) == FILE_BEGIN &&
               "whence mapping must match the system headers");
 
 uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
-              error_code& ec)
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   LARGE_INTEGER pos, res;
   pos.QuadPart = offset;
@@ -341,12 +343,12 @@ uint64_t seek(handle_type fd, seek_origin origin, int64_t offset,
   return 0;
 }
 
-file_perms permissions(handle_type fd, error_code& ec)
+file_perms permissions(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if (_WIN32_WINNT >= 0x0600)
-  constexpr file_perms write_perms = file_perms::owner_write |
-                                     file_perms::group_write |
-                                     file_perms::others_write;
+  ASIOEXT_CONSTEXPR file_perms write_perms = file_perms::owner_write |
+                                             file_perms::group_write |
+                                             file_perms::others_write;
   FILE_BASIC_INFO info;
   if (::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
     ec = error_code();
@@ -361,12 +363,12 @@ file_perms permissions(handle_type fd, error_code& ec)
 }
 
 void permissions(handle_type fd, file_perms perms, file_perm_options opts,
-                 error_code& ec)
+                 error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if (_WIN32_WINNT >= 0x0600)
-  constexpr file_perms write_perms = file_perms::owner_write |
-                                     file_perms::group_write |
-                                     file_perms::others_write;
+  ASIOEXT_CONSTEXPR file_perms write_perms = file_perms::owner_write |
+                                             file_perms::group_write |
+                                             file_perms::others_write;
 
   // Quit early if the changed values are without effect (i.e. not implemented)
   if ((opts & (file_perm_options::add | file_perm_options::remove)) !=
@@ -406,7 +408,7 @@ void permissions(handle_type fd, file_perms perms, file_perm_options opts,
 #endif
 }
 
-file_attrs attributes(handle_type fd, error_code& ec)
+file_attrs attributes(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if (_WIN32_WINNT >= 0x0600)
   FILE_BASIC_INFO info;
@@ -422,7 +424,7 @@ file_attrs attributes(handle_type fd, error_code& ec)
 }
 
 void attributes(handle_type fd, file_attrs attrs, file_attr_options opts,
-                error_code& ec)
+                error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if (_WIN32_WINNT >= 0x0600)
   FILE_BASIC_INFO info;
@@ -490,7 +492,8 @@ void set_times(handle_type fd, file_time_type ctime, file_time_type atime,
   set_error(ec);
 }
 
-uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)
+uint32_t read(handle_type fd, void* buffer, uint32_t size,
+              error_code& ec) ASIOEXT_NOEXCEPT
 {
   DWORD bytesRead = 0;
   if (!::ReadFile(fd, buffer, size, &bytesRead, NULL)) {
@@ -504,10 +507,8 @@ uint32_t read(handle_type fd, void* buffer, uint32_t size, error_code& ec)
   return bytesRead;
 }
 
-uint32_t write(handle_type fd,
-               const void* buffer,
-               uint32_t size,
-               error_code& ec)
+uint32_t write(handle_type fd, const void* buffer, uint32_t size,
+               error_code& ec) ASIOEXT_NOEXCEPT
 {
   DWORD bytesWritten = 0;
   if (!::WriteFile(fd, buffer, size, &bytesWritten, NULL)) {
@@ -518,11 +519,8 @@ uint32_t write(handle_type fd,
   return bytesWritten;
 }
 
-uint32_t pread(handle_type fd,
-               void* buffer,
-               uint32_t size,
-               uint64_t offset,
-               error_code& ec)
+uint32_t pread(handle_type fd, void* buffer, uint32_t size, uint64_t offset,
+               error_code& ec) ASIOEXT_NOEXCEPT
 {
   LARGE_INTEGER offset2;
   offset2.QuadPart = offset;
@@ -543,11 +541,8 @@ uint32_t pread(handle_type fd,
   return bytesRead;
 }
 
-uint32_t pwrite(handle_type fd,
-                const void* buffer,
-                uint32_t size,
-                uint64_t offset,
-                error_code& ec)
+uint32_t pwrite(handle_type fd, const void* buffer, uint32_t size,
+                uint64_t offset, error_code& ec) ASIOEXT_NOEXCEPT
 {
   LARGE_INTEGER offset2;
   offset2.QuadPart = offset;

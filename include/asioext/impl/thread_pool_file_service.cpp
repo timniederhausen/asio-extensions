@@ -268,7 +268,7 @@ void thread_pool_file_service::times(implementation_type& impl,
 }
 
 void thread_pool_file_service::cancel(implementation_type& impl,
-                                      error_code& ec)
+                                      error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (!impl.handle_.is_open()) {
     ec = asio::error::bad_descriptor;

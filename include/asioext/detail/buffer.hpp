@@ -24,7 +24,8 @@ ASIOEXT_NS_BEGIN
 // a length of zero, in which case we end up in an infinite loop.
 // TODO: Is this a bug?
 template <typename MutableBufferSequence>
-asio::mutable_buffer first_mutable_buffer(const MutableBufferSequence& buffers)
+asio::mutable_buffer first_mutable_buffer(
+    const MutableBufferSequence& buffers) ASIOEXT_NOEXCEPT
 {
   typename MutableBufferSequence::const_iterator it = buffers.begin();
   while (it != buffers.end()) {
@@ -36,7 +37,8 @@ asio::mutable_buffer first_mutable_buffer(const MutableBufferSequence& buffers)
 }
 
 template <typename ConstBufferSequence>
-asio::const_buffer first_const_buffer(const ConstBufferSequence& buffers)
+asio::const_buffer first_const_buffer(
+    const ConstBufferSequence& buffers) ASIOEXT_NOEXCEPT
 {
   typename ConstBufferSequence::const_iterator it = buffers.begin();
   while (it != buffers.end()) {
