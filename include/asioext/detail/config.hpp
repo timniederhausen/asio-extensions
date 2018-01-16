@@ -35,6 +35,8 @@
 # define ASIOEXT_DELETED = delete
 # define ASIOEXT_NOEXCEPT noexcept
 # define ASIOEXT_HAS_ALIAS_TEMPLATES 1
+# define ASIOEXT_HAS_CONSTEXPR 1
+# define ASIOEXT_HAS_CONSTEXPR14
 #endif
 
 #define ASIOEXT_NS_BEGIN namespace asioext {
@@ -220,7 +222,7 @@
 
 // ASIOEXT_CONSTEXPR: Expands to constexpr on supported compilers.
 #if !defined(ASIOEXT_CONSTEXPR)
-# if defined(ASIOEXT_HAS_CONSTEXPR11)
+# if defined(ASIOEXT_HAS_CONSTEXPR)
 #  define ASIOEXT_CONSTEXPR constexpr
 # else
 #  define ASIOEXT_CONSTEXPR
@@ -246,7 +248,7 @@
 
 // ASIOEXT_CONSTEXPR14: Expands to constexpr on supported compilers.
 #if !defined(ASIOEXT_CONSTEXPR14)
-# if defined(ASIOEXT_HAS_CONSTEXPR11)
+# if defined(ASIOEXT_HAS_CONSTEXPR14)
 #  define ASIOEXT_CONSTEXPR14 constexpr
 # else
 #  define ASIOEXT_CONSTEXPR14
