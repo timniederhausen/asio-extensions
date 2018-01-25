@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Asio Extensions"
 PROJECT_NUMBER         =
-PROJECT_BRIEF          = "Various utility components building upon Asio"
+PROJECT_BRIEF          = "Additional functionality built on top of (Boost.)Asio"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = @asioext_BINARY_DIR@/doc
 CREATE_SUBDIRS         = NO

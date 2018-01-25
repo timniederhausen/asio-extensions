@@ -3,23 +3,20 @@
 [![Build Status](https://travis-ci.org/timniederhausen/asio-extensions.svg?branch=master)](https://travis-ci.org/timniederhausen/asio-extensions)
 [![Build status](https://ci.appveyor.com/api/projects/status/696yog08f0fbpck0/branch/master?svg=true)](https://ci.appveyor.com/project/timniederhausen/asio-extensions/branch/master)
 
-AsioExt is a collection of components that build on Asio.
+AsioExt is a collection of various components and functionality that builds on (Boost.)Asio.
 It is compatible with standalone Asio, as well as the Boost version.
 
 ## Feature overview
 
-* File handle wrappers with support for:
-  * Creating and opening files
+**Filesystem:**
+
+* File handle types with support for:
   * Asio's `*Stream` concepts (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
-  * File permissions
-  * File attributes
-* Asynchronous file I/O interface (`basic_file`) with the following implementations:
-  * `thread_pool_file_service`: Blocking I/O operations are performed on the
-     thread-pool.
-* Utilities for reading/writing files
-* Utilities for service writers:
-  * Cancellation tokens
-  * `Handler` wrappers
+  * Querying/altering file metadata (size, permissions, attributes, file times)
+* Asynchronous file I/O with different implementations.
+
+*This is a very coarse overview of the project's features.
+The [documentation](http://timniederhausen.github.io/asio-extensions) has all the details.*
 
 ## Simple example
 
@@ -36,7 +33,7 @@ It is compatible with standalone Asio, as well as the Boost version.
 
 int main(int argc, const char* argv[])
 {
-  const std::string test_content = "Hello world";
+  const std::string test_content("Hello world");
 
   try {
     // Utility functions write/read containers and buffer sequences to/from files.

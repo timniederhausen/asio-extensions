@@ -63,7 +63,7 @@ struct hook_allocator_aux<Handler, std::allocator<T> >
 
 }
 
-/// @ingroup service
+/// @ingroup core
 /// @brief Allocator that uses a handler's memory allocation hooks.
 ///
 /// Asio @c Handlers (before Asio 1.11.0+) use two hooks to allow memory
@@ -168,7 +168,7 @@ bool operator!=(const asio_hook_allocator<T, Handler>& a,
                 const asio_hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
 { return std::addressof(a.handler_) != std::addressof(b.handler_); }
 
-/// @ingroup service
+/// @ingroup core
 /// @brief Helper trait to obtain the allocator associated with a handler.
 ///
 /// Retrieves an @c Allocator that is used to allocate memory tied to the
@@ -211,7 +211,7 @@ public:
   }
 };
 
-/// @ingroup service
+/// @ingroup core
 /// @brief Get the handler's associated allocator.
 ///
 /// Calling this function is equivalent to calling
@@ -225,7 +225,7 @@ typename hook_allocator<Handler>::type get_hook_allocator(Handler& handler)
 }
 
 #if defined(ASIOEXT_HAS_ALIAS_TEMPLATES)
-/// @ingroup service
+/// @ingroup core
 /// @brief Alias for hook_allocator::type
 template <typename Handler>
 using hook_allocator_t = typename hook_allocator<Handler>::type;

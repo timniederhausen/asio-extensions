@@ -21,6 +21,18 @@
 ///
 /// Type requirements and associated traits provided by this library.
 
+/// @defgroup core Core
+/// Core components and utilities.
+
+/// @defgroup compat Compatibility
+/// @brief Helpers for the various supported versions of Asio.
+
+/// @defgroup net Networking
+/// @brief Networking components and utilities.
+///
+/// This module contains classes and non-member functions that provide
+/// commonly used functionality that is not (yet) provided by Asio.
+
 /// @defgroup files Filesystem
 /// @brief Provide access to file data and metadata.
 ///
@@ -51,13 +63,6 @@
 
 /// @ingroup files
 /// @defgroup files_time File times
-
-/// @defgroup service Service utilities
-/// Utility classes and functions for the implementation of
-/// custom I/O objects and/or services.
-///
-/// @note Unless you're writing a custom service, there is probably
-/// little of interest in this group.
 
 /// AsioExt's main namespace.
 namespace asioext {

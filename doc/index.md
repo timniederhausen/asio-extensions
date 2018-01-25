@@ -3,22 +3,14 @@
 AsioExt is a collection of components that build on Asio.
 It is compatible with standalone Asio, as well as the Boost version.
 
-## Feature list
+## Feature overview
 
-* File handle wrappers (@ref asioext::file_handle, @ref asioext::scoped_file_handle) with support for:
-  * Creating and opening files
-  * Asio's `*Stream` concepts (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
-  * File permissions
-  * File attributes
-* Asynchronous file I/O interface (@ref asioext::basic_file) with the following implementations:
-  * @ref asioext::thread_pool_file_service : Blocking I/O operations are performed on the
-     thread-pool.
-* Utilities for reading/writing files:
-  * @ref asioext::read_file
-  * @ref asioext::write_file
-* Utilities for service writers (@ref service):
-  * Cancellation tokens (@ref asioext::cancellation_token)
-  * `Handler` wrappers (@ref asioext::composed_operation)
+* The @ref files component provides platform-independent functionality
+  that is not provided by Boost.Filesystem or standard iostreams.
+* The @ref net component contains utilities that make using Asio objects
+  more convenient.
+* The @ref core component provides low-level utilities that are used in other
+  components (e.g. cancellation tokens)
 
 ## Building
 

@@ -19,7 +19,7 @@
 
 ASIOEXT_NS_BEGIN
 
-/// @ingroup service
+/// @ingroup core
 /// @brief Manager for cancellation_tokens.
 ///
 /// This class provides functionality to create and cancel cancellation_tokens.
@@ -98,7 +98,7 @@ private:
   detail::shared_ptr<void> ptr_;
 };
 
-/// @ingroup service
+/// @ingroup core
 /// @brief Token to determine if an operation was cancelled.
 ///
 /// This class provides the ability to determine if an operation

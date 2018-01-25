@@ -22,13 +22,13 @@
 
 #include <type_traits>
 
+// @brief An initiating function's return type.
+//
+// This is a utility macro expanding to @c async_result::return_type
+// for the given completion token and signature.
+//
+// @note If possible @c async_result_t should be preferred.
 #if defined(ASIOEXT_IS_DOCUMENTATION)
-/// @brief An initiating function's return type.
-///
-/// This is a utility macro expanding to @c async_result::return_type
-/// for the given completion token and signature.
-///
-/// @note If possible @c async_result_t should be preferred.
 # define ASIOEXT_INITFN_RESULT_TYPE void_or_deduced
 #elif defined(ASIOEXT_USE_BOOST_ASIO)
 # define ASIOEXT_INITFN_RESULT_TYPE BOOST_ASIO_INITFN_RESULT_TYPE
@@ -38,10 +38,11 @@
 
 ASIOEXT_NS_BEGIN
 
-#if (ASIOEXT_ASIO_VERSION >= 101100)
+#if (ASIOEXT_ASIO_VERSION >= 101100) && !defined(ASIOEXT_IS_DOCUMENTATION)
 using asio::async_result;
 using asio::async_completion;
 #else
+/// @ingroup compat
 /// @brief An interface for customising the behaviour of an initiating function.
 ///
 /// @note This type is the same as @c asio::async_result if Asio 1.11.0+ is
@@ -77,6 +78,7 @@ private:
   asio::async_result<completion_handler_type> result_;
 };
 
+/// @ingroup compat
 /// Helper template to deduce the handler type from a CompletionToken, capture
 /// a local copy of the handler, and then create an async_result for the
 /// handler.
@@ -134,6 +136,7 @@ struct async_completion
 #endif
 
 #if defined(ASIOEXT_HAS_ALIAS_TEMPLATES)
+/// @ingroup core
 /// @brief An initiating function's return type.
 ///
 /// This alias template refers to the @c async_result::return_type
@@ -143,6 +146,7 @@ using async_result_t = typename async_result<
   typename std::decay<CompletionToken>::type, Signature
 >::return_type;
 
+/// @ingroup core
 /// @brief The real handler type to be used for the asynchronous operation.
 ///
 /// This alias template refers to the @c async_result::completion_handler_type

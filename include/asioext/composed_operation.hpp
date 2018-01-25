@@ -83,7 +83,7 @@ struct allocator_wrapper_impl<T,
 }
 #endif
 
-/// @ingroup service
+/// @ingroup core
 /// @brief Base class for composed operations.
 ///
 /// This class template is intended to be used as a base class for custom

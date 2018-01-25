@@ -23,6 +23,9 @@
 ASIOEXT_NS_BEGIN
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)
+/// @ingroup compat
+/// @{
+
 /// @brief Typedef for the error_code class used by this library.
 ///
 /// If Boost.Asio is used (i.e. @ref ASIOEXT_USE_BOOST_ASIO is defined),
@@ -43,6 +46,8 @@ typedef automatically_chosen generic_category;
 
 /// Either @c boost::system::errc or @c std::errc.
 typedef automatically_chosen errc;
+
+/// @}
 #elif defined(ASIOEXT_USE_BOOST_ASIO)
 using boost::system::error_code;
 using boost::system::error_category;
