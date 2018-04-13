@@ -18,6 +18,12 @@
 
 #include "asioext/detail/asio_version.hpp"
 
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# include <boost/asio/detail/handler_alloc_helpers.hpp>
+#else
+# include <asio/detail/handler_alloc_helpers.hpp>
+#endif
+
 #if (ASIOEXT_ASIO_VERSION >= 101100)
 # if defined(ASIOEXT_USE_BOOST_ASIO)
 #  include <boost/asio/associated_allocator.hpp>
@@ -79,7 +85,7 @@ struct hook_allocator_aux<Handler, std::allocator<T> >
 template <typename T, typename Handler>
 class asio_hook_allocator
 {
-  template <class U, typename Handler>
+  template <class U, typename Handler2>
   friend class asio_hook_allocator;
 
   template <class U>
@@ -126,7 +132,7 @@ private:
 template <typename Handler>
 class asio_hook_allocator<void, Handler>
 {
-  template <class U, typename Handler>
+  template <class U, typename Handler2>
   friend class asio_hook_allocator;
 
   template <class U>
