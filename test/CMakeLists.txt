@@ -7,6 +7,7 @@ set(sources
 	chrono.cpp
 	composed_operation.cpp
 	file_handle.cpp
+	linear_buffer.cpp
 	main.cpp
 	open.cpp
 	open_flags.cpp
