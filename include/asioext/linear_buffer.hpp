@@ -21,6 +21,7 @@
 #include "asioext/detail/move_support.hpp"
 
 #include <memory>
+#include <limits>
 #include <type_traits>
 
 ASIOEXT_NS_BEGIN
