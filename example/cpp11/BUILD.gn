@@ -45,3 +45,13 @@ executable("tee_async") {
     "../..:asioext",
   ]
 }
+
+executable("socks_http_client") {
+  sources = [
+    "socks_http_client.cpp",
+  ]
+
+  deps = [
+    "../..:asioext",
+  ]
+}

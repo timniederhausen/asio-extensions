@@ -66,10 +66,12 @@ source_set("asioext") {
     "include/asioext/connect.hpp",
     "include/asioext/detail/asio_version.hpp",
     "include/asioext/detail/async_result.hpp",
+    "include/asioext/detail/bind_handler.hpp",
     "include/asioext/detail/buffer.hpp",
     "include/asioext/detail/buffer_sequence_adapter.hpp",
     "include/asioext/detail/chrono.hpp",
     "include/asioext/detail/config.hpp",
+    "include/asioext/detail/coroutine.hpp",
     "include/asioext/detail/cstdint.hpp",
     "include/asioext/detail/enum.hpp",
     "include/asioext/detail/error.hpp",
@@ -108,6 +110,12 @@ source_set("asioext") {
     "include/asioext/read_file.hpp",
     "include/asioext/scoped_file_handle.hpp",
     "include/asioext/seek_origin.hpp",
+    "include/asioext/socks/client.hpp",
+    "include/asioext/socks/constants.hpp",
+    "include/asioext/socks/detail/client.hpp",
+    "include/asioext/socks/detail/protocol.hpp",
+    "include/asioext/socks/error.hpp",
+    "include/asioext/socks/impl/client.hpp",
     "include/asioext/standard_streams.hpp",
     "include/asioext/thread_pool_file_service.hpp",
     "include/asioext/unique_file_handle.hpp",
@@ -126,6 +134,8 @@ source_set("asioext") {
       "include/asioext/impl/standard_streams.cpp",
       "include/asioext/impl/thread_pool_file_service.cpp",
       "include/asioext/impl/unique_file_handle.cpp",
+      "include/asioext/socks/detail/impl/protocol.cpp",
+      "include/asioext/socks/impl/error.cpp",
     ]
   }
 
@@ -215,6 +225,7 @@ group("examples") {
     deps = [
       "example/cpp11:cp",
       "example/cpp11:simple",
+      "example/cpp11:socks_http_client",
       "example/cpp11:tee",
       "example/cpp11:tee_async",
     ]
