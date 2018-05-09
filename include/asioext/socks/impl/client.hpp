@@ -51,7 +51,7 @@ async_login(Socket& socket,
 template <class Socket, class ExecuteHandler>
 ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
 async_execute(Socket& socket, command cmd,
-              const asio::ip::tcp::endpoint& remote, uint16_t port,
+              const asio::ip::tcp::endpoint& remote,
               linear_buffer& buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler)
 {
@@ -59,7 +59,7 @@ async_execute(Socket& socket, command cmd,
 
   init_t init(handler);
   detail::socks_sexec_op<Socket, typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, cmd, remote, std::string(), port,
+    init.completion_handler, socket, cmd, remote, std::string(), 0,
     buffer);
 
   return init.result.get();

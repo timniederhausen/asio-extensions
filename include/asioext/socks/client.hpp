@@ -116,10 +116,33 @@ async_login(Socket& socket,
 template <class Socket, class ExecuteHandler>
 ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
 async_execute(Socket& socket, command cmd,
-              const asio::ip::tcp::endpoint& remote, uint16_t port,
+              const asio::ip::tcp::endpoint& remote,
               linear_buffer& buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler);
 
+/// @brief Asynchronously attempt to execute the given command.
+///
+/// This function asynchronously executes the given SOCKS command.
+/// The following commands are supported by a SOCKS 5 server:
+///
+/// * @c connect: Establish a connection to the given remote endpoint.
+/// Any data sent/received on the socket after successful command execution
+/// belongs to the proxied connection.
+///
+/// @param socket The connected socket. The remote endpoint
+/// needs to be a successfully greeted SOCKS 5 proxy.
+/// @param cmd The command to execute.
+/// @param remote Hostname of the remote endpoint.
+/// @param port Port of the remote endpoint.
+/// @param buffer A linear_buffer that is used to buffer sent/received messages.
+/// @param handler The handler to be called when the execute operation
+/// completes. The function signature of the handler must be:
+/// @code
+/// void handler(
+///   // Result of operation.
+///   const error_code& error,
+/// );
+/// @endcode
 template <class Socket, class ExecuteHandler>
 ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
 async_execute(Socket& socket, command cmd,
