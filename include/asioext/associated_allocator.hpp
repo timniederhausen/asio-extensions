@@ -1,14 +1,14 @@
 /// @file
-/// Declares the asio_hook_allocator class and the asioext::hook_allocator
-/// trait.
+/// Declares the asioext::hook_allocator class and the
+/// asioext::associated_allocator trait.
 ///
 /// @copyright Copyright (c) 2016 Tim Niederhausen (tim@rnc-ag.de)
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at
 /// http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_HOOKALLOCATOR_HPP
-#define ASIOEXT_HOOKALLOCATOR_HPP
+#ifndef ASIOEXT_ASSOCIATEDALLOCATOR_HPP
+#define ASIOEXT_ASSOCIATEDALLOCATOR_HPP
 
 #include "asioext/detail/config.hpp"
 
@@ -40,8 +40,9 @@
 
 ASIOEXT_NS_BEGIN
 
+#if !defined(ASIOEXT_IS_DOCUMENTATION)
 template <typename T, typename Handler>
-class asio_hook_allocator;
+class hook_allocator;
 
 namespace detail {
 
@@ -59,7 +60,7 @@ struct hook_allocator_aux
 template <typename Handler, typename T>
 struct hook_allocator_aux<Handler, std::allocator<T> >
 {
-  typedef asio_hook_allocator<T, Handler> type;
+  typedef hook_allocator<T, Handler> type;
 
   static type get(Handler& handler, const std::allocator<T>&) ASIOEXT_NOEXCEPT
   {
@@ -68,8 +69,9 @@ struct hook_allocator_aux<Handler, std::allocator<T> >
 };
 
 }
+#endif
 
-/// @ingroup core
+/// @ingroup compat
 /// @brief Allocator that uses a handler's memory allocation hooks.
 ///
 /// Asio @c Handlers (before Asio 1.11.0+) use two hooks to allow memory
@@ -83,32 +85,32 @@ struct hook_allocator_aux<Handler, std::allocator<T> >
 /// lifetime. All memory must be de-allocated before the user's handler
 /// is invoked ([async.reqmts.async.alloc]).
 template <typename T, typename Handler>
-class asio_hook_allocator
+class hook_allocator
 {
   template <class U, typename Handler2>
-  friend class asio_hook_allocator;
+  friend class hook_allocator;
 
   template <class U>
-  friend bool operator==(const asio_hook_allocator&,
-                         const asio_hook_allocator<U, Handler>&)
+  friend bool operator==(const hook_allocator&,
+                         const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
 
   template <class U>
-  friend bool operator!=(const asio_hook_allocator&,
-                         const asio_hook_allocator<U, Handler>&)
+  friend bool operator!=(const hook_allocator&,
+                         const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
 
 public:
   typedef T value_type;
 
-  explicit asio_hook_allocator(Handler& h) ASIOEXT_NOEXCEPT
+  explicit hook_allocator(Handler& h) ASIOEXT_NOEXCEPT
     : handler_(h)
   {
   }
 
   template <typename U>
-  asio_hook_allocator(
-      const asio_hook_allocator<U, Handler>& a) ASIOEXT_NOEXCEPT
+  hook_allocator(
+      const hook_allocator<U, Handler>& a) ASIOEXT_NOEXCEPT
     : handler_(a.handler_)
   {
   }
@@ -130,31 +132,31 @@ private:
 
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
 template <typename Handler>
-class asio_hook_allocator<void, Handler>
+class hook_allocator<void, Handler>
 {
   template <class U, typename Handler2>
-  friend class asio_hook_allocator;
+  friend class hook_allocator;
 
   template <class U>
-  friend bool operator==(const asio_hook_allocator&,
-                         const asio_hook_allocator<U, Handler>&)
+  friend bool operator==(const hook_allocator&,
+                         const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
 
   template <class U>
-  friend bool operator!=(const asio_hook_allocator&,
-                         const asio_hook_allocator<U, Handler>&)
+  friend bool operator!=(const hook_allocator&,
+                         const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
 
 public:
   typedef void value_type;
 
-  explicit asio_hook_allocator(Handler& h) ASIOEXT_NOEXCEPT
+  explicit hook_allocator(Handler& h) ASIOEXT_NOEXCEPT
     : handler_(h)
   {
   }
 
   template <typename U>
-  asio_hook_allocator(const asio_hook_allocator<U, Handler>& a) ASIOEXT_NOEXCEPT
+  hook_allocator(const hook_allocator<U, Handler>& a) ASIOEXT_NOEXCEPT
     : handler_(a.handler_)
   {
   }
@@ -165,16 +167,16 @@ private:
 #endif
 
 template <typename Handler, class T, class U>
-bool operator==(const asio_hook_allocator<T, Handler>& a,
-                const asio_hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
+bool operator==(const hook_allocator<T, Handler>& a,
+                const hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
 { return std::addressof(a.handler_) == std::addressof(b.handler_); }
 
 template <typename Handler, class T, class U>
-bool operator!=(const asio_hook_allocator<T, Handler>& a,
-                const asio_hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
+bool operator!=(const hook_allocator<T, Handler>& a,
+                const hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
 { return std::addressof(a.handler_) != std::addressof(b.handler_); }
 
-/// @ingroup core
+/// @ingroup compat
 /// @brief Helper trait to obtain the allocator associated with a handler.
 ///
 /// Retrieves an @c Allocator that is used to allocate memory tied to the
@@ -182,12 +184,12 @@ bool operator!=(const asio_hook_allocator<T, Handler>& a,
 ///
 /// Supports the @c associated_allocator trait introduced by
 /// the Networking TS / Asio 1.11.0+, as well as Asio's memory allocation
-/// hooks (which this trait will wrap in a @c asio_hook_allocator)
+/// hooks (which this trait will wrap in a @c hook_allocator)
 ///
 /// @note This trait is useful for libraries / applications that need to
 /// deal with both types of allocation customizations.
 template <typename Handler>
-class hook_allocator
+class associated_allocator
 {
 #if (ASIOEXT_ASIO_VERSION >= 101100)
   typedef typename asio::associated_allocator<Handler>::type
@@ -200,11 +202,15 @@ class hook_allocator
       associated_allocator_type> helper_type;
 
 public:
+#if defined(ASIOEXT_IS_DOCUMENTATION)
   /// @brief The Handler's ProtoAllocator.
   ///
   /// A type meeting ProtoAllocator requirements that if rebound
   /// can be used to allocate memory using the handler's allocator.
+  typedef implementation_defined type;
+#else
   typedef typename helper_type::type type;
+#endif
 
   /// @brief Get a ProtoAllocator for the given handler.
   static type get(Handler& handler) ASIOEXT_NOEXCEPT
@@ -217,25 +223,27 @@ public:
   }
 };
 
-/// @ingroup core
+/// @ingroup compat
 /// @brief Get the handler's associated allocator.
 ///
 /// Calling this function is equivalent to calling
-/// <code>hook_allocator<Handler>::get(handler)</code>.
-/// See @c hook_allocator for details.
+/// <code>associated_allocator<Handler>::get(handler)</code>.
+/// See @c associated_allocator for details.
 template <typename Handler>
-typename hook_allocator<Handler>::type get_hook_allocator(Handler& handler)
-    ASIOEXT_NOEXCEPT
+typename associated_allocator<Handler>::type
+    get_associated_allocator(Handler& handler) ASIOEXT_NOEXCEPT
 {
-  return hook_allocator<Handler>::get(handler);
+  return associated_allocator<Handler>::get(handler);
 }
 
 #if defined(ASIOEXT_HAS_ALIAS_TEMPLATES)
-/// @ingroup core
-/// @brief Alias for hook_allocator::type
+/// @ingroup compat
+/// @brief Alias for associated_allocator::type
 template <typename Handler>
-using hook_allocator_t = typename hook_allocator<Handler>::type;
+using associated_allocator_t = typename associated_allocator<Handler>::type;
 #endif
+
+/// @}
 
 ASIOEXT_NS_END
 
