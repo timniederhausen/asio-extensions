@@ -277,6 +277,25 @@
 # endif
 #endif
 
+// ASIOEXT_HAS_PRAGMA_ONCE: Support for the '#pragma once' extension.
+#if !defined(ASIOEXT_HAS_PRAGMA_ONCE)
+# if !defined(ASIOEXT_DISABLE_PRAGMA_ONCE)
+#  if defined(__clang__)
+#   define ASIOEXT_HAS_PRAGMA_ONCE 1
+#  endif
+#  if defined(__GNUC__)
+#   if ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 3)
+// GCC supports it, but recent versions(?) seem to have performance
+// penalties associated with this: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=58770
+//#    define ASIOEXT_HAS_PRAGMA_ONCE 1
+#   endif
+#  endif
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1020)
+#   define ASIOEXT_HAS_PRAGMA_ONCE 1
+#  endif
+# endif
+#endif
+
 // ASIOEXT_HAS_STD_SHARED_PTR: Standard library support for shared_ptr and weak_ptr.
 #if !defined(ASIOEXT_HAS_STD_SHARED_PTR)
 # if !defined(ASIOEXT_DISABLE_STD_SHARED_PTR)
@@ -300,21 +319,23 @@
 # endif
 #endif
 
-// ASIOEXT_HAS_PRAGMA_ONCE: Support for the '#pragma once' extension.
-#if !defined(ASIOEXT_HAS_PRAGMA_ONCE)
-# if !defined(ASIOEXT_DISABLE_PRAGMA_ONCE)
+// ASIOEXT_HAS_STD_INDEX_SEQUENCE: Standard library has std::index_sequence / std::index_sequence_for
+#if !defined(ASIOEXT_HAS_STD_INDEX_SEQUENCE)
+# if !defined(ASIOEXT_DISABLE_STD_INDEX_SEQUENCE)
 #  if defined(__clang__)
-#   define ASIOEXT_HAS_PRAGMA_ONCE 1
-#  endif
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 3)
-// GCC supports it, but recent versions(?) seem to have performance
-// penalties associated with this: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=58770
-//#    define ASIOEXT_HAS_PRAGMA_ONCE 1
+#   if (__cplusplus >= 201402)
+#    define ASIOEXT_HAS_STD_INDEX_SEQUENCE 1
 #   endif
 #  endif
-#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1020)
-#   define ASIOEXT_HAS_PRAGMA_ONCE 1
+#  if defined(__GNUC__)
+#   if (__GNUC__ >= 5)
+#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIOEXT_HAS_STD_INDEX_SEQUENCE 1
+#    endif
+#   endif
+#  endif
+#  if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1900)
+#   define ASIOEXT_HAS_STD_INDEX_SEQUENCE 1
 #  endif
 # endif
 #endif

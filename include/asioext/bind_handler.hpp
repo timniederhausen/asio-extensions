@@ -11,7 +11,15 @@
 # pragma once
 #endif
 
-#include "asioext/detail/bound_handler.hpp"
+#if defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && defined(ASIOEXT_HAS_STD_INDEX_SEQUENCE)
+# include "asioext/detail/bound_handler.hpp"
+#else
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+#  include <boost/asio/detail/bind_handler.hpp>
+# else
+#  include <asio/detail/bind_handler.hpp>
+# endif
+#endif
 
 #include <utility>
 
@@ -36,7 +44,7 @@ ASIOEXT_NS_BEGIN
 /// the original handler with the bound arguments.
 template <typename Handler, typename... Args>
 implementation_defined bind_handler(Handler&& handler, Args&&... args);
-#else
+#elif defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && defined(ASIOEXT_HAS_STD_INDEX_SEQUENCE)
 template <typename Handler, typename... Args>
 detail::bound_handler<
     typename std::decay<Handler>::type,
@@ -48,6 +56,10 @@ detail::bound_handler<
     typename std::decay<Args>::type...
   >(std::forward<Handler>(handler), std::forward<Args>(args)...);
 }
+#else
+// TODO: Write our own C++03 / C++11 version
+// (or drop support for them altogether)
+using asio::detail::bind_handler;
 #endif
 
 ASIOEXT_NS_END
