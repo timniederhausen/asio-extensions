@@ -109,8 +109,8 @@ public:
   /// @{
   ASIOEXT_CONSTEXPR int native_flags() const ASIOEXT_NOEXCEPT
   { return native_flags_; }
-  ASIOEXT_CONSTEXPR14 void native_flags(int value) const ASIOEXT_NOEXCEPT
-  { native_flags_ = value }
+  ASIOEXT_CONSTEXPR14 void native_flags(int value) ASIOEXT_NOEXCEPT
+  { native_flags_ = value; }
 
   ASIOEXT_CONSTEXPR uint32_t mode() const ASIOEXT_NOEXCEPT
   { return mode_; }

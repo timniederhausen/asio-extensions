@@ -39,7 +39,6 @@ class bound_handler
   friend struct asio::associated_executor;
 #endif
 
-  template <typename Handler>
   friend void* asio_handler_allocate(std::size_t size,
                                      bound_handler* this_handler)
   {
@@ -47,7 +46,6 @@ class bound_handler
         size, this_handler->handler_);
   }
 
-  template <typename Handler>
   friend void asio_handler_deallocate(void* pointer, std::size_t size,
                                       bound_handler* this_handler)
   {
@@ -55,14 +53,13 @@ class bound_handler
         pointer, size, this_handler->handler_);
   }
 
-  template <typename Handler>
   friend bool asio_handler_is_continuation(bound_handler* this_handler)
   {
     return ASIOEXT_HANDLER_CONT_HELPERS_NS::is_continuation(
         this_handler->handler_);
   }
 
-  template <typename Function, typename Handler>
+  template <typename Function>
   friend void asio_handler_invoke(Function& function,
                                   bound_handler* this_handler)
   {
@@ -70,7 +67,7 @@ class bound_handler
         function, this_handler->handler_);
   }
 
-  template <typename Function, typename Handler>
+  template <typename Function>
   friend void asio_handler_invoke(const Function& function,
                                   bound_handler* this_handler)
   {
