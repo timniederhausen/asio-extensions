@@ -26,22 +26,39 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 namespace detail {
 
-ASIOEXT_DECL bool encode_sgreet_packet(
+ASIOEXT_DECL std::size_t get_sgreet_packet_size(
+    const auth_method* auth_methods,
+    std::size_t num_auth_methods);
+
+ASIOEXT_DECL std::size_t get_slogin_packet_size(
+    const std::string& username,
+    const std::string& password);
+
+ASIOEXT_DECL std::size_t get_slogin_packet_size(
+    const std::string& username,
+    const std::string& password);
+
+ASIOEXT_DECL std::size_t get_sexec_packet_size(
+    command cmd,
+    const asio::ip::tcp::endpoint& remote,
+    const std::string& remote_host, uint16_t port);
+
+ASIOEXT_DECL void encode_sgreet_packet(
     const auth_method* auth_methods,
     std::size_t num_auth_methods,
-    linear_buffer& out);
+    uint8_t* out);
 
-ASIOEXT_DECL bool encode_slogin_packet(
+ASIOEXT_DECL void encode_slogin_packet(
     const std::string& username,
     const std::string& password,
-    linear_buffer& out);
+    uint8_t* out);
 
-ASIOEXT_DECL bool encode_sexec_packet(
+ASIOEXT_DECL void encode_sexec_packet(
     command cmd,
     const asio::ip::tcp::endpoint& remote,
     const std::string& remote_host,
     uint16_t port,
-    linear_buffer& out);
+    uint8_t* out);
 
 }
 }

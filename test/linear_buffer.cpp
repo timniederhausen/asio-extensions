@@ -6,6 +6,8 @@ ASIOEXT_NS_BEGIN
 
 BOOST_AUTO_TEST_SUITE(asioext_linear_buffer)
 
+typedef dynamic_linear_buffer<std::allocator<uint8_t>> dynbuf_type;
+
 BOOST_AUTO_TEST_CASE(empty)
 {
   linear_buffer x1;
@@ -15,8 +17,9 @@ BOOST_AUTO_TEST_CASE(empty)
 
 BOOST_AUTO_TEST_CASE(prepare_commit)
 {
-  linear_buffer x1;
-  linear_buffer::mutable_buffers_type b1 = x1.prepare(2);
+  linear_buffer b;
+  dynbuf_type x1(b);
+  dynbuf_type::mutable_buffers_type b1 = x1.prepare(2);
   asio::buffer_cast<char*>(b1)[0] = 'A';
   asio::buffer_cast<char*>(b1)[1] = 'B';
   x1.commit(2);
@@ -26,7 +29,7 @@ BOOST_AUTO_TEST_CASE(prepare_commit)
   BOOST_REQUIRE_EQUAL('A', asio::buffer_cast<const char*>(x1.data())[0]);
   BOOST_REQUIRE_EQUAL('B', asio::buffer_cast<const char*>(x1.data())[1]);
 
-  linear_buffer::mutable_buffers_type b2 = x1.prepare(2);
+  dynbuf_type::mutable_buffers_type b2 = x1.prepare(2);
   asio::buffer_cast<char*>(b2)[0] = 'C';
   asio::buffer_cast<char*>(b2)[1] = 'D';
   x1.commit(2);
@@ -38,9 +41,9 @@ BOOST_AUTO_TEST_CASE(prepare_commit)
   BOOST_REQUIRE_EQUAL('C', asio::buffer_cast<const char*>(x1.data())[2]);
   BOOST_REQUIRE_EQUAL('D', asio::buffer_cast<const char*>(x1.data())[3]);
 
-  linear_buffer::mutable_buffers_type b3 = x1.prepare(1);
+  dynbuf_type::mutable_buffers_type b3 = x1.prepare(1);
   asio::buffer_cast<char*>(b3)[0] = 'E';
-  linear_buffer::mutable_buffers_type b4 = x1.prepare(1);
+  dynbuf_type::mutable_buffers_type b4 = x1.prepare(1);
   asio::buffer_cast<char*>(b4)[0] = 'F';
   x1.commit(1);
 
@@ -55,8 +58,9 @@ BOOST_AUTO_TEST_CASE(prepare_commit)
 
 BOOST_AUTO_TEST_CASE(consume)
 {
-  linear_buffer x1;
-  linear_buffer::mutable_buffers_type b1 = x1.prepare(4);
+  linear_buffer b;
+  dynbuf_type x1(b);
+  dynbuf_type::mutable_buffers_type b1 = x1.prepare(4);
   asio::buffer_cast<char*>(b1)[0] = 'A';
   asio::buffer_cast<char*>(b1)[1] = 'B';
   asio::buffer_cast<char*>(b1)[2] = 'C';
@@ -76,7 +80,8 @@ BOOST_AUTO_TEST_CASE(consume)
 
 BOOST_AUTO_TEST_CASE(max_size)
 {
-  linear_buffer x1(0, 4);
+  linear_buffer b;
+  dynamic_linear_buffer<std::allocator<uint8_t>> x1(b, 4);
   BOOST_CHECK_EQUAL(4, x1.max_size());
 
   BOOST_CHECK_NO_THROW(x1.prepare(4));

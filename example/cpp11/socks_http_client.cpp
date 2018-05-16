@@ -55,7 +55,7 @@ private:
     };
 
     asioext::socks::async_greet(
-        socket_, auth_methods, 2, socks_buffer_,
+        socket_, auth_methods, 2, asioext::dynamic_buffer(socks_buffer_),
         [this] (const asioext::error_code& ec,
                 asioext::socks::auth_method chosen_method) {
       if (ec) {
@@ -66,9 +66,10 @@ private:
         establish_connection();
       } else if (chosen_method ==
                  asioext::socks::auth_method::username_password) {
-        asioext::socks::async_login(socket_, username_, password_,
-                                    socks_buffer_,
-                                    [this] (const asioext::error_code& ec) {
+        asioext::socks::async_login(
+            socket_, username_, password_,
+            asioext::dynamic_buffer(socks_buffer_),
+            [this] (const asioext::error_code& ec) {
           if (ec) {
             std::cout << "Error: " << ec << "\n";
             return;
@@ -81,9 +82,10 @@ private:
 
   void establish_connection()
   {
-    asioext::socks::async_execute(socket_, asioext::socks::command::connect,
-                                  server_, 80, socks_buffer_,
-                                  [this] (const asioext::error_code& ec) {
+    asioext::socks::async_execute(
+        socket_, asioext::socks::command::connect,
+        server_, 80, asioext::dynamic_buffer(socks_buffer_),
+        [this] (const asioext::error_code& ec) {
       handle_target_connect(ec);
     });
   }

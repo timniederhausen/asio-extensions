@@ -14,11 +14,10 @@
 
 #include "asioext/socks/error.hpp"
 #include "asioext/composed_operation.hpp"
-#include "asioext/linear_buffer.hpp"
+#include "asioext/bind_handler.hpp"
 
 #include "asioext/socks/detail/protocol.hpp"
 #include "asioext/detail/coroutine.hpp"
-#include "asioext/detail/bind_handler.hpp"
 #include "asioext/detail/move_support.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
@@ -34,7 +33,7 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 namespace detail {
 
-template <class Socket, class Handler>
+template <typename Socket, typename DynamicBuffer, typename Handler>
 class socks_sgreet_op
   : public composed_operation<Handler>
   , asio::coroutine
@@ -43,19 +42,27 @@ public:
   socks_sgreet_op(Handler& handler, Socket& socket,
                   const auth_method* auth_methods,
                   std::size_t num_auth_methods,
-                  linear_buffer& buffer)
+                  DynamicBuffer& buffer)
     : composed_operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler))
     , socket_(socket)
-    , buffer_(buffer)
+    , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
   {
-    if (!encode_sgreet_packet(auth_methods, num_auth_methods, buffer)) {
-      socket_.get_io_service().post(::asioext::detail::bind_handler(
+    const std::size_t size =
+        get_sgreet_packet_size(auth_methods, num_auth_methods);
+
+    if (0 == size) {
+      socket_.get_io_service().post(::asioext::bind_handler(
           this->handler_, asio::error::invalid_argument,
           auth_method::no_acceptable));
       return;
     }
 
-    asio::async_write(socket, buffer.data(),
+    asio::mutable_buffer buf = buffer_.prepare(size);
+    encode_sgreet_packet(auth_methods, num_auth_methods,
+                         asio::buffer_cast<uint8_t*>(buf));
+    buffer_.commit(size);
+
+    asio::async_write(socket, buffer_.data(),
                       ASIOEXT_MOVE_CAST(socks_sgreet_op)(*this));
   }
 
@@ -63,11 +70,11 @@ public:
 
 private:
   Socket& socket_;
-  linear_buffer& buffer_;
+  DynamicBuffer buffer_;
 };
 
-template <class Socket, class Handler>
-void socks_sgreet_op<Socket, Handler>::operator()(
+template <typename Socket, typename DynamicBuffer, typename Handler>
+void socks_sgreet_op<Socket, DynamicBuffer, Handler>::operator()(
     error_code ec, std::size_t bytes_transferred)
 {
   if (ec) {
@@ -111,7 +118,7 @@ void socks_sgreet_op<Socket, Handler>::operator()(
   }
 }
 
-template <class Socket, class Handler>
+template <typename Socket, typename DynamicBuffer, typename Handler>
 class socks_slogin_op
   : public composed_operation<Handler>
   , asio::coroutine
@@ -120,18 +127,26 @@ public:
   socks_slogin_op(Handler& handler, Socket& socket,
                   const std::string& username,
                   const std::string& password,
-                  linear_buffer& buffer)
+                  DynamicBuffer& buffer)
     : composed_operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler))
     , socket_(socket)
-    , buffer_(buffer)
+    , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
   {
-    if (!encode_slogin_packet(username, password, buffer)) {
-      socket_.get_io_service().post(::asioext::detail::bind_handler(
+    const std::size_t size =
+        get_slogin_packet_size(username, password);
+
+    if (0 == size) {
+      socket_.get_io_service().post(::asioext::bind_handler(
           this->handler_, asio::error::invalid_argument));
       return;
     }
 
-    asio::async_write(socket, buffer.data(),
+    asio::mutable_buffer buf = buffer_.prepare(size);
+    encode_slogin_packet(username, password,
+                         asio::buffer_cast<uint8_t*>(buf));
+    buffer_.commit(size);
+
+    asio::async_write(socket, buffer_.data(),
                       ASIOEXT_MOVE_CAST(socks_slogin_op)(*this));
   }
 
@@ -139,11 +154,11 @@ public:
 
 private:
   Socket& socket_;
-  linear_buffer& buffer_;
+  DynamicBuffer buffer_;
 };
 
-template <class Socket, class Handler>
-void socks_slogin_op<Socket, Handler>::operator()(
+template <typename Socket, typename DynamicBuffer, typename Handler>
+void socks_slogin_op<Socket, DynamicBuffer, Handler>::operator()(
     error_code ec, std::size_t bytes_transferred)
 {
   if (ec) {
@@ -185,7 +200,7 @@ void socks_slogin_op<Socket, Handler>::operator()(
   }
 }
 
-template <class Socket, class Handler>
+template <typename Socket, typename DynamicBuffer, typename Handler>
 class socks_sexec_op
   : public composed_operation<Handler>
   , asio::coroutine
@@ -196,18 +211,26 @@ public:
                  const asio::ip::tcp::endpoint& remote,
                  const std::string& remote_host,
                  uint16_t port,
-                 linear_buffer& buffer)
+                 DynamicBuffer& buffer)
     : composed_operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler))
     , socket_(socket)
-    , buffer_(buffer)
+    , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
   {
-    if (!encode_sexec_packet(cmd, remote, remote_host, port, buffer)) {
-      socket_.get_io_service().post(::asioext::detail::bind_handler(
+    const std::size_t size =
+        get_sexec_packet_size(cmd, remote, remote_host, port);
+
+    if (0 == size) {
+      socket_.get_io_service().post(::asioext::bind_handler(
           this->handler_, asio::error::invalid_argument));
       return;
     }
 
-    asio::async_write(socket, buffer.data(),
+    asio::mutable_buffer buf = buffer_.prepare(size);
+    encode_sexec_packet(cmd, remote, remote_host, port,
+                        asio::buffer_cast<uint8_t*>(buf));
+    buffer_.commit(size);
+
+    asio::async_write(socket, buffer_.data(),
                       ASIOEXT_MOVE_CAST(socks_sexec_op)(*this));
   }
 
@@ -215,13 +238,13 @@ public:
 
 private:
   Socket& socket_;
-  linear_buffer& buffer_;
+  DynamicBuffer buffer_;
   uint8_t address_type_;
   uint8_t first_address_byte_;
 };
 
-template <class Socket, class Handler>
-void socks_sexec_op<Socket, Handler>::operator()(
+template <typename Socket, typename DynamicBuffer, typename Handler>
+void socks_sexec_op<Socket, DynamicBuffer, Handler>::operator()(
     error_code ec, std::size_t bytes_transferred)
 {
   if (ec) {

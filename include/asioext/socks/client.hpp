@@ -31,6 +31,9 @@ ASIOEXT_NS_BEGIN
 
 namespace socks {
 
+/// @ingroup net_socks
+/// @{
+
 /// @brief Asynchronously perform a SOCKS 5 greeting with the remote
 /// SOCKS server.
 ///
@@ -42,7 +45,7 @@ namespace socks {
 /// needs to be a SOCKS 5 proxy.
 /// @param auth_methods Array containing the allowed authentication methods.
 /// @param num_auth_methods Number of authentication methods entries.
-/// @param buffer A linear_buffer that is used to buffer sent/received messages.
+/// @param buffer A DynamicBuffer that is used to buffer sent/received messages.
 /// @param handler The handler to be called when the greet operation
 /// completes. The function signature of the handler must be:
 /// @code
@@ -54,12 +57,12 @@ namespace socks {
 ///   auth_method chosen_method
 /// );
 /// @endcode
-template <class Socket, class GreetHandler>
+template <typename Socket, typename DynamicBuffer, typename GreetHandler>
 ASIOEXT_INITFN_RESULT_TYPE(GreetHandler, void(error_code, auth_method))
 async_greet(Socket& socket,
             const auth_method* auth_methods,
             std::size_t num_auth_methods,
-            linear_buffer& buffer,
+            ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
             ASIOEXT_MOVE_ARG(GreetHandler) handler);
 
 /// @brief Asynchronously attempt a login on the remote SOCKS 5 server.
@@ -83,12 +86,12 @@ async_greet(Socket& socket,
 ///   const error_code& error,
 /// );
 /// @endcode
-template <class Socket, class LoginHandler>
+template <typename Socket, typename DynamicBuffer, typename LoginHandler>
 ASIOEXT_INITFN_RESULT_TYPE(LoginHandler, void(error_code))
 async_login(Socket& socket,
             const std::string& username,
             const std::string& password,
-            linear_buffer& buffer,
+            ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
             ASIOEXT_MOVE_ARG(LoginHandler) handler);
 
 /// @brief Asynchronously attempt to execute the given command.
@@ -113,11 +116,11 @@ async_login(Socket& socket,
 ///   const error_code& error,
 /// );
 /// @endcode
-template <class Socket, class ExecuteHandler>
+template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
 ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
 async_execute(Socket& socket, command cmd,
               const asio::ip::tcp::endpoint& remote,
-              linear_buffer& buffer,
+              ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler);
 
 /// @brief Asynchronously attempt to execute the given command.
@@ -143,12 +146,14 @@ async_execute(Socket& socket, command cmd,
 ///   const error_code& error,
 /// );
 /// @endcode
-template <class Socket, class ExecuteHandler>
+template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
 ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
 async_execute(Socket& socket, command cmd,
               const std::string& remote, uint16_t port,
-              linear_buffer& buffer,
+              ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler);
+
+/// @}
 
 }
 

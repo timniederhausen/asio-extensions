@@ -33,6 +33,13 @@
 /// This module contains classes and non-member functions that provide
 /// commonly used functionality that is not (yet) provided by Asio.
 
+/// @ingroup net
+/// @defgroup net_socks SOCKS
+/// @brief SOCKS client implementation
+///
+/// This module contains functions to establish a SOCKS client session
+/// on a stream socket.
+
 /// @defgroup files Filesystem
 /// @brief Provide access to file data and metadata.
 ///
