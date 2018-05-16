@@ -33,7 +33,7 @@ public:
 
 const error_category& get_error_category() ASIOEXT_NOEXCEPT
 {
-  static const error_category_impl cat;
+  static const error_category_impl cat{};
   return cat;
 }
 

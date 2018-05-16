@@ -31,11 +31,13 @@ void invoke(Handler& handler, const Tuple& t, std::index_sequence<Is...>)
 template <typename Handler, typename... Args>
 class bound_handler
 {
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
   template <typename T, typename Executor>
   friend struct asio::associated_allocator;
 
   template <typename T, typename Allocator>
   friend struct asio::associated_executor;
+#endif
 
   template <typename Handler>
   friend void* asio_handler_allocate(std::size_t size,

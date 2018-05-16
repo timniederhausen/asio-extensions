@@ -125,7 +125,7 @@ public:
   /// After the move, @c other is an empty buffer with no allocated memory
   /// (as-if just default-constructed).
   basic_linear_buffer(basic_linear_buffer&& other) ASIOEXT_NOEXCEPT
-    : rep_(ASIOEXT_MOVE_CAST(allocator_and_buffer)(other.rep_))
+    : rep_(ASIOEXT_MOVE_CAST(representation_type)(other.rep_))
     , capacity_(other.capacity_)
     , size_(other.size_)
     , max_size_(other.max_size_)
