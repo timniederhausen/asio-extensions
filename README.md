@@ -14,6 +14,12 @@ It is compatible with standalone Asio, as well as the Boost version.
   * Asio's `*Stream` concepts (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
   * Querying/altering file metadata (size, permissions, attributes, file times)
 * Asynchronous file I/O with different implementations.
+* Utility functions for writing/reading files.
+
+**Networking:**
+
+* SOCKS 5 client library
+* Utility functions that simplify common operations (e.g. resolve and connect)
 
 *This is a very coarse overview of the project's features.
 The [documentation](http://timniederhausen.github.io/asio-extensions) has all the details.*

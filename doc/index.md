@@ -25,17 +25,21 @@ AsioExt's behavior can be customized by defining certain macros.
 See @ref buildopts for a full list of possible build options.
 
 Like Asio, AsioExt is header-only by default.
-However, it is also possible to build AsioExt as a separate compilation unit.
+However, it is also possible to build AsioExt as a separate compilation unit
+(by simply compiling a single additional `.cpp` file).
 
-Currently, AsioExt has support for CMake as well as GN.
+AsioExt ships with support for two different build systems (CMake, GN)
+and has been designed in such a way that its build scripts are easily
+re-usable.
 
 ## Supported platforms
 
 Currently, AsioExt is being tested on the following platforms:
 
+* Windows + Universal Windows
 * Linux
 * mac OS
-* Windows + Universal Windows
+* FreeBSD
 
 ## Dependencies
 

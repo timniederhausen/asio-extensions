@@ -24,6 +24,7 @@ ASIOEXT_NS_BEGIN
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 /// @ingroup compat
+/// @defgroup error Error handling
 /// @{
 
 /// @brief Typedef for the error_code class used by this library.

@@ -27,6 +27,7 @@ public:
       case error::login_failed: return "login_failed";
       case error::command_not_supported: return "command_not_supported";
     }
+    return "unknown";
   }
 };
 

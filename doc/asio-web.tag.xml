@@ -17,4 +17,8 @@
     <name>MutableBufferSequence</name>
     <filename>asio/reference/MutableBufferSequence</filename>
   </compound>
+  <compound kind="class">
+    <name>DynamicBuffer</name>
+    <filename>asio/reference/DynamicBuffer</filename>
+  </compound>
 </tagfile>

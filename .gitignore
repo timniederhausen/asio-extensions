@@ -6,3 +6,5 @@
 
 # GN output directories (development)
 /out*
+
+/node_modules

@@ -47,7 +47,7 @@ class hook_allocator;
 namespace detail {
 
 template <typename Handler, typename Allocator>
-struct hook_allocator_aux
+struct associated_allocator_aux
 {
   typedef Allocator type;
 
@@ -58,7 +58,7 @@ struct hook_allocator_aux
 };
 
 template <typename Handler, typename T>
-struct hook_allocator_aux<Handler, std::allocator<T> >
+struct associated_allocator_aux<Handler, std::allocator<T> >
 {
   typedef hook_allocator<T, Handler> type;
 
@@ -198,7 +198,7 @@ class associated_allocator
   typedef std::allocator<void> associated_allocator_type;
 #endif
 
-  typedef detail::hook_allocator_aux<Handler,
+  typedef detail::associated_allocator_aux<Handler,
       associated_allocator_type> helper_type;
 
 public:

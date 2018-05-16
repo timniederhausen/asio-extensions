@@ -21,22 +21,53 @@ ASIOEXT_NS_BEGIN
 
 namespace socks {
 
+/// @ingroup net_socks
+/// @{
+
+/// @brief SOCKS-specific error codes
 enum class error
 {
+  /// @brief No error.
   none = 0,
+
+  /// @brief SOCKS version mismatch between server and client.
+  ///
+  /// Used in case the client receives a packet with a different
+  // server major version.
   invalid_version,
+
+  /// @brief Server supports none of our authentication methods.
+  ///
+  /// Used in case the server rejects all of our proposed authentication
+  /// methods
+  ///
+  /// @see async_greet
   no_acceptable_auth_method,
+
+  /// @brief Authentication type version mismatch between client and server.
+  ///
+  /// The version of the agreed-on authentication scheme is different on
+  /// the server.
   invalid_auth_version,
+
+  /// @brief The server rejected our login attempt.
   login_failed,
+
+  /// @brief The SOCKS @c command we sent was rejected.
+  ///
+  /// The server doesn't understand the @c command we sent.
   command_not_supported,
 };
 
+/// @brief Get the @c error_category for @c error
 ASIOEXT_DECL const error_category& get_error_category() ASIOEXT_NOEXCEPT;
 
 inline error_code make_error_code(error e) ASIOEXT_NOEXCEPT
 {
   return error_code(static_cast<int>(e), get_error_category());
 }
+
+/// @}
 
 }
 
