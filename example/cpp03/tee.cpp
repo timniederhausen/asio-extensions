@@ -91,7 +91,6 @@ int main(int argc, const char* argv[])
   for (int i = 1; i != argc; ++i) {
     files[i - 1].reset(asioext::open(argv[i],
         asioext::open_flags::create_always | asioext::open_flags::access_write,
-        asioext::file_perms::create_default, asioext::file_attrs::none,
         ec).release());
     if (ec) {
       std::cerr << "Failed to open " << argv[i] << " with " << ec << '\n';

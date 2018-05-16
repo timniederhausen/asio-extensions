@@ -2,6 +2,8 @@
 /// Distributed under the Boost Software License, Version 1.0.
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include "asioext/open_args.hpp"
+
 #include "asioext/detail/posix_file_ops.hpp"
 #include "asioext/detail/chrono.hpp"
 #include "asioext/detail/error.hpp"
@@ -210,15 +212,8 @@ bool to_timeval(file_time_type t, Seconds& s,
   return false;
 }
 
-handle_type open(const char* path, open_flags flags,
-                 file_perms perms, file_attrs attrs,
-                 error_code& ec) ASIOEXT_NOEXCEPT
+int parse_open_flags(open_flags flags) ASIOEXT_NOEXCEPT
 {
-  if (!is_valid(flags)) {
-    ec = asio::error::invalid_argument;
-    return -1;
-  }
-
   int native_flags = 0;
   if ((flags & open_flags::create_new) != open_flags::none)
     native_flags = O_CREAT | O_EXCL;
@@ -237,22 +232,25 @@ handle_type open(const char* path, open_flags flags,
     case open_flags::access_read: native_flags |= O_RDONLY; break;
     case open_flags::access_write: native_flags |= O_WRONLY; break;
   }
+  return native_flags;
+}
 
-  mode_t mode = static_cast<mode_t>(perms & file_perms::all);
+handle_type open(const char* path, const open_args& args,
+                 error_code& ec) ASIOEXT_NOEXCEPT
+{
+  mode_t mode = static_cast<mode_t>(args.mode());
   while (true) {
-    handle_type fd = ::open(path, O_CLOEXEC | native_flags, mode);
+    handle_type fd = ::open(path, O_CLOEXEC | args.native_flags(), mode);
     if (fd != -1) {
       // Skip calling set_attributes() in case we don't support
       // attributes at all. TODO(tim): Fail in case attrs were requested?
 #if ASIOEXT_HAS_FILE_FLAGS
       // Unfortunately there's no way to atomically set file
       // flags as part of the open() call.
-      if (attrs != file_attrs::none) {
-        attributes(fd, attrs, file_attr_options::replace, ec);
-        if (ec) {
-          ::close(fd);
-          return -1;
-        }
+      if (args.attrs() != 0 && ::fchflags(fd, args.attrs()) != 0) {
+        set_error(ec, errno);
+        ::close(fd);
+        return -1;
       }
 #endif
 

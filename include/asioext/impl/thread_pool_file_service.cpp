@@ -127,44 +127,41 @@ void thread_pool_file_service::destroy(implementation_type& impl)
 
 void thread_pool_file_service::open(implementation_type& impl,
                                     const char* filename,
-                                    open_flags flags,
-                                    file_perms perms, file_attrs attrs,
+                                    const open_args& args,
                                     error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
     return;
   }
-  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec).release();
+  impl.handle_ = asioext::open(filename, args, ec).release();
 }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
 void thread_pool_file_service::open(implementation_type& impl,
                                     const wchar_t* filename,
-                                    open_flags flags,
-                                    file_perms perms, file_attrs attrs,
+                                    const open_args& args,
                                     error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
     return;
   }
-  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec).release();
+  impl.handle_ = asioext::open(filename, args, ec).release();
 }
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 void thread_pool_file_service::open(implementation_type& impl,
                                     const boost::filesystem::path& filename,
-                                    open_flags flags,
-                                    file_perms perms, file_attrs attrs,
+                                    const open_args& args,
                                     error_code& ec) ASIOEXT_NOEXCEPT
 {
   if (impl.handle_.is_open()) {
     ec = asio::error::already_open;
     return;
   }
-  impl.handle_ = asioext::open(filename, flags, perms, attrs, ec).release();
+  impl.handle_ = asioext::open(filename, args, ec).release();
 }
 #endif
 

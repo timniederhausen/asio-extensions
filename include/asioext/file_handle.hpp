@@ -172,7 +172,7 @@ public:
 
   /// @}
 
-  /// @name Positioning functions
+  /// @name File pointer functions
   /// @{
 
   /// @brief Get the current file position.

@@ -101,17 +101,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
 
   auto h = asioext::open(File::test_filename,
                          open_flags::access_read |
-                         open_flags::open_existing,
-                         asioext::file_perms::create_default,
-                         asioext::file_attrs::none, ec);
+                         open_flags::open_existing, ec);
   BOOST_REQUIRE(ec);
   BOOST_CHECK(!h.is_open());
 
   h = asioext::open(File::test_filename,
                     open_flags::access_read |
-                    open_flags::create_new,
-                    asioext::file_perms::create_default,
-                    asioext::file_attrs::none, ec);
+                    open_flags::create_new, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
 
@@ -119,17 +115,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
 
   h = asioext::open(File::test_filename,
                     open_flags::access_read |
-                    open_flags::create_new,
-                    asioext::file_perms::create_default,
-                    asioext::file_attrs::none, ec);
+                    open_flags::create_new, ec);
   BOOST_CHECK(!h.is_open());
   BOOST_CHECK(ec); // TODO: check for file_exists
 
   h = asioext::open(File::test_filename,
                     open_flags::access_read |
-                    open_flags::open_always,
-                    asioext::file_perms::create_default,
-                    asioext::file_attrs::none, ec);
+                    open_flags::open_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
 
@@ -137,9 +129,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
 
   h = asioext::open(File::test_filename,
                     open_flags::access_read |
-                    open_flags::open_existing,
-                    asioext::file_perms::create_default,
-                    asioext::file_attrs::none, ec);
+                    open_flags::open_existing, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
 
@@ -147,9 +137,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(creation_dispositions, File, file_types)
 
   h = asioext::open(File::test_filename,
                     open_flags::access_read |
-                    open_flags::create_always,
-                    asioext::file_perms::create_default,
-                    asioext::file_attrs::none, ec);
+                    open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_CHECK(h.is_open());
 }
@@ -185,9 +173,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
     File delete_guard;
     auto h = asioext::open(File::test_filename,
                            open_flags::access_write |
-                           open_flags::create_new,
-                           asioext::file_perms::create_default,
-                           asioext::file_attrs::none, ec);
+                           open_flags::create_new, ec);
     BOOST_REQUIRE(h.is_open());
     BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
     for (file_perms perms : permissions_to_test) {
@@ -198,11 +184,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
 
   for (file_perms perms : permissions_to_test) {
     test_file_rm_guard delete_guard(File::test_filename);
-    auto h = asioext::open(File::test_filename,
-                           open_flags::access_read |
-                           open_flags::create_new,
-                           perms,
-                           asioext::file_attrs::none, ec);
+    auto h = asioext::open(
+        File::test_filename,
+        open_args(open_flags::access_read | open_flags::create_new, perms),
+        ec);
 
     BOOST_REQUIRE(h.is_open());
     BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
@@ -219,11 +204,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permissions, File, file_types)
       asioext::file_perms::group_write |
       asioext::file_perms::others_write;
 
-  auto h = asioext::open(File::test_filename,
-                         open_flags::access_write |
-                         open_flags::create_new,
-                         asioext::file_perms::create_default & ~write_perms,
-                         asioext::file_attrs::none, ec);
+  auto h = asioext::open(
+      File::test_filename,
+      open_args(open_flags::access_write | open_flags::create_new,
+                file_perms::create_default & ~write_perms),
+      ec);
 
   BOOST_REQUIRE(h.is_open());
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
@@ -241,9 +226,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
   asioext::error_code ec;
 
 #if !defined(ASIOEXT_WINDOWS)
-  // Ensure the process' umask doesn't interfere with our permission tests.
-  scoped_umask umsk(0);
-
   static constexpr file_attrs attributes_to_test[] = {
 #ifdef UF_HIDDEN
     file_attrs::hidden,
@@ -277,9 +259,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
     File delete_guard;
     auto h = asioext::open(File::test_filename,
                            open_flags::access_write |
-                           open_flags::create_new,
-                           asioext::file_perms::create_default,
-                           asioext::file_attrs::none, ec);
+                           open_flags::create_new, ec);
     BOOST_REQUIRE(h.is_open());
     BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
     for (file_attrs attrs : attributes_to_test) {
@@ -294,11 +274,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(attributes, File, file_types)
 
   for (file_attrs attrs : attributes_to_test) {
     test_file_rm_guard delete_guard(File::test_filename);
-    auto h = asioext::open(File::test_filename,
-                           open_flags::access_write |
-                           open_flags::create_new,
-                           asioext::file_perms::create_default,
-                           attrs, ec);
+    auto h = asioext::open(
+        File::test_filename,
+        open_args(open_flags::access_write | open_flags::create_new,
+                  asioext::file_perms::create_default, attrs),
+        ec);
 
     BOOST_REQUIRE(h.is_open());
     BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);

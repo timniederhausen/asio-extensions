@@ -16,68 +16,60 @@
 
 ASIOEXT_NS_BEGIN
 
-unique_file_handle open(const char* filename, open_flags flags,
-                        file_perms perms, file_attrs attrs)
+unique_file_handle open(const char* filename, const open_args& args)
 {
   error_code ec;
-  unique_file_handle h = open(filename, flags, perms, attrs, ec);
+  unique_file_handle h = open(filename, args, ec);
   detail::throw_error(ec);
-  return ASIOEXT_MOVE_CAST(unique_file_handle)(h);
+  return h;
 }
 
-unique_file_handle open(const char* filename, open_flags flags,
-                        file_perms perms, file_attrs attrs,
+unique_file_handle open(const char* filename, const open_args& args,
                         error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
-  return unique_file_handle(detail::win_file_ops::open(filename, flags,
-                                                       perms, attrs, ec));
+  return unique_file_handle(detail::win_file_ops::open(filename, args, ec));
 #else
-  return unique_file_handle(detail::posix_file_ops::open(filename, flags,
-                                                         perms, attrs, ec));
+  return unique_file_handle(detail::posix_file_ops::open(filename, args, ec));
 #endif
 }
 
 #if defined(ASIOEXT_WINDOWS)
-unique_file_handle open(const wchar_t* filename, open_flags flags,
-                        file_perms perms, file_attrs attrs)
+unique_file_handle open(const wchar_t* filename, const open_args& args)
 {
   error_code ec;
-  unique_file_handle h(detail::win_file_ops::open(filename, flags,
-                                                  perms, attrs, ec));
+  const detail::win_file_ops::handle_type h =
+      detail::win_file_ops::open(filename, args, ec);
   detail::throw_error(ec);
-  return ASIOEXT_MOVE_CAST(unique_file_handle)(h);
+  return unique_file_handle(h);
 }
 
-unique_file_handle open(const wchar_t* filename, open_flags flags,
-                        file_perms perms, file_attrs attrs,
+unique_file_handle open(const wchar_t* filename, const open_args& args,
                         error_code& ec) ASIOEXT_NOEXCEPT
 {
-  return unique_file_handle(detail::win_file_ops::open(filename, flags,
-                                                       perms, attrs, ec));
+  return unique_file_handle(detail::win_file_ops::open(filename, args, ec));
 }
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 unique_file_handle open(const boost::filesystem::path& filename,
-                        open_flags flags, file_perms perms, file_attrs attrs)
+                        const open_args& args)
 {
   error_code ec;
-  unique_file_handle h = open(filename, flags, perms, attrs, ec);
+  unique_file_handle h = open(filename, args, ec);
   detail::throw_error(ec);
-  return ASIOEXT_MOVE_CAST(unique_file_handle)(h);
+  return h;
 }
 
 unique_file_handle open(const boost::filesystem::path& filename,
-                        open_flags flags, file_perms perms, file_attrs attrs,
-                        error_code& ec) ASIOEXT_NOEXCEPT
+                        const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
 {
 #if defined(ASIOEXT_WINDOWS)
-  return unique_file_handle(detail::win_file_ops::open(filename.c_str(), flags,
-                                                       perms, attrs, ec));
+  return unique_file_handle(detail::win_file_ops::open(
+      filename.c_str(), args, ec));
 #else
-  return unique_file_handle(detail::posix_file_ops::open(filename.c_str(), flags,
-                                                         perms, attrs, ec));
+  return unique_file_handle(detail::posix_file_ops::open(
+      filename.c_str(), args, ec));
 #endif
 }
 #endif

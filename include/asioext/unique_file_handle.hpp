@@ -212,7 +212,7 @@ public:
   /// the object is reset.
   ASIOEXT_DECL void reset(file_handle handle, error_code& ec) ASIOEXT_NOEXCEPT;
 
-  /// @name Positioning functions
+  /// @name File pointer functions
   /// @{
 
   /// @copydoc file_handle::position()

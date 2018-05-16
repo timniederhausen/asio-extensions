@@ -40,9 +40,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_write |
-                                 open_flags::create_always,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::create_always, ec);
   if (!ec)
     asio::write(file, buffers, ec);
 }
@@ -64,9 +62,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_write |
-                                 open_flags::create_always,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::create_always, ec);
   if (!ec)
     asio::write(file, buffers, ec);
 }
@@ -91,9 +87,7 @@ ASIOEXT_DETAIL_WRITEFILE_BUF_RET(ConstBufferSequence)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_write |
-                                 open_flags::create_always,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::create_always, ec);
   if (!ec)
     asio::write(file, buffers, ec);
 }

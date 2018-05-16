@@ -38,9 +38,7 @@ ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
-                                 open_flags::open_existing,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::open_existing, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -61,9 +59,7 @@ ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
-                                 open_flags::open_existing,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::open_existing, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -86,9 +82,7 @@ ASIOEXT_DETAIL_RF_RAW_RET(RawByteContainer)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
-                                 open_flags::open_existing,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::open_existing, ec);
   if (!ec)
     read_file(file.get(), c, ec);
 }
@@ -143,9 +137,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
-                                 open_flags::open_existing,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::open_existing, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -167,9 +159,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
-                                 open_flags::open_existing,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::open_existing, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }
@@ -194,9 +184,7 @@ ASIOEXT_DETAIL_RF_BUF_RET(MutableBufferSequence)
 {
   unique_file_handle file = open(filename,
                                  open_flags::access_read |
-                                 open_flags::open_existing,
-                                 file_perms::create_default,
-                                 file_attrs::none, ec);
+                                 open_flags::open_existing, ec);
   if (!ec)
     read_file(file.get(), buffers, ec);
 }

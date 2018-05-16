@@ -16,6 +16,7 @@
 #endif
 
 #include "asioext/file_handle.hpp"
+#include "asioext/open_args.hpp"
 #include "asioext/file_perms.hpp"
 #include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
@@ -119,16 +120,14 @@ public:
   /// Open a handle to the given file.
   ASIOEXT_DECL void open(implementation_type& impl,
                          const char* filename,
-                         open_flags flags,
-                         file_perms perms, file_attrs attrs,
+                         const open_args& args,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
   /// Open a handle to the given file.
   ASIOEXT_DECL void open(implementation_type& impl,
                          const wchar_t* filename,
-                         open_flags flags,
-                         file_perms perms, file_attrs attrs,
+                         const open_args& args,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 
@@ -136,8 +135,7 @@ public:
   /// Open a handle to the given file.
   ASIOEXT_DECL void open(implementation_type& impl,
                          const boost::filesystem::path& filename,
-                         open_flags flags,
-                         file_perms perms, file_attrs attrs,
+                         const open_args& args,
                          error_code& ec) ASIOEXT_NOEXCEPT;
 #endif
 

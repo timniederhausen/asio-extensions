@@ -44,9 +44,7 @@ BOOST_AUTO_TEST_CASE(ownership_transfer)
   asioext::error_code ec;
   auto fh = asioext::open(empty_filename,
                           asioext::open_flags::access_write |
-                          asioext::open_flags::create_always,
-                          asioext::file_perms::create_default,
-                          asioext::file_attrs::none, ec);
+                          asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   asioext::file_handle h = fh.release();
@@ -73,9 +71,7 @@ BOOST_AUTO_TEST_CASE(read_write)
   asioext::error_code ec;
   fh = asioext::open(test_filename,
                      asioext::open_flags::access_write |
-                     asioext::open_flags::create_always,
-                     asioext::file_perms::create_default,
-                     asioext::file_attrs::none, ec);
+                     asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, asio::write(fh, asio::buffer(test_data, 0)));
@@ -91,9 +87,7 @@ BOOST_AUTO_TEST_CASE(read_write)
 
   fh = asioext::open(test_filename,
                      asioext::open_flags::access_read |
-                     asioext::open_flags::open_existing,
-                     asioext::file_perms::create_default,
-                     asioext::file_attrs::none, ec);
+                     asioext::open_flags::open_existing, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   asio::mutable_buffers_1 empty_buffer2(nullptr, 0);
@@ -117,9 +111,7 @@ BOOST_AUTO_TEST_CASE(position)
   asioext::error_code ec;
   fh = asioext::open(test_filename,
                      asioext::open_flags::access_write |
-                     asioext::open_flags::create_always,
-                     asioext::file_perms::create_default,
-                     asioext::file_attrs::none, ec);
+                     asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.position());
@@ -138,9 +130,7 @@ BOOST_AUTO_TEST_CASE(seek)
   asioext::error_code ec;
   fh = open(test_filename,
             asioext::open_flags::access_write |
-            asioext::open_flags::create_always,
-            asioext::file_perms::create_default,
-            asioext::file_attrs::none, ec);
+            asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.seek(asioext::seek_origin::from_current, 0));
@@ -166,9 +156,7 @@ BOOST_AUTO_TEST_CASE(get_size)
   asioext::error_code ec;
   fh = asioext::open(test_filename,
                      asioext::open_flags::access_write |
-                     asioext::open_flags::create_always,
-                     asioext::file_perms::create_default,
-                     asioext::file_attrs::none, ec);
+                     asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.size());
@@ -187,9 +175,7 @@ BOOST_AUTO_TEST_CASE(set_size)
   asioext::error_code ec;
   fh = asioext::open(test_filename,
                      asioext::open_flags::access_write |
-                     asioext::open_flags::create_always,
-                     asioext::file_perms::create_default,
-                     asioext::file_attrs::none, ec);
+                     asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.size());
@@ -211,9 +197,7 @@ BOOST_AUTO_TEST_CASE(get_times)
   asioext::error_code ec;
   asioext::unique_file_handle fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
-    asioext::open_flags::create_always,
-    asioext::file_perms::create_default,
-    asioext::file_attrs::none, ec);
+    asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   file_times times1 = fh.times(ec);
@@ -235,9 +219,7 @@ BOOST_AUTO_TEST_CASE(set_times_auto)
   asioext::error_code ec;
   asioext::unique_file_handle fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
-    asioext::open_flags::create_always,
-    asioext::file_perms::create_default,
-    asioext::file_attrs::none, ec);
+    asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   const file_times times1 = fh.times(ec);
@@ -252,9 +234,7 @@ BOOST_AUTO_TEST_CASE(set_times_auto)
 
   fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
-    asioext::open_flags::open_existing,
-    asioext::file_perms::create_default,
-    asioext::file_attrs::none, ec);
+    asioext::open_flags::open_existing, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   char buffer2[20] = {0, };
@@ -264,9 +244,7 @@ BOOST_AUTO_TEST_CASE(set_times_auto)
 
   fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
-    asioext::open_flags::open_existing,
-    asioext::file_perms::create_default,
-    asioext::file_attrs::none, ec);
+    asioext::open_flags::open_existing, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   const file_times times2 = fh.times(ec);
@@ -287,9 +265,7 @@ BOOST_AUTO_TEST_CASE(set_times_manual)
   asioext::error_code ec;
   asioext::unique_file_handle fh = asioext::open(test_filename,
     asioext::open_flags::access_write |
-    asioext::open_flags::create_always,
-    asioext::file_perms::create_default,
-    asioext::file_attrs::none, ec);
+    asioext::open_flags::create_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   file_times times1 = fh.times(ec);

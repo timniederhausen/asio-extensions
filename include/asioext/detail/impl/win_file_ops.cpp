@@ -3,6 +3,7 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "asioext/open_flags.hpp"
+#include "asioext/open_args.hpp"
 
 #include "asioext/detail/win_file_ops.hpp"
 #include "asioext/detail/chrono.hpp"
@@ -77,65 +78,61 @@ file_attrs native_to_file_attrs(uint32_t native) ASIOEXT_NOEXCEPT
   return attrs;
 }
 
-bool parse_open_flags(create_file_args& args, open_flags flags,
-                      file_perms perms, file_attrs attrs) ASIOEXT_NOEXCEPT
+void parse_open_flags(open_flags flags, file_perms perms, file_attrs attrs,
+                      open_args& args) ASIOEXT_NOEXCEPT
 {
-  if (!is_valid(flags))
-    return false;
-
+  uint32_t creation_disposition;
   if ((flags & open_flags::create_new) != open_flags::none)
-    args.creation_disposition = CREATE_NEW;
+    creation_disposition = CREATE_NEW;
   else if ((flags & open_flags::create_always) != open_flags::none)
-    args.creation_disposition = CREATE_ALWAYS;
+    creation_disposition = CREATE_ALWAYS;
   else if ((flags & open_flags::open_existing) != open_flags::none)
-    args.creation_disposition = OPEN_EXISTING;
+    creation_disposition = OPEN_EXISTING;
   else if ((flags & open_flags::open_always) != open_flags::none)
-    args.creation_disposition = OPEN_ALWAYS;
+    creation_disposition = OPEN_ALWAYS;
   else if ((flags & open_flags::truncate_existing) != open_flags::none)
-    args.creation_disposition = TRUNCATE_EXISTING;
+    creation_disposition = TRUNCATE_EXISTING;
   else
-    args.creation_disposition = 0;
+    creation_disposition = 0;
 
-  args.desired_access = 0;
+  uint32_t desired_access = 0;
   if ((flags & open_flags::access_read) != open_flags::none)
-    args.desired_access |= GENERIC_READ;
+    desired_access |= GENERIC_READ;
   if ((flags & open_flags::access_write) != open_flags::none)
-    args.desired_access |= GENERIC_WRITE;
+    desired_access |= GENERIC_WRITE;
 
-  args.attrs = file_attrs_to_native(attrs);
+  uint32_t native_attrs = file_attrs_to_native(attrs);
 
   ASIOEXT_CONSTEXPR file_perms write_perms = file_perms::owner_write |
                                              file_perms::group_write |
                                              file_perms::others_write;
 
   if ((perms & write_perms) != file_perms::none)
-    args.attrs &= ~FILE_ATTRIBUTE_READONLY;
+    native_attrs &= ~FILE_ATTRIBUTE_READONLY;
   else
-    args.attrs |= FILE_ATTRIBUTE_READONLY;
+    native_attrs |= FILE_ATTRIBUTE_READONLY;
 
-  args.flags = 0;
+  uint32_t native_flags = 0;
   if ((flags & open_flags::internal_async) != open_flags::none)
-    args.flags |= FILE_FLAG_OVERLAPPED;
+    native_flags |= FILE_FLAG_OVERLAPPED;
 
   // TODO: FILE_SHARE_DELETE?
-  args.share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+  uint32_t share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
   if ((flags & open_flags::exclusive_read) != open_flags::none)
-    args.share_mode &= ~FILE_SHARE_READ;
+    share_mode &= ~FILE_SHARE_READ;
   if ((flags & open_flags::exclusive_write) != open_flags::none)
-    args.share_mode &= ~FILE_SHARE_WRITE;
-  return true;
+    share_mode &= ~FILE_SHARE_WRITE;
+
+  args.creation_disposition(creation_disposition);
+  args.desired_access(desired_access);
+  args.attrs(native_attrs);
+  args.flags(native_flags);
+  args.share_mode(share_mode);
 }
 
-handle_type open(const char* filename, open_flags flags,
-                 file_perms perms, file_attrs attrs,
+handle_type open(const char* filename, const open_args& args,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
-  create_file_args args;
-  if (!parse_open_flags(args, flags, perms, attrs)) {
-    ec = asio::error::invalid_argument;
-    return INVALID_HANDLE_VALUE;
-  }
-
 #if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES) || defined(ASIOEXT_WINDOWS_APP)
   detail::win_path p(filename, std::strlen(filename), ec);
   if (ec) return INVALID_HANDLE_VALUE;
@@ -145,21 +142,20 @@ handle_type open(const char* filename, open_flags flags,
   const handle_type h =
 # if defined(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES)
       ::CreateFileW(p.c_str(),
-                    args.desired_access, args.share_mode, NULL,
-                    args.creation_disposition, args.attrs | args.flags, NULL);
 # else
       ::CreateFileA(filename,
-                    args.desired_access, args.share_mode, NULL,
-                    args.creation_disposition, args.attrs | args.flags, NULL);
 # endif
+                    args.desired_access(), args.share_mode(), NULL,
+                    args.creation_disposition(),
+                    args.attrs() | args.flags(), NULL);
 #else
   CREATEFILE2_EXTENDED_PARAMETERS params = {};
   params.dwSize = sizeof(params);
-  params.dwFileAttributes = args.attrs;
-  params.dwFileFlags = args.flags;
+  params.dwFileAttributes = args.attrs();
+  params.dwFileFlags = args.flags();
   const handle_type h =
-      ::CreateFile2(p.c_str(), args.desired_access, args.share_mode,
-                    args.creation_disposition, &params);
+      ::CreateFile2(p.c_str(), args.desired_access(), args.share_mode(),
+                    args.creation_disposition(), &params);
 #endif
 
   if (h == INVALID_HANDLE_VALUE)
@@ -170,28 +166,22 @@ handle_type open(const char* filename, open_flags flags,
   return h;
 }
 
-handle_type open(const wchar_t* filename, open_flags flags,
-                 file_perms perms, file_attrs attrs,
+handle_type open(const wchar_t* filename, const open_args& args,
                  error_code& ec) ASIOEXT_NOEXCEPT
 {
-  create_file_args args;
-  if (!parse_open_flags(args, flags, perms, attrs)) {
-    ec = asio::error::invalid_argument;
-    return INVALID_HANDLE_VALUE;
-  }
-
 #if !defined(ASIOEXT_WINDOWS_APP)
   const handle_type h =
-      ::CreateFileW(filename, args.desired_access, args.share_mode, NULL,
-                    args.creation_disposition, args.attrs | args.flags, NULL);
+      ::CreateFileW(filename, args.desired_access(), args.share_mode(), NULL,
+                    args.creation_disposition(),
+                    args.attrs() | args.flags(), NULL);
 #else
   CREATEFILE2_EXTENDED_PARAMETERS params = {};
   params.dwSize = sizeof(params);
-  params.dwFileAttributes = args.attrs;
-  params.dwFileFlags = args.flags;
+  params.dwFileAttributes = args.attrs();
+  params.dwFileFlags = args.flags();
   const handle_type h =
-      ::CreateFile2(filename, args.desired_access, args.share_mode,
-                    args.creation_disposition, &params);
+      ::CreateFile2(filename, args.desired_access(), args.share_mode(),
+                    args.creation_disposition(), &params);
 #endif
 
   if (h != INVALID_HANDLE_VALUE)

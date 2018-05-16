@@ -22,33 +22,31 @@
 
 ASIOEXT_NS_BEGIN
 
+class open_args;
+
 namespace detail {
 namespace win_file_ops {
 
-// Pulling in windows.h/windef.h is certainly overkill.
+// Pulling in windows.h/windef.h for just one type is certainly overkill.
 // http://stackoverflow.com/questions/4121173/how-do-i-forward-declare-handle-win32
+// XXX This breaks with STRICT defined (which fortunately no one is doing).
 typedef void* handle_type;
-
-struct create_file_args;
 
 ASIOEXT_DECL void set_error(error_code& ec) ASIOEXT_NOEXCEPT;
 
 ASIOEXT_DECL uint32_t file_attrs_to_native(file_attrs attrs) ASIOEXT_NOEXCEPT;
 ASIOEXT_DECL file_attrs native_to_file_attrs(uint32_t native) ASIOEXT_NOEXCEPT;
 
-ASIOEXT_DECL bool parse_open_flags(create_file_args& args,
-                                   open_flags flags,
-                                   file_perms perms,
-                                   file_attrs attrs) ASIOEXT_NOEXCEPT;
+ASIOEXT_DECL void parse_open_flags(
+    open_flags flags, file_perms perms, file_attrs attrs,
+    open_args& args) ASIOEXT_NOEXCEPT;
 
 ASIOEXT_DECL handle_type open(const char* filename,
-                              open_flags flags,
-                              file_perms perms, file_attrs attrs,
+                              const open_args& args,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 
 ASIOEXT_DECL handle_type open(const wchar_t* filename,
-                              open_flags flags,
-                              file_perms perms, file_attrs attrs,
+                              const open_args& args,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 
 ASIOEXT_DECL void close(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT;

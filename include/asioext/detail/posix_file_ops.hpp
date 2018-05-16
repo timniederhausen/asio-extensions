@@ -29,6 +29,8 @@
 
 ASIOEXT_NS_BEGIN
 
+class open_args;
+
 namespace detail {
 namespace posix_file_ops {
 
@@ -39,8 +41,9 @@ ASIOEXT_DECL void set_error(error_code& ec, int e) ASIOEXT_NOEXCEPT;
 ASIOEXT_DECL uint32_t file_attrs_to_native(file_attrs attrs) ASIOEXT_NOEXCEPT;
 ASIOEXT_DECL file_attrs native_to_file_attrs(uint32_t native) ASIOEXT_NOEXCEPT;
 
-ASIOEXT_DECL handle_type open(const char* path, open_flags flags,
-                              file_perms perms, file_attrs attrs,
+ASIOEXT_DECL int parse_open_flags(open_flags flags) ASIOEXT_NOEXCEPT;
+
+ASIOEXT_DECL handle_type open(const char* path, const open_args& args,
                               error_code& ec) ASIOEXT_NOEXCEPT;
 
 ASIOEXT_DECL void close(handle_type fd, error_code& ec) ASIOEXT_NOEXCEPT;
