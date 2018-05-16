@@ -34,6 +34,16 @@
 # define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
 #endif
 
+#if (ASIOEXT_ASIO_VERSION >= 101100)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+#  include <boost/asio/associated_allocator.hpp>
+#  include <boost/asio/associated_executor.hpp>
+# else
+#  include <asio/associated_allocator.hpp>
+#  include <asio/associated_executor.hpp>
+# endif
+#endif
+
 ASIOEXT_NS_BEGIN
 
 /// @ingroup core

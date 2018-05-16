@@ -9,16 +9,11 @@
 #include "asioext/file_handle.hpp"
 #include "asioext/composed_operation.hpp"
 #include "asioext/error_code.hpp"
+#include "asioext/bind_handler.hpp"
 
 #include "asioext/detail/error.hpp"
 #include "asioext/detail/move_support.hpp"
 #include "asioext/detail/operation.hpp"
-
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/detail/bind_handler.hpp>
-#else
-# include <asio/detail/bind_handler.hpp>
-#endif
 
 ASIOEXT_NS_BEGIN
 
@@ -131,7 +126,7 @@ void read_some_op<MutableBufferSequence, Handler>::operator()()
   } else {
     bytes_transferred = handle_.read_some(buffers_, ec);
   }
-  this->get_executor().dispatch(asio::detail::bind_handler(
+  this->get_executor().dispatch(bind_handler(
       ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
 }
 
@@ -145,7 +140,7 @@ void write_some_op<ConstBufferSequence, Handler>::operator()()
   } else {
     bytes_transferred = handle_.write_some(buffers_, ec);
   }
-  this->get_executor().dispatch(asio::detail::bind_handler(
+  this->get_executor().dispatch(bind_handler(
       ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
 }
 
@@ -159,7 +154,7 @@ void read_some_at_op<MutableBufferSequence, Handler>::operator()()
   } else {
     bytes_transferred = handle_.read_some_at(offset_, buffers_, ec);
   }
-  this->get_executor().dispatch(asio::detail::bind_handler(
+  this->get_executor().dispatch(bind_handler(
       ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
 }
 
@@ -173,7 +168,7 @@ void write_some_at_op<ConstBufferSequence, Handler>::operator()()
   } else {
     bytes_transferred = handle_.write_some_at(offset_, buffers_, ec);
   }
-  this->get_executor().dispatch(asio::detail::bind_handler(
+  this->get_executor().dispatch(bind_handler(
       ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
 }
 

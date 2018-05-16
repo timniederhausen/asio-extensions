@@ -96,7 +96,7 @@ ASIOEXT_DECL void connect(asio::ip::tcp::socket::lowest_layer_type& socket,
 
 ///   // On success, an iterator denoting the successfully
 ///   // connected endpoint. Otherwise, the end iterator.
-///   Iterator iterator
+///   asio::ip::tcp::resolver::iterator iterator
 /// );
 /// @endcode
 template <typename ComposedConnectHandler>

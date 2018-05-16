@@ -7,6 +7,7 @@
 #define ASIOEXT_IMPL_CONNECT_HPP
 
 #include "asioext/composed_operation.hpp"
+#include "asioext/bind_handler.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # include <boost/asio/connect.hpp>
@@ -36,8 +37,9 @@ public:
     error_code ec;
     socket_.open(asio::ip::tcp::v4(), ec);
     if (ec) {
-      socket_.get_io_service().post(asio::detail::bind_handler(
-          this->handler_, ec, asio::ip::tcp::resolver::iterator()));
+      socket_.get_io_service().post(bind_handler(
+          ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec,
+          asio::ip::tcp::resolver::iterator()));
       return;
     }
     resolver_.async_resolve(q, ASIOEXT_MOVE_CAST(connect_op)(*this));
