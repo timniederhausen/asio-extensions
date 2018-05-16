@@ -34,6 +34,7 @@
 # define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
 # define ASIOEXT_DELETED = delete
 # define ASIOEXT_NOEXCEPT noexcept
+# define ASIOEXT_NOEXCEPT_IF(c) noexcept(c)
 # define ASIOEXT_HAS_ALIAS_TEMPLATES 1
 # define ASIOEXT_HAS_CONSTEXPR 1
 # define ASIOEXT_HAS_CONSTEXPR14
@@ -176,7 +177,7 @@
 #endif
 
 // ASIOEXT_NOEXCEPT_IF: Expands to 'noexcept(pred)' on supported compilers.
-#if !defined(ASIOEXT_NOEXCEPT)
+#if !defined(ASIOEXT_NOEXCEPT_IF)
 # if !defined(ASIOEXT_DISABLE_NOEXCEPT)
 #  if (BOOST_VERSION >= 105300)
 #   define ASIOEXT_NOEXCEPT_IF BOOST_NOEXCEPT_IF
