@@ -18,8 +18,9 @@ ASIOEXT_NS_BEGIN
 unique_file_handle duplicate(file_handle handle)
 {
   error_code ec;
-  close(ec);
+  unique_file_handle h = duplicate(handle, ec);
   detail::throw_error(ec);
+  return h;
 }
 
 unique_file_handle duplicate(file_handle handle,

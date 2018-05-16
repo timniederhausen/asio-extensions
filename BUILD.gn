@@ -128,6 +128,7 @@ source_set("asioext") {
       "include/asioext/impl/cancellation_token.cpp",
       "include/asioext/impl/chrono.cpp",
       "include/asioext/impl/connect.cpp",
+      "include/asioext/impl/duplicate.cpp",
       "include/asioext/impl/file_handle.cpp",
       "include/asioext/impl/open.cpp",
       "include/asioext/impl/open_flags.cpp",
