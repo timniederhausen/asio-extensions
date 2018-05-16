@@ -46,8 +46,84 @@
 
 ASIOEXT_NS_BEGIN
 
+namespace detail {
+
+template <typename Handler, typename Operation>
+class composed_op
+{
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
+  template <typename T, typename Executor>
+  friend struct asio::associated_allocator;
+
+  template <typename T, typename Allocator>
+  friend struct asio::associated_executor;
+#endif
+
+  template <typename Handler>
+  friend void* asio_handler_allocate(std::size_t size,
+                                     composed_op* this_handler)
+  {
+    return ASIOEXT_HANDLER_ALLOC_HELPERS_NS::allocate(
+        size, this_handler->handler_);
+  }
+
+  template <typename Handler>
+  friend void asio_handler_deallocate(void* pointer, std::size_t size,
+                                      composed_op* this_handler)
+  {
+    ASIOEXT_HANDLER_ALLOC_HELPERS_NS::deallocate(
+        pointer, size, this_handler->handler_);
+  }
+
+  template <typename Handler>
+  friend bool asio_handler_is_continuation(composed_op* this_handler)
+  {
+    return ASIOEXT_HANDLER_CONT_HELPERS_NS::is_continuation(
+        this_handler->handler_);
+  }
+
+  template <typename Function, typename Handler>
+  friend void asio_handler_invoke(Function& function,
+                                  composed_op* this_handler)
+  {
+    ASIOEXT_HANDLER_INVOKE_HELPERS_NS::invoke(
+        function, this_handler->handler_);
+  }
+
+  template <typename Function, typename Handler>
+  friend void asio_handler_invoke(const Function& function,
+                                  composed_op* this_handler)
+  {
+    ASIOEXT_HANDLER_INVOKE_HELPERS_NS::invoke(
+        function, this_handler->handler_);
+  }
+
+public:
+  template <typename Handler2, typename Operation2>
+  explicit composed_op(Handler2&& handler, Operation2&& op)
+    : handler_(std::forward<Handler2>(handler))
+    , op_(std::forward<Operation2>(op))
+  {
+    // ctor
+  }
+
+  template <typename... Args>
+  void operator()(Args&&... args)
+    ASIOEXT_NOEXCEPT_IF(noexcept(op_(ASIOEXT_MOVE_CAST(Handler)(handler_),
+                                     std::forward<Args>(args)...)))
+  {
+    op_(ASIOEXT_MOVE_CAST(Handler)(handler_), std::forward<Args>(args)...);
+  }
+
+private:
+  Handler handler_;
+  Operation op_;
+};
+
+}
+
 /// @ingroup core
-/// @brief Base class for composed operations.
+/// @brief (Deprecated.) Base class for composed operations.
 ///
 /// This class template is intended to be used as a base class for custom
 /// composed operation types that wrap a user-provided handler.
@@ -164,6 +240,77 @@ inline void asio_handler_invoke(const Function& function,
 }
 #endif
 
+/// @ingroup core
+/// @brief Adapt a function object to the ComposedOperation requirements.
+///
+/// This function binds the given function object to the specified handler,
+/// creating a new @c Handler that if invoked calls `op(...)` while also
+/// providing overloads for Asio's hooks that forward to the real @c handler's
+/// hooks (if implemented).
+///
+/// Implemented hooks:
+/// * `asio_handler_allocate()`
+/// * `asio_handler_deallocate()`
+/// * `asio_handler_is_continuation()`
+/// * `asio_handler_invoke()`
+/// * `asio::associated_allocator<>` (requires Asio 1.11.0+)
+/// * `asio::associated_executor<>` (requires Asio 1.11.0+)
+///
+/// @param handler The @c Handler object whose hooks you wish to use.
+/// @param op The function object that you wish to bind to the given handler.
+/// @returns A new @c Handler that retains the original handler's hooks/
+/// customization points but forwards invocations to `op` (with all arguments
+/// passed as-is).
+template <typename Handler, typename Operation>
+detail::composed_op<
+    typename std::decay<Handler>::type,
+    typename std::decay<Operation>::type
+> make_composed_operation(Handler&& handler, Operation&& op)
+{
+  return detail::composed_op<
+    typename std::decay<Handler>::type,
+    typename std::decay<Operation>::type
+  >(std::forward<Handler>(handler), std::forward<Operation>(op));
+}
+
 ASIOEXT_NS_END
+
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+namespace boost {
+# endif
+namespace asio {
+
+template <typename Handler, typename Operation, typename Allocator>
+struct associated_allocator<
+    asioext::detail::composed_op<Handler, Operation>, Allocator>
+{
+  typedef typename associated_allocator<Handler, Allocator>::type type;
+
+  static type get(const asioext::detail::composed_op<Handler, Operation>& h,
+                  const Allocator& a = Allocator()) ASIOEXT_NOEXCEPT
+  {
+    return associated_allocator<Handler, Allocator>::get(h.handler_, a);
+  }
+};
+
+template <typename Handler, typename Operation, typename Executor>
+struct associated_executor<
+    asioext::detail::composed_op<Handler, Operation>, Executor>
+{
+  typedef typename associated_executor<Handler, Executor>::type type;
+
+  static type get(const asioext::detail::composed_op<Handler, Operation>& h,
+                  const Executor& ex = Executor()) ASIOEXT_NOEXCEPT
+  {
+    return associated_executor<Handler, Executor>::get(h.handler_, ex);
+  }
+};
+
+}
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+}
+# endif
+#endif
 
 #endif

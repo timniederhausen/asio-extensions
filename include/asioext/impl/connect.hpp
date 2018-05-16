@@ -20,17 +20,14 @@ ASIOEXT_NS_BEGIN
 namespace detail {
 
 template <class Handler>
-class connect_op : public composed_operation<Handler>
+class connect_op
 {
 public:
   connect_op(Handler& handler,
              asio::ip::tcp::socket::lowest_layer_type& socket,
              asio::ip::tcp::resolver& resolver,
              const asio::ip::tcp::resolver::query& q)
-    : composed_operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler))
-    , socket_(socket)
-    , resolver_(resolver)
-    , state_(0)
+    : socket_(socket)
   {
     // Open the socket to give the caller something to close to cancel the
     // asynchronous operation.
@@ -38,40 +35,32 @@ public:
     socket_.open(asio::ip::tcp::v4(), ec);
     if (ec) {
       socket_.get_io_service().post(bind_handler(
-          ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec,
+          ASIOEXT_MOVE_CAST(Handler)(handler), ec,
           asio::ip::tcp::resolver::iterator()));
       return;
     }
-    resolver_.async_resolve(q, ASIOEXT_MOVE_CAST(connect_op)(*this));
+    resolver.async_resolve(q, asioext::make_composed_operation(
+        ASIOEXT_MOVE_CAST(Handler)(handler),
+        ASIOEXT_MOVE_CAST(connect_op)(*this)));
   }
 
-  void operator()(error_code ec, asio::ip::tcp::resolver::iterator iter);
+  void operator()(ASIOEXT_MOVE_ARG(Handler) handler,
+                  error_code ec, asio::ip::tcp::resolver::iterator iter);
 
 private:
   asio::ip::tcp::socket::lowest_layer_type& socket_;
-  asio::ip::tcp::resolver& resolver_;
-  int state_;
 };
 
 template <class Handler>
-void connect_op<Handler>::operator()(error_code ec,
+void connect_op<Handler>::operator()(ASIOEXT_MOVE_ARG(Handler) handler,
+                                     error_code ec,
                                      asio::ip::tcp::resolver::iterator iter)
 {
-  if (ec) {
-    this->handler_(ec, asio::ip::tcp::resolver::iterator());
+  if (!ec) {
+    asio::async_connect(socket_, iter, ASIOEXT_MOVE_CAST(Handler)(handler));
     return;
   }
-  switch (state_) {
-    case 0: {
-      state_ = 1;
-      asio::async_connect(socket_, iter, ASIOEXT_MOVE_CAST(connect_op)(*this));
-      return;
-    }
-    case 1: {
-      this->handler_(ec, iter);
-      return;
-    }
-  }
+  handler(ec, asio::ip::tcp::resolver::iterator());
 }
 
 }
@@ -96,41 +85,5 @@ async_connect(asio::ip::tcp::socket::lowest_layer_type& socket,
 }
 
 ASIOEXT_NS_END
-
-#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
-# if defined(ASIOEXT_USE_BOOST_ASIO)
-namespace boost {
-# endif
-namespace asio {
-
-template <typename Handler, typename Allocator>
-struct associated_allocator<asioext::detail::connect_op<Handler>, Allocator>
-{
-  typedef typename associated_allocator<Handler, Allocator>::type type;
-
-  static type get(const asioext::detail::connect_op<Handler>& h,
-                  const Allocator& a = Allocator()) ASIOEXT_NOEXCEPT
-  {
-    return associated_allocator<Handler, Allocator>::get(h.handler_, a);
-  }
-};
-
-template <typename Handler, typename Executor>
-struct associated_executor<asioext::detail::connect_op<Handler>, Executor>
-{
-  typedef typename associated_executor<Handler, Executor>::type type;
-
-  static type get(const asioext::detail::connect_op<Handler>& h,
-                  const Executor& ex = Executor()) ASIOEXT_NOEXCEPT
-  {
-    return associated_executor<Handler, Executor>::get(h.handler_, ex);
-  }
-};
-
-}
-# if defined(ASIOEXT_USE_BOOST_ASIO)
-}
-# endif
-#endif
 
 #endif
