@@ -367,7 +367,8 @@ private:
   template <typename Function>
   void reallocate(std::size_t cap, Function&& cb);
 
-  ASIOEXT_CONSTEXPR std::size_t calculate_capacity(std::size_t n) ASIOEXT_NOEXCEPT
+  ASIOEXT_CONSTEXPR std::size_t calculate_capacity(std::size_t n)
+      const ASIOEXT_NOEXCEPT
   {
     return capacity_ < max_size_ / 2 ?
         (std::max)(size_ + n, 2 * capacity_) :
