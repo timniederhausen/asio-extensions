@@ -2,12 +2,53 @@
 <tagfile>
   <compound kind="namespace">
     <name>asio</name>
-    <filename></filename>
+    <filename>asio/reference</filename>
     <class kind="class">asio::error_code</class>
+    <class kind="class">asio::async_result</class>
+    <class kind="class">asio::handler_type</class>
+    <class kind="class">asio::async_completion</class>
+    <class kind="class">asio::associated_allocator</class>
+    <class kind="class">asio::associated_executor</class>
   </compound>
   <compound kind="class">
     <name>asio::error_code</name>
     <filename>asio/reference/error_code</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::async_result</name>
+    <filename>asio/reference/async_result</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::handler_type</name>
+    <filename>asio/reference/handler_type</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::async_completion</name>
+    <filename>asio/reference/async_completion</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::associated_allocator</name>
+    <filename>asio/reference/associated_allocator</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::associated_executor</name>
+    <filename>asio/reference/associated_executor</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::asio_handler_allocate</name>
+    <filename>asio/reference/asio_handler_allocate</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::asio_handler_deallocate</name>
+    <filename>asio/reference/asio_handler_deallocate</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::asio_handler_is_continuation</name>
+    <filename>asio/reference/asio_handler_is_continuation</filename>
+  </compound>
+  <compound kind="class">
+    <name>asio::asio_handler_invoke</name>
+    <filename>asio/reference/asio_handler_invoke</filename>
   </compound>
   <compound kind="class">
     <name>ConstBufferSequence</name>

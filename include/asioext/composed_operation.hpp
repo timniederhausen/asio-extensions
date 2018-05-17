@@ -134,15 +134,20 @@ private:
 /// [async.reqmts.async.composed] inside the Networking TS.
 ///
 /// Implemented hooks:
-/// * asio_handler_allocate()
-/// * asio_handler_deallocate()
-/// * asio_handler_is_continuation()
-/// * asio_handler_invoke()
+/// * @ref asio::asio_handler_allocate()
+/// * @ref asio::asio_handler_deallocate()
+/// * @ref asio::asio_handler_is_continuation()
+/// * @ref asio::asio_handler_invoke()
 ///
-/// This class does **not** provide support for
-/// @c asio::associated_allocator<> and
-/// @c asio::associated_executor<> (Asio 1.11.0+). The user is required
-/// to manually specialize these templates in the asio namespace.
+/// This class does **not** provide support for:
+///
+/// * @ref asio::associated_allocator<> (Asio 1.11.0+)
+/// * @ref asio::associated_executor<> (Asio 1.11.0+)
+///
+/// The user is required to manually specialize these templates in the asio namespace.
+///
+/// <b>Note:</b> This is one of the reasons why @ref make_composed_operation is
+/// preferred.
 ///
 /// Example specializations:
 /// @code
@@ -175,11 +180,11 @@ private:
 /// }
 /// @endcode
 ///
-///
-/// @note This type's <code>operator()</code> is executed by the
-/// user-specified executor / invocation hook (see above).
-/// It is not suitable for operations that are to be executed
-/// in a service-provided context (e.g. a private io_service).
+/// @note Composed operations are executed by the original handler's
+/// user-specified executor / invocation hook (see above). <br>
+/// It is therefore not suitable for cases where your custom
+/// operation needs to execute in a specific way (e.g. when
+/// simulating an asynchronous operation using a private threadpool).
 template <typename Handler>
 class composed_operation
 {
@@ -237,27 +242,68 @@ inline void asio_handler_invoke(const Function& function,
 }
 #endif
 
+#if defined(ASIOEXT_IS_DOCUMENTATION)
 /// @ingroup core
 /// @brief Adapt a function object to the ComposedOperation requirements.
 ///
 /// This function binds the given function object to the specified handler,
-/// creating a new @c Handler that if invoked calls `op(...)` while also
-/// providing overloads for Asio's hooks that forward to the real @c handler's
-/// hooks (if implemented).
+/// creating a new @c Handler that retains the original handler's hooks/
+/// customization points but forwards calls to @c op. A rvalue-reference
+/// to the original handler is passed as first argument to @c op.
 ///
-/// Implemented hooks:
-/// * `asio_handler_allocate()`
-/// * `asio_handler_deallocate()`
-/// * `asio_handler_is_continuation()`
-/// * `asio_handler_invoke()`
-/// * `asio::associated_allocator<>` (requires Asio 1.11.0+)
-/// * `asio::associated_executor<>` (requires Asio 1.11.0+)
+/// @c op will be invoked by the following expression:
+/// @code
+/// op(std::move(handler), std::forward<Args>(args)...)
+/// @endcode
+/// where @c args are the arguments that the resulting handler
+/// has been called with.
+///
+/// The returned wrapper support the following customization points:
+/// * @ref asio::asio_handler_allocate()
+/// * @ref asio::asio_handler_deallocate()
+/// * @ref asio::asio_handler_is_continuation()
+/// * @ref asio::asio_handler_invoke()
+/// * @ref asio::associated_allocator<> (for Asio 1.11.0+)
+/// * @ref asio::associated_executor<> (for Asio 1.11.0+)
 ///
 /// @param handler The @c Handler object whose hooks you wish to use.
 /// @param op The function object that you wish to bind to the given handler.
 /// @returns A new @c Handler that retains the original handler's hooks/
-/// customization points but forwards invocations to `op` (with all arguments
-/// passed as-is).
+/// customization points but forwards invocations to `op`.
+///
+/// @par Example
+/// @code
+/// template <typename AsyncReadStream, typename AsyncWriteStream,
+///           typename MutableBufferSequence, typename Handler>
+/// asioext::async_result_t<Handler, void (asioext::error_code, std::size_t)>
+/// async_copy(AsyncReadStream& from, AsyncWriteStream& to,
+///            const MutableBufferSequence& buffers, Handler&& handler)
+/// {
+///   asioext::async_completion<
+///       Handler, void (asioext::error_code, std::size_t)> init(handler);
+///   auto op = [&to, buffers] (auto&& handler, asioext::error_code ec,
+///                             std::size_t size) {
+///     if (!ec)
+///       asio::async_write(to, buffers, std::move(handler));
+///     else
+///       handler(ec, size);
+///   };
+///   asio::async_read(from, buffers,
+///       asioext::make_composed_operation(std::move(init.completion_handler),
+///                                        std::move(op)));
+///   return init.result.get();
+/// }
+/// @endcode
+///
+/// @note Composed operations are executed by the original handler's
+/// user-specified executor / invocation hook (see above). <br>
+/// It is therefore not suitable for cases where your custom
+/// operation needs to execute in a specific way (e.g. when
+/// simulating an asynchronous operation using a private threadpool).
+template <typename Handler, typename Operation>
+implementation_defined make_composed_operation(Handler&& handler,
+                                               Operation&& op);
+#else
 template <typename Handler, typename Operation>
 detail::composed_op<
     typename std::decay<Handler>::type,
@@ -269,6 +315,7 @@ detail::composed_op<
     typename std::decay<Operation>::type
   >(std::forward<Handler>(handler), std::forward<Operation>(op));
 }
+#endif
 
 ASIOEXT_NS_END
 

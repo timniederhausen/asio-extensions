@@ -77,8 +77,8 @@ struct associated_allocator_aux<Handler, std::allocator<T> >
 /// Asio @c Handlers (before Asio 1.11.0+) use two hooks to allow memory
 /// allocation to be customized:
 ///
-/// * asio_handler_allocate()
-/// * asio_handler_deallocate()
+/// * `asio_handler_allocate()`
+/// * `asio_handler_deallocate()`
 ///
 /// This stateless allocator uses these hooks to allocate/free memory.
 /// @note The allocated memory's lifetime is dependent on the handler's

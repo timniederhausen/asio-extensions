@@ -32,8 +32,6 @@ ASIOEXT_NS_BEGIN
 /// If Boost.Asio is used (i.e. @ref ASIOEXT_USE_BOOST_ASIO is defined),
 /// this will be a typedef for @c boost::system::error_code.
 /// Otherwise this'll be a typedef for @c std::error_code.
-
-/// Either @c boost::system::error_code or @c std::error_code.
 typedef automatically_chosen error_code;
 
 /// Either @c boost::system::error_category or @c std::error_category.
