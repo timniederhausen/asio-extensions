@@ -8,10 +8,6 @@
 
 #include "asioext/detail/error.hpp"
 
-#ifdef ASIOEXT_HAS_MOVE
-# include <utility>
-#endif
-
 ASIOEXT_NS_BEGIN
 
 void thread_pool_file_service::thread_function::operator()()
@@ -64,7 +60,8 @@ void thread_pool_file_service::move_construct(
   impl.handle_ = other_impl.handle_;
   other_impl.handle_.clear();
 
-  impl.cancel_token_ = std::move(other_impl.cancel_token_);
+  impl.cancel_token_ =
+      ASIOEXT_MOVE_CAST(cancellation_token_source)(other_impl.cancel_token_);
 
   // Insert implementation into linked list of all implementations.
   detail::mutex::scoped_lock lock(mutex_);

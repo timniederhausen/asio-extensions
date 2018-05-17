@@ -4,9 +4,6 @@
 /// http://www.boost.org/LICENSE_1_0.txt)
 
 #include "asioext/cancellation_token.hpp"
-#include "asioext/open.hpp"
-
-#include "asioext/detail/error.hpp"
 
 ASIOEXT_NS_BEGIN
 
