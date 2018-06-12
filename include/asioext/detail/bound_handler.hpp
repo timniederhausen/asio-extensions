@@ -85,9 +85,10 @@ public:
   }
 
   void operator()()
-    ASIOEXT_NOEXCEPT_IF(noexcept(invoke(handler_, args_, args_indices_type{})))
+    ASIOEXT_NOEXCEPT_IF(noexcept(asioext::detail::invoke(
+          handler_, args_, args_indices_type{})))
   {
-    invoke(handler_, args_, args_indices_type{});
+    asioext::detail::invoke(handler_, args_, args_indices_type{});
   }
 
 private:
