@@ -20,15 +20,6 @@ ASIOEXT_NS_BEGIN
 namespace detail {
 namespace win_file_ops {
 
-struct create_file_args
-{
-  DWORD creation_disposition;
-  DWORD desired_access;
-  DWORD share_mode;
-  DWORD attrs;
-  DWORD flags;
-};
-
 // these two are not in the header because they use a Windows.h type
 ASIOEXT_DECL file_time_type filetime_to_chrono(FILETIME ft) ASIOEXT_NOEXCEPT
 {
