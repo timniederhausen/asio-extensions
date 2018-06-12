@@ -306,6 +306,14 @@ public:
   /// @param last Position of one past the last byte to remove.
   void erase(std::size_t first, std::size_t last);
 
+  /// @brief Ensure the buffer has at least the given capacity.
+  ///
+  /// This function ensures the buffer's capacity is at least @c min_cap.
+  ///
+  /// If the buffer is reallocated, all iterators and references
+  /// (including the `end()` iterator) are invalidated.
+  void reserve(std::size_t min_cap);
+
   /// @brief Resize the buffer.
   ///
   /// This function changes the buffer's size to @c new_size.

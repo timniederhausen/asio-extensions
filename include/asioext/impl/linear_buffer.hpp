@@ -87,6 +87,21 @@ void basic_linear_buffer<Allocator>::erase(std::size_t first, std::size_t last)
 }
 
 template <class Allocator>
+void basic_linear_buffer<Allocator>::reserve(std::size_t min_cap)
+{
+  if (min_cap > max_size_) {
+    std::length_error ex("basic_linear_buffer too long");
+    detail::throw_exception(ex);
+  }
+
+  if (min_cap > capacity_) {
+    reallocate(min_cap, [this] (uint8_t* new_buffer) {
+      std::memcpy(new_buffer, rep_.data_, size_);
+    });
+  }
+}
+
+template <class Allocator>
 void basic_linear_buffer<Allocator>::resize(std::size_t new_size)
 {
   if (new_size > max_size_) {
