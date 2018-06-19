@@ -50,9 +50,9 @@
 ///   * This includes support for Asio's `*Stream` type requirements
 ///     (*SyncReadStream*, *SyncRandomAccessReadDevice*, ...)
 ///   * as well as an asynchronous I/O interface for files (@ref asioext::basic_file),
-///     with several underlying implementations:
-///     * @ref asioext::thread_pool_file_service : Blocking I/O operations are performed on the
-///       thread-pool.
+///     with currently one implementations:
+///     * @ref asioext::thread_pool_file_service (Blocking I/O operations are performed on the
+///       thread-pool.)
 /// * Provide accessors and modifiers for file metadata, including:
 ///   * File size
 ///   * File permissions

@@ -26,16 +26,11 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup core
-/// @brief A dynamically sized contiguously stored buffer
+/// @brief Basic container-like wrapper around a dynamic size byte array.
 ///
-/// This class owns and manages a contiguous buffer that is divided
-/// into an input and output sequence.
-///
-/// @note Unlike Asio's @c DynamicBuffer this class owns the buffer
-/// it manages. Unless you are not interested in the data read/written and
-/// the buffer object can be destroyed once the operation finishes,
-/// it's not recommended to use this class with the
-/// @ref DynamicBuffer functions provided by Asio.
+/// This class templates manages a contiguously-stored array of bytes,
+/// allocating memory using the given allocator as needed. Individual bytes
+/// are accessible as `uint8_t` values.
 template <typename Allocator = std::allocator<uint8_t>>
 class basic_linear_buffer
 {
@@ -318,13 +313,17 @@ public:
   ///
   /// This function changes the buffer's size to @c new_size.
   ///
+  /// When growing the buffer, new bytes are not zero-initialized
+  /// (unlike e.g. <tt>std::vector<uint8_t></tt> which does initialize all
+  /// elements).
+  ///
   /// If the buffer is resized, all iterators and references
   /// (including the `end()` iterator) are invalidated.
   void resize(std::size_t new_size);
 
   /// @brief Clear the buffer.
   ///
-  /// Clears the buffer and resets it to zero size, without deallocating
+  /// Resets the buffer to a size of zero without deallocating
   /// the memory.
   void clear() ASIOEXT_NOEXCEPT
   {
