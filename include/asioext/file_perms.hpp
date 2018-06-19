@@ -118,8 +118,6 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perms)
 /// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
 enum class file_perm_options
 {
-  none = 0,
-
   /// Replace existing permissions.
   replace = 1 << 0,
 

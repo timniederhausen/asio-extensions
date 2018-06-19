@@ -353,16 +353,18 @@ void permissions(handle_type fd, file_perms perms, file_perm_options opts,
 
   // Quit early if the changed values are without effect (i.e. not implemented)
   if ((opts & (file_perm_options::add | file_perm_options::remove)) !=
-      file_perm_options::none && (perms & write_perms) == file_perms::none) {
+      static_cast<file_perm_options>(0) && (perms & write_perms) == file_perms::none) {
     ec = error_code();
     return;
   }
 
   FILE_BASIC_INFO info;
   if (::GetFileInformationByHandleEx(fd, FileBasicInfo, &info, sizeof(info))) {
-    if ((opts & file_perm_options::add) != file_perm_options::none)
+    if ((opts & file_perm_options::add) !=
+        static_cast<file_perm_options>(0))
       info.FileAttributes &= ~FILE_ATTRIBUTE_READONLY;
-    else if ((opts & file_perm_options::remove) != file_perm_options::none)
+    else if ((opts & file_perm_options::remove) !=
+             static_cast<file_perm_options>(0))
       info.FileAttributes |= FILE_ATTRIBUTE_READONLY;
     else if ((perms & write_perms) != file_perms::none)
       info.FileAttributes &= ~FILE_ATTRIBUTE_READONLY;
@@ -416,8 +418,8 @@ void attributes(handle_type fd, file_attrs attrs, file_attr_options opts,
 
   const uint32_t new_attrs = file_attrs_to_native(attrs);
   if ((opts & (file_attr_options::add | file_attr_options::remove)) !=
-      file_attr_options::none) {
-    if ((opts & file_attr_options::add) != file_attr_options::none)
+      static_cast<file_attr_options>(0)) {
+    if ((opts & file_attr_options::add) != static_cast<file_attr_options>(0))
       info.FileAttributes |= new_attrs;
     else
       info.FileAttributes &= ~new_attrs;

@@ -26,11 +26,9 @@ ASIOEXT_NS_BEGIN
 ///
 /// This enum represents file attributes. @c file_attrs meets the requirements
 /// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
-///
-/// @note The file's attributes are replaced if neither
-/// @ref file_attr_options::add nor @ref file_attr_options::remove has been set.
 enum class file_attrs : uint32_t
 {
+  /// The file has no attributes.
   none = 0,
 
   /// The file is hidden. It is typically not included in directory listings.
@@ -98,8 +96,6 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attrs)
 /// of [BitmaskType](http://en.cppreference.com/w/cpp/concept/BitmaskType).
 enum class file_attr_options
 {
-  none = 0,
-
   /// Replace all current attributes.
   replace = 1 << 0,
 

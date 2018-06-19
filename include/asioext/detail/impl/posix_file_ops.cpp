@@ -366,13 +366,13 @@ void permissions(handle_type fd, file_perms perms, file_perm_options opts,
 {
   mode_t mode = static_cast<mode_t>(perms & file_perms::all);
   if ((opts & (file_perm_options::add | file_perm_options::remove)) !=
-      file_perm_options::none) {
+      static_cast<file_perm_options>(0)) {
     struct stat st;
     if (::fstat(fd, &st) != 0) {
       set_error(ec, errno);
       return;
     }
-    if ((opts & file_perm_options::add) != file_perm_options::none)
+    if ((opts & file_perm_options::add) != static_cast<file_perm_options>(0))
       mode |= st.st_mode;
     else
       mode = st.st_mode & ~mode;
@@ -407,13 +407,13 @@ void attributes(handle_type fd, file_attrs attrs, file_attr_options opts,
 #if ASIOEXT_HAS_FILE_FLAGS
   uint32_t new_attrs = file_attrs_to_native(attrs);
   if ((opts & (file_attr_options::add | file_attr_options::remove)) !=
-      file_attr_options::none) {
+      static_cast<file_attr_options>(0)) {
     struct stat st;
     if (::fstat(fd, &st) != 0) {
       set_error(ec, errno);
       return;
     }
-    if ((opts & file_attr_options::add) != file_attr_options::none)
+    if ((opts & file_attr_options::add) != static_cast<file_attr_options>(0))
       new_attrs = st.st_flags | new_attrs;
     else
       new_attrs = st.st_flags & ~new_attrs;
