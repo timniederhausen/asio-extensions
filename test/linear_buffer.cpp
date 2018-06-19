@@ -105,9 +105,24 @@ BOOST_AUTO_TEST_CASE(max_size)
   BOOST_CHECK_EQUAL(asio::error::no_memory, ec);
 }
 
+#if defined(ASIOEXT_HAS_MOVE)
 BOOST_AUTO_TEST_CASE(move)
 {
+  linear_buffer a;
+  a.resize(5);
+  std::memcpy(a.data(), "HELLO", 5);
+  BOOST_REQUIRE_EQUAL(5, a.size());
+  BOOST_REQUIRE_GE(5, a.capacity());
+
+  linear_buffer b(std::move(a));
+  BOOST_REQUIRE_EQUAL(0, a.size());
+  BOOST_REQUIRE_EQUAL(0, a.capacity());
+  BOOST_REQUIRE_EQUAL(5, b.size());
+  BOOST_REQUIRE_GE(5, b.capacity());
+  BOOST_REQUIRE_EQUAL(std::string(reinterpret_cast<const char*>(b.data()), 5),
+                      "HELLO");
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 
