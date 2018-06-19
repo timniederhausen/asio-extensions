@@ -75,6 +75,11 @@ class bound_handler
         function, this_handler->handler_);
   }
 
+  typedef std::index_sequence_for<Args...> args_indices_type;
+
+  Handler handler_;
+  std::tuple<Args...> args_;
+
 public:
   template <typename Handler2, typename... Args2>
   explicit bound_handler(Handler2&& handler, Args2&&... args)
@@ -90,12 +95,6 @@ public:
   {
     asioext::detail::invoke(handler_, args_, args_indices_type{});
   }
-
-private:
-  typedef std::index_sequence_for<Args...> args_indices_type;
-
-  Handler handler_;
-  std::tuple<Args...> args_;
 };
 
 }

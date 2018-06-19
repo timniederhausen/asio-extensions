@@ -95,6 +95,9 @@ class composed_op
         function, this_handler->handler_);
   }
 
+  Handler handler_;
+  Operation op_;
+
 public:
   template <typename Handler2, typename Operation2>
   explicit composed_op(Handler2&& handler, Operation2&& op)
@@ -111,10 +114,6 @@ public:
   {
     op_(ASIOEXT_MOVE_CAST(Handler)(handler_), std::forward<Args>(args)...);
   }
-
-private:
-  Handler handler_;
-  Operation op_;
 };
 
 }
