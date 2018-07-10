@@ -61,8 +61,8 @@ public:
 
   /// @brief Determine if this open_args object is valid.
   ///
-  /// @returns @c true if this object contains only valid options,
-  /// @c false otherwise.
+  /// @returns @c true if this object contains only valid options
+  /// (i.e. no mutually exclusive options), @c false otherwise.
   ASIOEXT_CONSTEXPR bool is_valid() const ASIOEXT_NOEXCEPT
   {
 #if defined(ASIOEXT_WINDOWS)

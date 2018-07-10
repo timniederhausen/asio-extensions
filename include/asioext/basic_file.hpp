@@ -945,7 +945,7 @@ public:
   /// or std::vector.
   ///
   /// @warning Interleaving asynchronous reads with other operations that cause
-  /// the file position/pointer to change is undefined!
+  /// the file position/pointer to change leads to undefined behaviour!
   ///
   /// @note Starting multiple asynchronous reads is implementation-defined and
   /// not recommended. (A FileService might make additional gurantees, but is
@@ -1004,7 +1004,7 @@ public:
   /// std::vector.
   ///
   /// @warning Interleaving asynchronous writes with other operations that
-  /// cause the file position/pointer to change is undefined!
+  /// cause the file position/pointer to change leads to undefined behaviour!
   ///
   /// @note Starting multiple asynchronous writes is implementation-defined and
   /// not recommended. (A FileService might make additional gurantees, but is
