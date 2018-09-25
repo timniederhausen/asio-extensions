@@ -15,6 +15,8 @@
 # pragma once
 #endif
 
+#include "asioext/detail/is_raw_byte_container.hpp"
+
 #include <string>
 #include <vector>
 #include <type_traits>
@@ -64,10 +66,6 @@ struct is_raw_byte_container
   static const bool value;
 };
 #else
-template <class T>
-struct is_raw_byte_container : std::false_type
-{};
-
 template <class Traits, class Allocator>
 struct is_raw_byte_container<std::basic_string<char, Traits, Allocator> >
   : std::true_type

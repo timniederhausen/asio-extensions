@@ -16,6 +16,7 @@
 
 #include "asioext/error_code.hpp"
 #include "asioext/detail/buffer.hpp"
+#include "asioext/detail/is_raw_byte_container.hpp"
 #include "asioext/detail/move_support.hpp"
 #include "asioext/detail/cstdint.hpp"
 
@@ -38,6 +39,8 @@ public:
   typedef Allocator allocator_type;
   typedef std::allocator_traits<allocator_type> allocator_traits_type;
 
+  typedef std::size_t size_type;
+
   /// The type used to represent an iterator for the buffer's data.
   typedef uint8_t* iterator;
 
@@ -51,6 +54,12 @@ public:
   /// The type used to represent a const. reference to a single byte inside
   /// the buffer.
   typedef const uint8_t& const_reference;
+
+  /// The type used to represent a const object as a list of buffers.
+  typedef asio::const_buffers_1 const_buffers_type;
+
+  /// The type used to represent a non-const object as a list of buffers.
+  typedef asio::mutable_buffers_1 mutable_buffers_type;
 
   static_assert(std::is_same<typename allocator_type::value_type, uint8_t>::value,
                 "Allocator::value_type must be uint8_t");
@@ -67,7 +76,7 @@ public:
   {
   }
 
-  /// @brief Construct a dynamic buffer from an allocator.
+  /// @brief Construct a linear buffer from an allocator.
   ///
   /// The constructed basic_linear_buffer is empty and doesn't have
   /// any allocated memory.
@@ -81,7 +90,7 @@ public:
   {
   }
 
-  /// @brief Construct a dynamic buffer.
+  /// @brief Construct a linear buffer.
   ///
   /// @param initial_size The initial size that the buffer starts with.
   /// @param maximum_size Specifies a maximum size for the buffer, in bytes.
@@ -97,7 +106,7 @@ public:
     rep_.data_ = allocator_traits_type::allocate(rep_, initial_size);
   }
 
-  /// @brief Construct a dynamic buffer from an allocator.
+  /// @brief Construct a linear buffer from an allocator.
   ///
   /// @param a The allocator that shall be used to allocate the buffer's storage.
   /// @param initial_size The initial size that the buffer starts with.
@@ -115,7 +124,7 @@ public:
   }
 
 #ifdef ASIOEXT_HAS_MOVE
-  /// @brief Move-construct a dynamic buffer.
+  /// @brief Move-construct a linear buffer.
   ///
   /// After the move, @c other is an empty buffer with no allocated memory
   /// (as-if just default-constructed).
@@ -139,7 +148,7 @@ public:
   }
 
 #ifdef ASIOEXT_HAS_MOVE
-  /// @brief Move-assign a dynamic buffer.
+  /// @brief Move-assign a linear buffer.
   ///
   /// After the move, @c other is an empty buffer with no allocated memory
   /// (as-if just default-constructed).
@@ -152,7 +161,7 @@ public:
     return size_;
   }
 
-  /// @brief Get the maximum size of the dynamic buffer.
+  /// @brief Get the maximum size of the linear buffer.
   ///
   /// @returns The allowed maximum of the sum of the sizes of the input sequence
   /// and output sequence.
@@ -161,13 +170,19 @@ public:
     return max_size_;
   }
 
-  /// @brief Get the current capacity of the dynamic buffer.
+  /// @brief Get the current capacity of the linear buffer.
   ///
   /// @returns The current total capacity of the buffer, i.e. for both the input
   /// sequence and output sequence.
   std::size_t capacity() const ASIOEXT_NOEXCEPT
   {
     return capacity_;
+  }
+
+  /// @brief Determine if this linear buffer is empty.
+  bool empty() const ASIOEXT_NOEXCEPT
+  {
+    return 0 == size_;
   }
 
   /// @brief Get an iterator pointing at the buffer data beginning.
@@ -193,6 +208,32 @@ public:
 
   /// @brief Get a pointer to the buffer data beginning.
   const uint8_t* data() const ASIOEXT_NOEXCEPT { return rep_.data_; }
+
+  /// Get a list of buffers that represents this object's memory.
+  ///
+  /// @returns An object of type @c mutable_buffers_type that satisfies
+  /// MutableBufferSequence requirements, representing the memory in the
+  /// input sequence.
+  ///
+  /// @note The returned object is invalidated by any @c basic_linear_buffer
+  /// member function that causes a reallocation.
+  mutable_buffers_type as_buffers() ASIOEXT_NOEXCEPT
+  {
+    return mutable_buffers_type(rep_.data_, size_);
+  }
+
+  /// Get a list of buffers that represents this object's memory.
+  ///
+  /// @returns An object of type @c const_buffers_type that satisfies
+  /// ConstBufferSequence requirements, representing the memory in the
+  /// input sequence.
+  ///
+  /// @note The returned object is invalidated by any @c basic_linear_buffer
+  /// member function that causes a reallocation.
+  const_buffers_type as_buffers() const ASIOEXT_NOEXCEPT
+  {
+    return const_buffers_type(rep_.data_, size_);
+  }
 
   /// @brief Get a reference to a specific byte inside the buffer.
   ///
@@ -405,6 +446,10 @@ inline asio::mutable_buffers_1 buffer(basic_linear_buffer<Allocator>& b)
 /// @brief A linear buffer using the default allocator.
 typedef basic_linear_buffer<> linear_buffer;
 
+template <class Allocator>
+struct is_raw_byte_container<basic_linear_buffer<Allocator>> : std::true_type
+{};
+
 /// @ingroup core
 /// @brief Adapt a @c basic_linear_buffer to the DynamicBuffer requirements.
 template <typename Allocator>
@@ -474,7 +519,7 @@ public:
   /// Get a list of buffers that represents the input sequence.
   ///
   /// @returns An object of type @c mutable_buffers_type that satisfies
-  /// ConstBufferSequence requirements, representing the memory in the
+  /// MutableBufferSequence requirements, representing the memory in the
   /// input sequence.
   ///
   /// @note The returned object is invalidated by any @c dynamic_linear_buffer
