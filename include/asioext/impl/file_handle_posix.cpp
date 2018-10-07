@@ -53,7 +53,7 @@ uint64_t file_handle::size(error_code& ec) ASIOEXT_NOEXCEPT
   return detail::posix_file_ops::size(handle_, ec);
 }
 
-void file_handle::size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
+void file_handle::truncate(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
 {
   detail::posix_file_ops::size(handle_, new_size, ec);
 }

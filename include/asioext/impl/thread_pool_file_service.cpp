@@ -201,11 +201,11 @@ uint64_t thread_pool_file_service::size(implementation_type& impl,
   return impl.handle_.size(ec);
 }
 
-void thread_pool_file_service::size(implementation_type& impl,
-                                    uint64_t new_size,
-                                    error_code& ec) ASIOEXT_NOEXCEPT
+void thread_pool_file_service::truncate(implementation_type& impl,
+                                        uint64_t new_size,
+                                        error_code& ec) ASIOEXT_NOEXCEPT
 {
-  impl.handle_.size(new_size, ec);
+  impl.handle_.truncate(new_size, ec);
 }
 
 file_perms thread_pool_file_service::permissions(

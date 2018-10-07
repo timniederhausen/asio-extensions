@@ -175,8 +175,8 @@ public:
                              error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Set the file size.
-  ASIOEXT_DECL void size(implementation_type& impl, uint64_t new_size,
-                         error_code& ec) ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL void truncate(implementation_type& impl, uint64_t new_size,
+                             error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// Get the file permissions.
   ASIOEXT_DECL file_perms permissions(implementation_type& impl,

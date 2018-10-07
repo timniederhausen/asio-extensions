@@ -27,10 +27,11 @@
 ASIOEXT_NS_BEGIN
 
 /// @ingroup files_time
-/// @brief Container for various times associated with a file.
+/// @brief Container for various time points associated with a file.
 ///
-/// This struct contains all times commonly tied to a file.
-/// Not all of them might be available on all platforms.
+/// This struct contains several time points commonly associated
+/// with a file.
+/// The availability of the individual time points is platform-dependent.
 struct file_times
 {
   /// @brief The file's creation time.
@@ -260,7 +261,7 @@ public:
   /// @param new_size The new total size of the file (in bytes).
   ///
   /// @throws asio::system_error Thrown on failure.
-  ASIOEXT_DECL void size(uint64_t new_size);
+  ASIOEXT_DECL void truncate(uint64_t new_size);
 
   /// @brief Set the size of a file.
   ///
@@ -270,7 +271,7 @@ public:
   ///
   /// @param ec Set to indicate what error occurred. If no error occurred,
   /// the object is reset.
-  ASIOEXT_DECL void size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL void truncate(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT;
 
   /// @brief Get the file's current access permissions.
   ///

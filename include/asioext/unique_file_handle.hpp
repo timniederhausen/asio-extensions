@@ -258,16 +258,16 @@ public:
     return handle_.size(ec);
   }
 
-  /// @copydoc file_handle::size(uint64_t)
-  void size(uint64_t new_size)
+  /// @copydoc file_handle::truncate(uint64_t)
+  void truncate(uint64_t new_size)
   {
-    handle_.size(new_size);
+    handle_.truncate(new_size);
   }
 
-  /// @copydoc file_handle::size(uint64_t,error_code&)
-  void size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
+  /// @copydoc file_handle::truncate(uint64_t,error_code&)
+  void truncate(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    handle_.size(new_size, ec);
+    handle_.truncate(new_size, ec);
   }
 
   /// @copydoc file_handle::permissions()

@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(get_size)
   BOOST_REQUIRE_EQUAL(test_data_size, fh.size());
 }
 
-BOOST_AUTO_TEST_CASE(set_size)
+BOOST_AUTO_TEST_CASE(truncate)
 {
   test_file_rm_guard rguard1(test_filename);
 
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(set_size)
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 
   BOOST_REQUIRE_EQUAL(0, fh.size());
-  fh.size(128, ec);
+  fh.truncate(128, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_REQUIRE_EQUAL(128, fh.size());
   BOOST_REQUIRE_EQUAL(0, fh.position());

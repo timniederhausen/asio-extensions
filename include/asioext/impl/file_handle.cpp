@@ -49,10 +49,10 @@ uint64_t file_handle::size()
   return s;
 }
 
-void file_handle::size(uint64_t new_size)
+void file_handle::truncate(uint64_t new_size)
 {
   error_code ec;
-  size(new_size, ec);
+  truncate(new_size, ec);
   detail::throw_error(ec, "set_size");
 }
 

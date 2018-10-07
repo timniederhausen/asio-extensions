@@ -491,18 +491,18 @@ public:
     return this->get_service().size(this->get_implementation(), ec);
   }
 
-  /// @copydoc file_handle::size(uint64_t)
-  void size(uint64_t new_size)
+  /// @copydoc file_handle::truncate(uint64_t)
+  void truncate(uint64_t new_size)
   {
     error_code ec;
-    this->get_service().size(this->get_implementation(), new_size, ec);
+    this->get_service().truncate(this->get_implementation(), new_size, ec);
     detail::throw_error(ec);
   }
 
-  /// @copydoc file_handle::size(uint64_t,error_code&)
-  void size(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
+  /// @copydoc file_handle::truncate(uint64_t,error_code&)
+  void truncate(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().size(this->get_implementation(), new_size, ec);
+    this->get_service().truncate(this->get_implementation(), new_size, ec);
   }
 
   /// @copydoc file_handle::permissions()
