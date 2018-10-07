@@ -99,7 +99,7 @@ public:
                             (std::numeric_limits<std::size_t>::max)())
     : rep_()
     , capacity_(initial_size)
-    , size_(0)
+    , size_(initial_size)
     , max_size_((std::min)(allocator_traits_type::max_size(rep_),
                            maximum_size))
   {
@@ -116,12 +116,15 @@ public:
                             (std::numeric_limits<std::size_t>::max)())
     : rep_(a)
     , capacity_(initial_size)
-    , size_(0)
+    , size_(initial_size)
     , max_size_((std::min)(allocator_traits_type::max_size(rep_),
                            maximum_size))
   {
     rep_.data_ = allocator_traits_type::allocate(rep_, initial_size);
   }
+
+  /// @brief Copy-construct a linear buffer.
+  basic_linear_buffer(const basic_linear_buffer& other);
 
 #ifdef ASIOEXT_HAS_MOVE
   /// @brief Move-construct a linear buffer.
@@ -146,6 +149,9 @@ public:
     if (rep_.data_)
       allocator_traits_type::deallocate(rep_, rep_.data_, capacity_);
   }
+
+  /// @brief Copy-assign a linear buffer.
+  basic_linear_buffer& operator=(const basic_linear_buffer& other);
 
 #ifdef ASIOEXT_HAS_MOVE
   /// @brief Move-assign a linear buffer.
@@ -478,12 +484,14 @@ public:
         (std::numeric_limits<std::size_t>::max)()) ASIOEXT_NOEXCEPT
     : data_(b)
     , size_(data_.size())
-    , max_size_(maximum_size)
+    , max_size_(std::min(b.max_size(), maximum_size))
   {
   }
 
-#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+#if defined(ASIOEXT_HAS_MOVE)
   /// @brief Move-construct a dynamic buffer.
+  ///
+  /// The moved-from object should no longer be used afterwards.
   dynamic_linear_buffer(dynamic_linear_buffer&& other) ASIOEXT_NOEXCEPT
     : data_(other.data_)
     , size_(other.size_)

@@ -13,6 +13,36 @@
 
 ASIOEXT_NS_BEGIN
 
+template <typename Allocator>
+basic_linear_buffer<Allocator>::basic_linear_buffer(
+    const basic_linear_buffer& other)
+  : rep_()
+  , capacity_(other.size_)
+  , size_(other.size_)
+  , max_size_(other.max_size_)
+{
+  rep_.data_ = allocator_traits_type::allocate(rep_, other.size_);
+  std::memcpy(rep_.data_, other.rep_.data_, size_);
+}
+
+template <typename Allocator>
+basic_linear_buffer<Allocator>& basic_linear_buffer<Allocator>::operator=(
+    const basic_linear_buffer& other)
+{
+  const size_type n = other.size_;
+  if (n > max_size_) {
+    std::length_error ex("basic_linear_buffer too long");
+    detail::throw_exception(ex);
+  }
+
+  if (n > capacity_)
+    reallocate(calculate_capacity(n), [this] (uint8_t* new_buffer) {});
+
+  std::memcpy(rep_.data_, other.rep_.data_, n);
+  size_ = n;
+  return *this;
+}
+
 #ifdef ASIOEXT_HAS_MOVE
 template <class Allocator>
 basic_linear_buffer<Allocator>& basic_linear_buffer<Allocator>::operator=(

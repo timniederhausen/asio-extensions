@@ -6,26 +6,69 @@ ASIOEXT_NS_BEGIN
 
 BOOST_AUTO_TEST_SUITE(asioext_linear_buffer)
 
-typedef dynamic_linear_buffer<std::allocator<uint8_t>> dynbuf_type;
-
-BOOST_AUTO_TEST_CASE(empty)
+BOOST_AUTO_TEST_CASE(basic_construction)
 {
   linear_buffer x1;
   BOOST_CHECK_EQUAL(0, x1.size());
   BOOST_CHECK_EQUAL(0, x1.capacity());
+
+  linear_buffer x2(16, 64);
+  BOOST_CHECK_EQUAL(16, x2.size());
+  BOOST_CHECK_LE(5, x2.capacity());
+  BOOST_CHECK_EQUAL(64, x2.max_size());
 }
+
+BOOST_AUTO_TEST_CASE(copy)
+{
+  linear_buffer a;
+  a.resize(5);
+  std::memcpy(a.data(), "HELLO", 5);
+  BOOST_REQUIRE_EQUAL(5, a.size());
+  BOOST_REQUIRE_LE(5, a.capacity());
+
+  linear_buffer b(a);
+  BOOST_REQUIRE_EQUAL(5, b.size());
+  BOOST_REQUIRE_LE(5, b.capacity());
+  BOOST_REQUIRE_EQUAL(std::string(reinterpret_cast<const char*>(b.data()), 5),
+                      "HELLO");
+}
+
+#if defined(ASIOEXT_HAS_MOVE)
+BOOST_AUTO_TEST_CASE(move)
+{
+  linear_buffer a;
+  a.resize(5);
+  std::memcpy(a.data(), "HELLO", 5);
+  BOOST_REQUIRE_EQUAL(5, a.size());
+  BOOST_REQUIRE_LE(5, a.capacity());
+
+  linear_buffer b(std::move(a));
+  BOOST_REQUIRE_EQUAL(0, a.size());
+  BOOST_REQUIRE_EQUAL(0, a.capacity());
+  BOOST_REQUIRE_EQUAL(5, b.size());
+  BOOST_REQUIRE_LE(5, b.capacity());
+  BOOST_REQUIRE_EQUAL(std::string(reinterpret_cast<const char*>(b.data()), 5),
+                      "HELLO");
+}
+#endif
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(asioext_dynamic_linear_buffer)
+
+typedef dynamic_linear_buffer<std::allocator<uint8_t>> dynbuf_type;
 
 BOOST_AUTO_TEST_CASE(prepare_commit)
 {
-  linear_buffer b;
-  dynbuf_type x1(b);
+  linear_buffer a;
+  dynbuf_type x1(a);
   dynbuf_type::mutable_buffers_type b1 = x1.prepare(2);
   asio::buffer_cast<char*>(b1)[0] = 'A';
   asio::buffer_cast<char*>(b1)[1] = 'B';
   x1.commit(2);
 
   BOOST_REQUIRE_EQUAL(2, x1.size());
-  BOOST_REQUIRE_GE(2, x1.capacity());
+  BOOST_REQUIRE_LE(2, x1.capacity());
   BOOST_REQUIRE_EQUAL('A', asio::buffer_cast<const char*>(x1.data())[0]);
   BOOST_REQUIRE_EQUAL('B', asio::buffer_cast<const char*>(x1.data())[1]);
 
@@ -58,8 +101,8 @@ BOOST_AUTO_TEST_CASE(prepare_commit)
 
 BOOST_AUTO_TEST_CASE(consume)
 {
-  linear_buffer b;
-  dynbuf_type x1(b);
+  linear_buffer a;
+  dynbuf_type x1(a);
   dynbuf_type::mutable_buffers_type b1 = x1.prepare(4);
   asio::buffer_cast<char*>(b1)[0] = 'A';
   asio::buffer_cast<char*>(b1)[1] = 'B';
@@ -80,8 +123,8 @@ BOOST_AUTO_TEST_CASE(consume)
 
 BOOST_AUTO_TEST_CASE(max_size)
 {
-  linear_buffer b;
-  dynamic_linear_buffer<std::allocator<uint8_t>> x1(b, 4);
+  linear_buffer a;
+  dynbuf_type x1(a, 4);
   BOOST_CHECK_EQUAL(4, x1.max_size());
 
   BOOST_CHECK_NO_THROW(x1.prepare(4));
@@ -108,19 +151,11 @@ BOOST_AUTO_TEST_CASE(max_size)
 #if defined(ASIOEXT_HAS_MOVE)
 BOOST_AUTO_TEST_CASE(move)
 {
-  linear_buffer a;
-  a.resize(5);
-  std::memcpy(a.data(), "HELLO", 5);
-  BOOST_REQUIRE_EQUAL(5, a.size());
-  BOOST_REQUIRE_GE(5, a.capacity());
-
-  linear_buffer b(std::move(a));
-  BOOST_REQUIRE_EQUAL(0, a.size());
-  BOOST_REQUIRE_EQUAL(0, a.capacity());
-  BOOST_REQUIRE_EQUAL(5, b.size());
-  BOOST_REQUIRE_GE(5, b.capacity());
-  BOOST_REQUIRE_EQUAL(std::string(reinterpret_cast<const char*>(b.data()), 5),
-                      "HELLO");
+  linear_buffer a(16, 64);
+  dynbuf_type x1(a);
+  dynbuf_type x2(std::move(x1));
+  BOOST_CHECK_EQUAL(16, x2.size());
+  BOOST_CHECK_EQUAL(64, x2.max_size());
 }
 #endif
 
