@@ -26,39 +26,52 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 namespace detail {
 
-ASIOEXT_DECL std::size_t get_sgreet_packet_size(
-    const auth_method* auth_methods,
-    std::size_t num_auth_methods);
+// SOCKS v4a
 
-ASIOEXT_DECL std::size_t get_slogin_packet_size(
-    const std::string& username,
-    const std::string& password);
-
-ASIOEXT_DECL std::size_t get_slogin_packet_size(
-    const std::string& username,
-    const std::string& password);
-
-ASIOEXT_DECL std::size_t get_sexec_packet_size(
-    command cmd,
+ASIOEXT_DECL std::size_t get_exec_packet_size(
     const asio::ip::tcp::endpoint& remote,
-    const std::string& remote_host, uint16_t port);
+    const std::string& remote_host,
+    const std::string& user_id) ASIOEXT_NOEXCEPT;
 
-ASIOEXT_DECL void encode_sgreet_packet(
-    const auth_method* auth_methods,
-    std::size_t num_auth_methods,
-    uint8_t* out);
-
-ASIOEXT_DECL void encode_slogin_packet(
-    const std::string& username,
-    const std::string& password,
-    uint8_t* out);
-
-ASIOEXT_DECL void encode_sexec_packet(
+ASIOEXT_DECL void encode_exec_packet(
     command cmd,
     const asio::ip::tcp::endpoint& remote,
     const std::string& remote_host,
     uint16_t port,
-    uint8_t* out);
+    const std::string& user_id,
+    uint8_t* out) ASIOEXT_NOEXCEPT;
+
+// SOCKS v5
+
+ASIOEXT_DECL std::size_t get_greet_packet_size(
+    const auth_method* auth_methods,
+    std::size_t num_auth_methods) ASIOEXT_NOEXCEPT;
+
+ASIOEXT_DECL std::size_t get_login_packet_size(
+    const std::string& username,
+    const std::string& password) ASIOEXT_NOEXCEPT;
+
+ASIOEXT_DECL std::size_t get_exec_packet_size(
+    command cmd,
+    const asio::ip::tcp::endpoint& remote,
+    const std::string& remote_host, uint16_t port) ASIOEXT_NOEXCEPT;
+
+ASIOEXT_DECL void encode_greet_packet(
+    const auth_method* auth_methods,
+    std::size_t num_auth_methods,
+    uint8_t* out) ASIOEXT_NOEXCEPT;
+
+ASIOEXT_DECL void encode_login_packet(
+    const std::string& username,
+    const std::string& password,
+    uint8_t* out) ASIOEXT_NOEXCEPT;
+
+ASIOEXT_DECL void encode_exec_packet(
+    command cmd,
+    const asio::ip::tcp::endpoint& remote,
+    const std::string& remote_host,
+    uint16_t port,
+    uint8_t* out) ASIOEXT_NOEXCEPT;
 
 }
 }

@@ -34,7 +34,7 @@ enum class command : uint8_t
   /// Establish and proxy a TCP connection to the specified target host.
   connect = 1,
 
-  /// Bind to the specified port and listen for connections.
+  /// Bind to the specified port and listen for TCP connections.
   bind = 2,
 
   /// Associate an UDP port.
@@ -44,11 +44,14 @@ enum class command : uint8_t
 /// @brief SOCKS versions
 ///
 /// This enum contains constants representing
-/// the different SOCKS versions.
+/// the different SOCKS versions supported by this library.
 enum class version : uint8_t
 {
-  v4,
-  v5,
+  /// SOCKS4a
+  v4a = 4,
+
+  /// SOCKS5
+  v5 = 5,
 };
 
 /// @brief SOCKS login authentication methods.

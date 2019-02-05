@@ -33,37 +33,41 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 namespace detail {
 
+// SOCKS v4
+
 template <typename Socket, typename DynamicBuffer, typename Handler>
-class socks_sgreet_op : asio::coroutine
+class v4_exec_op : asio::coroutine
 {
 public:
-  socks_sgreet_op(Handler& handler, Socket& socket,
-                  const auth_method* auth_methods,
-                  std::size_t num_auth_methods,
-                  DynamicBuffer& buffer)
+  v4_exec_op(Handler& handler, Socket& socket,
+             command cmd,
+             const asio::ip::tcp::endpoint& remote,
+             const std::string& remote_host,
+             uint16_t port,
+             const std::string& user_id,
+             DynamicBuffer& buffer)
     : socket_(socket)
     , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
   {
     const std::size_t size =
-        get_sgreet_packet_size(auth_methods, num_auth_methods);
+        get_exec_packet_size(remote, remote_host, user_id);
 
     if (0 == size) {
       socket_.get_io_service().post(asioext::bind_handler(
-          ASIOEXT_MOVE_CAST(Handler)(handler), asio::error::invalid_argument,
-          auth_method::no_acceptable));
+          ASIOEXT_MOVE_CAST(Handler)(handler), asio::error::invalid_argument));
       return;
     }
 
     asio::mutable_buffer buf = buffer_.prepare(size);
-    encode_sgreet_packet(auth_methods, num_auth_methods,
-                         asio::buffer_cast<uint8_t*>(buf));
+    encode_exec_packet(cmd, remote, remote_host, port,
+                       asio::buffer_cast<uint8_t*>(buf));
     buffer_.commit(size);
 
     asio::async_write(
         socket, buffer_.data(),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_sgreet_op)(*this)));
+            ASIOEXT_MOVE_CAST(exec_op)(*this)));
   }
 
   void operator()(ASIOEXT_MOVE_ARG(Handler) handler, error_code ec,
@@ -75,7 +79,97 @@ private:
 };
 
 template <typename Socket, typename DynamicBuffer, typename Handler>
-void socks_sgreet_op<Socket, DynamicBuffer, Handler>::operator()(
+void v4_exec_op<Socket, DynamicBuffer, Handler>::operator()(
+    ASIOEXT_MOVE_ARG(Handler) handler, error_code ec, std::size_t size)
+{
+  if (ec) {
+    handler(ec);
+    return;
+  }
+
+  ASIOEXT_CORO_REENTER (this) {
+    buffer_.consume(size);
+    ASIOEXT_CORO_YIELD asio::async_read(
+        socket_, buffer_.prepare(1 + 1 + 2 + 4),
+        asioext::make_composed_operation(
+            ASIOEXT_MOVE_CAST(Handler)(handler),
+            ASIOEXT_MOVE_CAST(v4_exec_op)(*this)));
+
+    if (ec) {
+      handler(ec);
+      return;
+    }
+
+    buffer_.commit(1 + 1 + 2 + 4);
+
+    const uint8_t* data = asio::buffer_cast<const uint8_t*>(buffer_.data());
+
+    const uint8_t null_byte = data[0];
+    const uint8_t status_code = data[1];
+
+    buffer_.consume(1 + 1 + 2 + 4);
+
+    if (null_byte != 0) {
+      handler(error::invalid_version);
+      return;
+    }
+
+    switch (status_code) {
+      case 0x5a: /* no error */ break;
+      case 0x5b: ec = error::generic; break;
+      case 0x5c: ec = error::identd_not_reachable; break;
+      case 0x5d: ec = error::login_failed; break;
+    }
+
+    handler(ec);
+  }
+}
+
+// SOCKS v5
+
+template <typename Socket, typename DynamicBuffer, typename Handler>
+class v5_greet_op : asio::coroutine
+{
+public:
+  v5_greet_op(Handler& handler, Socket& socket,
+              const auth_method* auth_methods,
+              std::size_t num_auth_methods,
+              DynamicBuffer& buffer)
+    : socket_(socket)
+    , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
+  {
+    const std::size_t size =
+        get_greet_packet_size(auth_methods, num_auth_methods);
+
+    if (0 == size) {
+      socket_.get_io_service().post(asioext::bind_handler(
+          ASIOEXT_MOVE_CAST(Handler)(handler), asio::error::invalid_argument,
+          auth_method::no_acceptable));
+      return;
+    }
+
+    asio::mutable_buffer buf = buffer_.prepare(size);
+    encode_greet_packet(auth_methods, num_auth_methods,
+                        asio::buffer_cast<uint8_t*>(buf));
+    buffer_.commit(size);
+
+    asio::async_write(
+        socket, buffer_.data(),
+        asioext::make_composed_operation(
+            ASIOEXT_MOVE_CAST(Handler)(handler),
+            ASIOEXT_MOVE_CAST(v5_greet_op)(*this)));
+  }
+
+  void operator()(ASIOEXT_MOVE_ARG(Handler) handler, error_code ec,
+                  std::size_t size = 0);
+
+private:
+  Socket& socket_;
+  DynamicBuffer buffer_;
+};
+
+template <typename Socket, typename DynamicBuffer, typename Handler>
+void v5_greet_op<Socket, DynamicBuffer, Handler>::operator()(
     ASIOEXT_MOVE_ARG(Handler) handler, error_code ec, std::size_t size)
 {
   if (ec) {
@@ -89,7 +183,7 @@ void socks_sgreet_op<Socket, DynamicBuffer, Handler>::operator()(
         socket_, buffer_.prepare(2),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_sgreet_op)(*this)));
+            ASIOEXT_MOVE_CAST(v5_greet_op)(*this)));
 
     if (ec) {
       handler(ec, auth_method::no_acceptable);
@@ -120,18 +214,18 @@ void socks_sgreet_op<Socket, DynamicBuffer, Handler>::operator()(
 }
 
 template <typename Socket, typename DynamicBuffer, typename Handler>
-class socks_slogin_op : asio::coroutine
+class v5_login_op : asio::coroutine
 {
 public:
-  socks_slogin_op(Handler& handler, Socket& socket,
-                  const std::string& username,
-                  const std::string& password,
-                  DynamicBuffer& buffer)
+  v5_login_op(Handler& handler, Socket& socket,
+              const std::string& username,
+              const std::string& password,
+              DynamicBuffer& buffer)
     : socket_(socket)
     , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
   {
     const std::size_t size =
-        get_slogin_packet_size(username, password);
+        get_login_packet_size(username, password);
 
     if (0 == size) {
       socket_.get_io_service().post(asioext::bind_handler(
@@ -140,14 +234,14 @@ public:
     }
 
     asio::mutable_buffer buf = buffer_.prepare(size);
-    encode_slogin_packet(username, password,
-                         asio::buffer_cast<uint8_t*>(buf));
+    encode_login_packet(username, password,
+                        asio::buffer_cast<uint8_t*>(buf));
     buffer_.commit(size);
 
     asio::async_write(socket, buffer_.data(),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_slogin_op)(*this)));
+            ASIOEXT_MOVE_CAST(v5_login_op)(*this)));
   }
 
   void operator()(ASIOEXT_MOVE_ARG(Handler) handler, error_code ec,
@@ -159,7 +253,7 @@ private:
 };
 
 template <typename Socket, typename DynamicBuffer, typename Handler>
-void socks_slogin_op<Socket, DynamicBuffer, Handler>::operator()(
+void v5_login_op<Socket, DynamicBuffer, Handler>::operator()(
     ASIOEXT_MOVE_ARG(Handler) handler, error_code ec, std::size_t size)
 {
   if (ec) {
@@ -173,7 +267,7 @@ void socks_slogin_op<Socket, DynamicBuffer, Handler>::operator()(
         socket_, buffer_.prepare(2),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_slogin_op)(*this)));
+            ASIOEXT_MOVE_CAST(v5_login_op)(*this)));
 
     if (ec) {
       handler(ec);
@@ -204,20 +298,20 @@ void socks_slogin_op<Socket, DynamicBuffer, Handler>::operator()(
 }
 
 template <typename Socket, typename DynamicBuffer, typename Handler>
-class socks_sexec_op : asio::coroutine
+class v5_exec_op : asio::coroutine
 {
 public:
-  socks_sexec_op(Handler& handler, Socket& socket,
-                 command cmd,
-                 const asio::ip::tcp::endpoint& remote,
-                 const std::string& remote_host,
-                 uint16_t port,
-                 DynamicBuffer& buffer)
+  v5_exec_op(Handler& handler, Socket& socket,
+             command cmd,
+             const asio::ip::tcp::endpoint& remote,
+             const std::string& remote_host,
+             uint16_t port,
+             DynamicBuffer& buffer)
     : socket_(socket)
     , buffer_(ASIOEXT_MOVE_CAST(DynamicBuffer)(buffer))
   {
     const std::size_t size =
-        get_sexec_packet_size(cmd, remote, remote_host, port);
+        get_exec_packet_size(cmd, remote, remote_host, port);
 
     if (0 == size) {
       socket_.get_io_service().post(asioext::bind_handler(
@@ -226,15 +320,15 @@ public:
     }
 
     asio::mutable_buffer buf = buffer_.prepare(size);
-    encode_sexec_packet(cmd, remote, remote_host, port,
-                        asio::buffer_cast<uint8_t*>(buf));
+    encode_exec_packet(cmd, remote, remote_host, port,
+                       asio::buffer_cast<uint8_t*>(buf));
     buffer_.commit(size);
 
     asio::async_write(
         socket, buffer_.data(),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_sexec_op)(*this)));
+            ASIOEXT_MOVE_CAST(v5_exec_op)(*this)));
   }
 
   void operator()(ASIOEXT_MOVE_ARG(Handler) handler, error_code ec,
@@ -248,7 +342,7 @@ private:
 };
 
 template <typename Socket, typename DynamicBuffer, typename Handler>
-void socks_sexec_op<Socket, DynamicBuffer, Handler>::operator()(
+void v5_exec_op<Socket, DynamicBuffer, Handler>::operator()(
     ASIOEXT_MOVE_ARG(Handler) handler, error_code ec, std::size_t size)
 {
   if (ec) {
@@ -262,7 +356,7 @@ void socks_sexec_op<Socket, DynamicBuffer, Handler>::operator()(
         socket_, buffer_.prepare(5),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_sexec_op)(*this)));
+            ASIOEXT_MOVE_CAST(v5_exec_op)(*this)));
 
     if (ec) {
       handler(ec);
@@ -324,7 +418,7 @@ void socks_sexec_op<Socket, DynamicBuffer, Handler>::operator()(
         socket_, buffer_.prepare(size + 2),
         asioext::make_composed_operation(
             ASIOEXT_MOVE_CAST(Handler)(handler),
-            ASIOEXT_MOVE_CAST(socks_sexec_op)(*this)));
+            ASIOEXT_MOVE_CAST(v5_exec_op)(*this)));
 
     if (ec) {
       handler(ec);

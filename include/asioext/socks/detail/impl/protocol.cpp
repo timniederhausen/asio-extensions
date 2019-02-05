@@ -10,8 +10,65 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 namespace detail {
 
-std::size_t get_sgreet_packet_size(const auth_method* auth_methods,
-                                   std::size_t num_auth_methods)
+// SOCKS v4a
+
+std::size_t get_exec_packet_size(const asio::ip::tcp::endpoint& remote,
+                                 const std::string& remote_host,
+                                 const std::string& user_id) ASIOEXT_NOEXCEPT
+{
+  if (remote_host.empty() && remote.protocol() != asio::ip::tcp::v4())
+    return 0;
+
+  std::size_t size = 1 + 1 + 2 + 4;
+  size += user_id.size() + 1;
+
+  if (!remote_host.empty())
+    size += remote_host.size() + 1;
+
+  return size;
+}
+
+void encode_exec_packet(command cmd,
+                        const asio::ip::tcp::endpoint& remote,
+                        const std::string& remote_host, uint16_t port,
+                        const std::string& user_id,
+                        uint8_t* out) ASIOEXT_NOEXCEPT
+{
+  *out++ = 4; // SOCKS version
+
+  *out++ = static_cast<uint8_t>(cmd);
+
+  *out++ = static_cast<uint8_t>((port >> 8) & 0xff);
+  *out++ = static_cast<uint8_t>((port >> 0) & 0xff);
+
+  if (remote_host.empty()) {
+    const asio::ip::address_v4::bytes_type addr =
+        remote.address().to_v4().to_bytes();
+    for (std::size_t i = 0; i != addr.size(); ++i)
+      *out++ = addr[i];
+  } else {
+    // 0.0.0.1 - an invalid IP
+    *out++ = 0;
+    *out++ = 0;
+    *out++ = 0;
+    *out++ = 1;
+  }
+
+  std::memcpy(out, user_id.data(), user_id.size());
+  out += user_id.size();
+  *out++ = '\0';
+
+  if (!remote_host.empty()) {
+    std::memcpy(out, remote_host.data(), remote_host.size());
+    out += remote_host.size();
+    *out++ = '\0';
+  }
+}
+
+// SOCKS v5
+
+std::size_t get_greet_packet_size(const auth_method* auth_methods,
+                                  std::size_t num_auth_methods) ASIOEXT_NOEXCEPT
 {
   if (num_auth_methods > 255)
     return 0;
@@ -19,8 +76,8 @@ std::size_t get_sgreet_packet_size(const auth_method* auth_methods,
   return num_auth_methods + 2;
 }
 
-std::size_t get_slogin_packet_size(const std::string& username,
-                                   const std::string& password)
+std::size_t get_login_packet_size(const std::string& username,
+                                  const std::string& password) ASIOEXT_NOEXCEPT
 {
   const std::size_t username_size = username.size();
   const std::size_t password_size = password.size();
@@ -30,10 +87,10 @@ std::size_t get_slogin_packet_size(const std::string& username,
   return username_size + password_size + 3;
 }
 
-std::size_t get_sexec_packet_size(command cmd,
-                                  const asio::ip::tcp::endpoint& remote,
-                                  const std::string& remote_host,
-                                  uint16_t port)
+std::size_t get_exec_packet_size(command cmd,
+                                 const asio::ip::tcp::endpoint& remote,
+                                 const std::string& remote_host,
+                                 uint16_t port) ASIOEXT_NOEXCEPT
 {
   const std::size_t remote_host_size = remote_host.size();
   if (remote_host_size > 255)
@@ -52,39 +109,39 @@ std::size_t get_sexec_packet_size(command cmd,
   return size;
 }
 
-void encode_sgreet_packet(const auth_method* auth_methods,
-                          std::size_t num_auth_methods,
-                          uint8_t* buf)
+void encode_greet_packet(const auth_method* auth_methods,
+                         std::size_t num_auth_methods,
+                         uint8_t* out) ASIOEXT_NOEXCEPT
 {
-  *buf++ = 5;
-  *buf++ = static_cast<uint8_t>(num_auth_methods);
+  *out++ = 5; // SOCKS version
+  *out++ = static_cast<uint8_t>(num_auth_methods);
   for (std::size_t i = 0; i != num_auth_methods; ++i)
-    *buf++ = static_cast<uint8_t>(auth_methods[i]);
+    *out++ = static_cast<uint8_t>(auth_methods[i]);
 }
 
-void encode_slogin_packet(const std::string& username,
-                          const std::string& password,
-                          uint8_t* buf)
+void encode_login_packet(const std::string& username,
+                         const std::string& password,
+                         uint8_t* out) ASIOEXT_NOEXCEPT
 {
   const std::size_t username_size = username.size();
   const std::size_t password_size = password.size();
 
-  *buf++ = 1;
+  *out++ = 1; // Authentication version
 
-  *buf++ = static_cast<uint8_t>(username_size);
-  std::memcpy(buf, username.data(), username_size);
-  buf += username_size;
+  *out++ = static_cast<uint8_t>(username_size);
+  std::memcpy(out, username.data(), username_size);
+  out += username_size;
 
-  *buf++ = static_cast<uint8_t>(password_size);
-  std::memcpy(buf, password.data(), password_size);
-  buf += password_size;
+  *out++ = static_cast<uint8_t>(password_size);
+  std::memcpy(out, password.data(), password_size);
+  out += password_size;
 }
 
-void encode_sexec_packet(command cmd,
-                         const asio::ip::tcp::endpoint& remote,
-                         const std::string& remote_host,
-                         uint16_t port,
-                         uint8_t* buf)
+void encode_exec_packet(command cmd,
+                        const asio::ip::tcp::endpoint& remote,
+                        const std::string& remote_host,
+                        uint16_t port,
+                        uint8_t* out) ASIOEXT_NOEXCEPT
 {
   const std::size_t remote_host_size = remote_host.size();
 
@@ -98,35 +155,35 @@ void encode_sexec_packet(command cmd,
   else
     size += 16;
 
-  *buf++ = 5;
-  *buf++ = static_cast<uint8_t>(cmd);
-  *buf++ = 0;
+  *out++ = 5; // SOCKS version
+  *out++ = static_cast<uint8_t>(cmd);
+  *out++ = 0;
 
   if (!remote_host.empty()) {
-    *buf++ = 3;
+    *out++ = 3;
 
-    *buf++ = static_cast<uint8_t>(remote_host_size);
-    std::memcpy(buf, remote_host.data(), remote_host_size);
-    buf += remote_host_size;
+    *out++ = static_cast<uint8_t>(remote_host_size);
+    std::memcpy(out, remote_host.data(), remote_host_size);
+    out += remote_host_size;
 
-    *buf++ = static_cast<uint8_t>((port >> 8) & 0xff);
-    *buf++ = static_cast<uint8_t>((port >> 0) & 0xff);
+    *out++ = static_cast<uint8_t>((port >> 8) & 0xff);
+    *out++ = static_cast<uint8_t>((port >> 0) & 0xff);
   } else {
     const uint16_t rport = remote.port();
-    *buf++ = is_v4 ? 1 : 4;
+    *out++ = is_v4 ? 1 : 4;
     if (is_v4) {
       const asio::ip::address_v4::bytes_type addr =
           remote.address().to_v4().to_bytes();
       for (std::size_t i = 0; i != addr.size(); ++i)
-        *buf++ = addr[i];
+        *out++ = addr[i];
     } else {
       const asio::ip::address_v6::bytes_type addr =
           remote.address().to_v6().to_bytes();
       for (std::size_t i = 0; i != addr.size(); ++i)
-        *buf++ = addr[i];
+        *out++ = addr[i];
     }
-    *buf++ = static_cast<uint8_t>((rport >> 8) & 0xff);
-    *buf++ = static_cast<uint8_t>((rport >> 0) & 0xff);
+    *out++ = static_cast<uint8_t>((rport >> 8) & 0xff);
+    *out++ = static_cast<uint8_t>((rport >> 0) & 0xff);
   }
 }
 

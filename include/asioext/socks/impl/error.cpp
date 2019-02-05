@@ -26,6 +26,8 @@ public:
       case error::invalid_auth_version: return "invalid_auth_version";
       case error::login_failed: return "login_failed";
       case error::command_not_supported: return "command_not_supported";
+      case error::identd_not_reachable: return "identd_not_reachable";
+      case error::generic: return "generic";
     }
     return "unknown";
   }

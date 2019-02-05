@@ -22,6 +22,7 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 
 /// @ingroup net_socks
+/// @defgroup net_socks_error Error handling
 /// @{
 
 /// @brief SOCKS-specific error codes
@@ -57,6 +58,15 @@ enum class error
   ///
   /// The server doesn't understand the @c command we sent.
   command_not_supported,
+
+  /// @brief The client's identd is not reachable from the server.
+  identd_not_reachable,
+
+  /// @brief A generic error occurred.
+  ///
+  /// This value is used when the SOCKS server gives us no additional
+  /// information.
+  generic,
 };
 
 /// @brief Get the @c error_category for @c error

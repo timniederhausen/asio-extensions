@@ -32,6 +32,76 @@ ASIOEXT_NS_BEGIN
 namespace socks {
 
 /// @ingroup net_socks
+/// @defgroup net_socks_v4a SOCKS4a functions
+/// SOCKS4a client implementation
+/// @{
+
+/// @brief Asynchronously attempt to execute the given command.
+///
+/// This function asynchronously executes the given SOCKS command.
+/// The following commands are supported by a SOCKS v4 server:
+///
+/// * @c connect: Establish a connection to the given remote endpoint.
+/// Any data sent/received on the socket after successful command execution
+/// belongs to the proxied connection.
+///
+/// @param socket A socket connected to the SOCKS server.
+/// @param cmd The command to execute.
+/// @param remote The remote endpoint. Only IPv4 endpoints are supported.
+/// @param user_id An opqaue user id string that will be sent to the SOCKS server.
+/// @param buffer A linear_buffer that is used to buffer sent/received messages.
+/// @param handler The handler to be called when the execute operation
+/// completes. The function signature of the handler must be:
+/// @code
+/// void handler(
+///   // Result of operation.
+///   const error_code& error,
+/// );
+/// @endcode
+template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
+ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
+async_execute(Socket& socket, asioext::socks::command cmd,
+              const asio::ip::tcp::endpoint& remote,
+              const std::string& user_id,
+              ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
+              ASIOEXT_MOVE_ARG(ExecuteHandler) handler);
+
+/// @brief Asynchronously attempt to execute the given command.
+///
+/// This function asynchronously executes the given SOCKS command.
+/// The following commands are supported by a SOCKS v4 server:
+///
+/// * @c connect: Establish a connection to the given remote endpoint.
+/// Any data sent/received on the socket after successful command execution
+/// belongs to the proxied connection.
+///
+/// @param socket A socket connected to the SOCKS server.
+/// @param cmd The command to execute.
+/// @param remote Hostname of the remote endpoint.
+/// @param port Port of the remote endpoint.
+/// @param user_id An opqaue user id string that will be sent to the SOCKS server.
+/// @param buffer A linear_buffer that is used to buffer sent/received messages.
+/// @param handler The handler to be called when the execute operation
+/// completes. The function signature of the handler must be:
+/// @code
+/// void handler(
+///   // Result of operation.
+///   const error_code& error,
+/// );
+/// @endcode
+template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
+ASIOEXT_INITFN_RESULT_TYPE(ExecuteHandler, void(error_code))
+async_execute(Socket& socket, asioext::socks::command cmd,
+              const std::string& remote, uint16_t port,
+              const std::string& user_id,
+              ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
+              ASIOEXT_MOVE_ARG(ExecuteHandler) handler);
+
+/// @}
+
+/// @ingroup net_socks
+/// @defgroup net_socks_v5 SOCKS5 functions
+/// SOCKS5 implementation
 /// @{
 
 /// @brief Asynchronously perform a SOCKS 5 greeting with the remote
