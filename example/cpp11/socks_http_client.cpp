@@ -13,6 +13,50 @@
 #include <ostream>
 #include <string>
 
+namespace {
+
+// This helper function expects |username|, |password| and |buffer| to
+// live at least as long as the initiated asynchronous operation.
+template <typename Socket, typename Handler>
+asioext::async_result_t<Handler, void (asioext::error_code, std::size_t)>
+async_socks_login(Socket& socket, const std::string& username,
+                  const std::string& password, asioext::linear_buffer& buffer,
+                  Handler&& handler)
+{
+  asioext::async_completion<
+      Handler, void (asioext::error_code, std::size_t)> init(handler);
+
+  auto op = [&socket, &buffer, &username, &password]
+            (auto&& handler, asioext::error_code ec,
+             asioext::socks::auth_method chosen_method) {
+    if (ec || chosen_method == asioext::socks::auth_method::none) {
+      handler(ec);
+      return;
+    }
+
+    asioext::socks::async_login(
+        socket, username, password, asioext::dynamic_buffer(buffer),
+        std::move(handler));
+  };
+
+  static const asioext::socks::auth_method auth_methods[] = {
+    asioext::socks::auth_method::none,
+    asioext::socks::auth_method::username_password,
+  };
+  std::size_t auth_method_count = 2;
+  if (username.empty())
+    auth_method_count = 1;
+
+  asioext::socks::async_greet(
+      socket, auth_methods, auth_method_count,
+      asioext::dynamic_buffer(buffer),
+      asioext::make_composed_operation(std::move(init.completion_handler),
+                                       std::move(op)));
+  return init.result.get();
+}
+
+}
+
 class client
 {
 public:
@@ -35,62 +79,34 @@ public:
     asioext::async_connect(socket_, resolver_,
                            asio::ip::tcp::resolver::query(socks_server,
                                                           socks_port),
-                           [this] (const asioext::error_code& ec,
+                           [this] (asioext::error_code ec,
                                    asio::ip::tcp::resolver::iterator it) {
-      handle_proxy_connect(ec);
+      if (ec) {
+        std::cout << "Error: " << ec << "\n";
+        return;
+      }
+
+      async_socks_login(socket_, username_, password_,
+                        socks_buffer_,
+                        [this] (asioext::error_code ec) { on_logged_in(ec); });
     });
   }
 
 private:
-  void handle_proxy_connect(const asio::error_code& ec)
+  void on_logged_in(asioext::error_code ec)
   {
     if (ec) {
       std::cout << "Error: " << ec << "\n";
       return;
     }
 
-    static const asioext::socks::auth_method auth_methods[] = {
-      asioext::socks::auth_method::none,
-      asioext::socks::auth_method::username_password,
-    };
-
-    asioext::socks::async_greet(
-        socket_, auth_methods, 2, asioext::dynamic_buffer(socks_buffer_),
-        [this] (const asioext::error_code& ec,
-                asioext::socks::auth_method chosen_method) {
-      if (ec) {
-        std::cout << "Error: " << ec << "\n";
-        return;
-      }
-      if (chosen_method == asioext::socks::auth_method::none) {
-        establish_connection();
-      } else if (chosen_method ==
-                 asioext::socks::auth_method::username_password) {
-        asioext::socks::async_login(
-            socket_, username_, password_,
-            asioext::dynamic_buffer(socks_buffer_),
-            [this] (const asioext::error_code& ec) {
-          if (ec) {
-            std::cout << "Error: " << ec << "\n";
-            return;
-          }
-          establish_connection();
-        });
-      }
-    });
-  }
-
-  void establish_connection()
-  {
     asioext::socks::async_execute(
         socket_, asioext::socks::command::connect,
         server_, 80, asioext::dynamic_buffer(socks_buffer_),
-        [this] (const asioext::error_code& ec) {
-      handle_target_connect(ec);
-    });
+        [this] (asioext::error_code ec) { handle_target_connect(ec); });
   }
 
-  void handle_target_connect(const asio::error_code& ec)
+  void handle_target_connect(asio::error_code ec)
   {
     if (ec) {
       std::cout << "Error: " << ec << "\n";
@@ -98,21 +114,21 @@ private:
     }
 
     asio::async_write(socket_, request_,
-                      [this] (const asioext::error_code& ec,
+                      [this] (asioext::error_code ec,
                               std::size_t) {
       if (ec) {
         std::cout << "Error: " << ec << "\n";
         return;
       }
       asio::async_read_until(socket_, response_, "\r\n",
-                             [this] (const asioext::error_code& ec,
+                             [this] (asioext::error_code ec,
                                      std::size_t) {
         handle_read_status_line(ec);
       });
     });
   }
 
-  void handle_read_status_line(const asio::error_code& ec)
+  void handle_read_status_line(asio::error_code ec)
   {
     if (ec) {
       std::cout << "Error: " << ec << "\n";
@@ -142,13 +158,13 @@ private:
 
     // Read the response headers, which are terminated by a blank line.
     asio::async_read_until(socket_, response_, "\r\n\r\n",
-                           [this] (const asioext::error_code& ec,
+                           [this] (asioext::error_code ec,
                                    std::size_t) {
       handle_read_headers(ec);
     });
   }
 
-  void handle_read_headers(const asio::error_code& ec)
+  void handle_read_headers(asio::error_code ec)
   {
     if (ec) {
       std::cout << "Error: " << ec << "\n";
@@ -169,12 +185,12 @@ private:
     // Start reading remaining data until EOF.
     asio::async_read(socket_, response_,
                      asio::transfer_at_least(1),
-                     [this] (const asioext::error_code& ec, std::size_t) {
+                     [this] (asioext::error_code ec, std::size_t) {
       handle_read_content(ec);
     });
   }
 
-  void handle_read_content(const asio::error_code& ec)
+  void handle_read_content(asio::error_code ec)
   {
     if (ec) {
       std::cout << "Error: " << ec << "\n";
@@ -187,7 +203,7 @@ private:
     // Continue reading remaining data until EOF.
     asio::async_read(socket_, response_,
                      asio::transfer_at_least(1),
-                     [this] (const asioext::error_code& ec, std::size_t) {
+                     [this] (asioext::error_code ec, std::size_t) {
       handle_read_content(ec);
     });
   }
