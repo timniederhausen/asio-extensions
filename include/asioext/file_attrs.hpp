@@ -114,8 +114,4 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_attr_options)
 
 ASIOEXT_NS_END
 
-#if defined(ASIOEXT_HEADER_ONLY)
-# include "asioext/impl/file_attrs.cpp"
-#endif
-
 #endif

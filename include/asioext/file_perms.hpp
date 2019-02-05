@@ -136,8 +136,4 @@ ASIOEXT_ENUM_CLASS_BITMASK_OPS(file_perm_options)
 
 ASIOEXT_NS_END
 
-#if defined(ASIOEXT_HEADER_ONLY)
-# include "asioext/impl/file_perms.cpp"
-#endif
-
 #endif
