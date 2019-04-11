@@ -481,7 +481,7 @@ public:
   {
     error_code ec;
     uint64_t s = this->get_service().size(this->get_implementation(), ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "size");
     return s;
   }
 
@@ -496,7 +496,7 @@ public:
   {
     error_code ec;
     this->get_service().truncate(this->get_implementation(), new_size, ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "truncate");
   }
 
   /// @copydoc file_handle::truncate(uint64_t,error_code&)
@@ -512,7 +512,7 @@ public:
     error_code ec;
     file_perms p = this->get_service().permissions(this->get_implementation(),
                                                    ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "get_permissions");
     return p;
   }
 
@@ -531,7 +531,7 @@ public:
     error_code ec;
     this->get_service().permissions(this->get_implementation(), perms,
                                     opts, ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "set_permissions");
   }
 
   /// @copydoc file_handle::permissions(file_perms,error_code&)
@@ -556,7 +556,7 @@ public:
   {
     error_code ec;
     file_attrs a = this->get_service().attributes(this->get_implementation(), ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "get_attributes");
     return a;
   }
 
@@ -575,7 +575,7 @@ public:
     error_code ec;
     this->get_service().attributes(this->get_implementation(),
                                    attrs, opts, ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "set_attributes");
   }
 
   /// @copydoc file_handle::attributes(file_attrs,error_code&)
@@ -600,7 +600,7 @@ public:
   {
     error_code ec;
     file_times t = this->get_service().times(this->get_implementation(), ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "get_times");
     return t;
   }
 
@@ -615,7 +615,7 @@ public:
   {
     error_code ec;
     this->get_service().times(this->get_implementation(), new_times, ec);
-    detail::throw_error(ec);
+    detail::throw_error(ec, "set_times");
   }
 
   /// @copydoc file_handle::times(const file_times&,error_code&)

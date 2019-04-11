@@ -20,7 +20,7 @@ unique_file_handle open(const char* filename, const open_args& args)
 {
   error_code ec;
   unique_file_handle h = open(filename, args, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "open");
   return h;
 }
 
@@ -40,7 +40,7 @@ unique_file_handle open(const wchar_t* filename, const open_args& args)
   error_code ec;
   const detail::win_file_ops::handle_type h =
       detail::win_file_ops::open(filename, args, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "open");
   return unique_file_handle(h);
 }
 
@@ -57,7 +57,7 @@ unique_file_handle open(const boost::filesystem::path& filename,
 {
   error_code ec;
   unique_file_handle h = open(filename, args, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "open");
   return h;
 }
 

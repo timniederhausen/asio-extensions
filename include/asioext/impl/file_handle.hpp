@@ -17,7 +17,7 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers)
 {
   error_code ec;
   std::size_t s = read_some(buffers, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "read_some");
   return s;
 }
 
@@ -26,7 +26,7 @@ std::size_t file_handle::write_some(const ConstBufferSequence& buffers)
 {
   error_code ec;
   std::size_t s = write_some(buffers, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "write_some");
   return s;
 }
 
@@ -36,7 +36,7 @@ std::size_t file_handle::read_some_at(uint64_t offset,
 {
   error_code ec;
   std::size_t s = read_some_at(offset, buffers, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "read_some_at");
   return s;
 }
 
@@ -46,7 +46,7 @@ std::size_t file_handle::write_some_at(uint64_t offset,
 {
   error_code ec;
   std::size_t s = write_some_at(offset, buffers, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "write_some_at");
   return s;
 }
 

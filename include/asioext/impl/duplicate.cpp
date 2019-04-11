@@ -19,7 +19,7 @@ unique_file_handle duplicate(file_handle handle)
 {
   error_code ec;
   unique_file_handle h = duplicate(handle, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "duplicate");
   return h;
 }
 

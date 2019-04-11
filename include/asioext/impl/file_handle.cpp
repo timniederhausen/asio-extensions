@@ -22,14 +22,14 @@ void file_handle::close()
 {
   error_code ec;
   close(ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "close");
 }
 
 uint64_t file_handle::position()
 {
   error_code ec;
   uint64_t s = position(ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "position");
   return s;
 }
 
@@ -37,7 +37,7 @@ uint64_t file_handle::seek(seek_origin origin, int64_t offset)
 {
   error_code ec;
   uint64_t s = seek(origin, offset, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "seek");
   return s;
 }
 
@@ -45,7 +45,7 @@ uint64_t file_handle::size()
 {
   error_code ec;
   uint64_t s = size(ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "size");
   return s;
 }
 
@@ -53,7 +53,7 @@ void file_handle::truncate(uint64_t new_size)
 {
   error_code ec;
   truncate(new_size, ec);
-  detail::throw_error(ec, "set_size");
+  detail::throw_error(ec, "truncate");
 }
 
 #if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1400) \
@@ -115,7 +115,7 @@ file_times file_handle::times()
 {
   error_code ec;
   file_times t = times(ec);
-  detail::throw_error(ec, "times");
+  detail::throw_error(ec, "get_times");
   return t;
 }
 
@@ -123,7 +123,7 @@ void file_handle::times(const file_times& new_times)
 {
   error_code ec;
   times(new_times, ec);
-  detail::throw_error(ec, "times");
+  detail::throw_error(ec, "set_times");
 }
 
 ASIOEXT_NS_END

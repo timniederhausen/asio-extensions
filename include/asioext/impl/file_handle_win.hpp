@@ -17,7 +17,7 @@ ASIOEXT_NS_BEGIN
 // and is unfortunately the only way this can be implemented reasonably.
 //
 // Windows has vectored I/O functions (ReadFileScatter, WriteFileGather),
-// but they impose very strict alignment and size requirements and thus are
+// but they impose very strict alignment and size requirements and are thus
 // unusable here.
 
 template <typename MutableBufferSequence>
