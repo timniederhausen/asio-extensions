@@ -4,7 +4,6 @@
 # include "scoped_umask.hpp"
 #endif
 
-#include "asioext/scoped_file_handle.hpp"
 #include "asioext/open.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)

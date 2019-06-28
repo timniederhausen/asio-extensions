@@ -5,7 +5,7 @@
 
 #include "test_file_writer.hpp"
 
-#include "asioext/scoped_file_handle.hpp"
+#include "asioext/unique_file_handle.hpp"
 #include "asioext/open.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
@@ -22,7 +22,7 @@ test_file_writer::test_file_writer(const char* filename,
                                    const void* data, std::size_t size)
   : filename_(filename)
 {
-  scoped_file_handle fh = open(filename_,
+  unique_file_handle fh = open(filename_,
                                open_flags::access_write |
                                open_flags::create_always);
   if (size != 0)
