@@ -66,7 +66,7 @@ ASIOEXT_CONSTEXPR14 bool safe_duration_cast(
 }
 
 template <class Duration, class FirstDuration, class SecondDuration>
-struct time_fragment_values
+struct time_pair_values
 {
   typedef typename std::common_type<
     typename Duration::rep,
@@ -110,7 +110,7 @@ template <class Duration, class FirstDuration, class SecondDuration>
 bool decompose_time(const Duration& in, FirstDuration& first,
                     SecondDuration& second) ASIOEXT_NOEXCEPT
 {
-  typedef time_fragment_values<Duration, FirstDuration, SecondDuration>
+  typedef time_pair_values<Duration, FirstDuration, SecondDuration>
       values_type;
 
   // Use the largest type we might need during computation.
@@ -144,7 +144,7 @@ template <class Duration, class FirstDuration, class SecondDuration>
 bool compose_time(const FirstDuration& first, const SecondDuration& second,
                   Duration& out) ASIOEXT_NOEXCEPT
 {
-  typedef time_fragment_values<Duration, FirstDuration, SecondDuration>
+  typedef time_pair_values<Duration, FirstDuration, SecondDuration>
       values_type;
 
   if (first >= FirstDuration::zero()) {

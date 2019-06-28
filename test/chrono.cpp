@@ -48,9 +48,9 @@ BOOST_AUTO_TEST_CASE(safe_duration_cast)
                      chrono::nanoseconds());
 }
 
-BOOST_AUTO_TEST_CASE(time_fragment_values)
+BOOST_AUTO_TEST_CASE(time_pair_values)
 {
-  typedef detail::time_fragment_values<
+  typedef detail::time_pair_values<
     chrono::microseconds, chrono::seconds, chrono::nanoseconds
   > test_type;
   typedef std::numeric_limits<chrono::microseconds::rep> limit_type;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(decompose_time)
   decompose_time_ok(chrono::seconds(123) + chrono::nanoseconds(456789),
                     chrono::seconds(123), chrono::nanoseconds(456789));
 
-  typedef detail::time_fragment_values<
+  typedef detail::time_pair_values<
     chrono::nanoseconds, chrono::seconds, chrono::nanoseconds
   > test_values;
   decompose_time_ok(chrono::nanoseconds::max(),
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(compose_time)
   compose_time_ok(chrono::seconds(123) + chrono::nanoseconds(456789),
                   chrono::seconds(123), chrono::nanoseconds(456789));
 
-  typedef detail::time_fragment_values<
+  typedef detail::time_pair_values<
     chrono::nanoseconds, chrono::seconds, chrono::nanoseconds
   > test_values;
 
