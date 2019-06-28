@@ -7,170 +7,123 @@
 #define ASIOEXT_IMPL_THREADPOOLFILESERVICE_HPP
 
 #include "asioext/file_handle.hpp"
-#include "asioext/composed_operation.hpp"
+#include "asioext/compose.hpp"
 #include "asioext/error_code.hpp"
-#include "asioext/bind_handler.hpp"
 
 #include "asioext/detail/error.hpp"
-#include "asioext/detail/move_support.hpp"
-#include "asioext/detail/operation.hpp"
+
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# include <boost/asio/bind_executor.hpp>
+# include <boost/asio/post.hpp>
+#else
+# include <asio/bind_executor.hpp>
+# include <asio/post.hpp>
+#endif
 
 ASIOEXT_NS_BEGIN
 
 namespace detail {
 
-template <typename MutableBufferSequence, typename Handler>
-class read_some_op : public operation<Handler>
+template <typename OperationImpl>
+class thread_pool_fs_op
 {
 public:
-  read_some_op(const cancellation_token_source& source, file_handle handle,
-               const MutableBufferSequence& buffers,
-               Handler& handler,
-               asio::io_service& io_service)
-    : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
-    , handle_(handle)
-    , cancel_token_(source)
-    , buffers_(buffers)
+  thread_pool_fs_op(const cancellation_token_source& source,
+                    OperationImpl& impl,
+                    thread_pool_file_service* svc)
+    : cancel_token_(source)
+    , impl_(std::move(impl))
+    , svc_(svc)
   {
     // ctor
   }
 
-  void operator()();
-
-private:
-  file_handle handle_;
-  cancellation_token cancel_token_;
-  MutableBufferSequence buffers_;
-};
-
-template <typename ConstBufferSequence, typename Handler>
-class write_some_op : public operation<Handler>
-{
-public:
-  write_some_op(const cancellation_token_source& source, file_handle handle,
-                const ConstBufferSequence& buffers,
-                Handler& handler, asio::io_service& io_service)
-    : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
-    , handle_(handle)
-    , cancel_token_(source)
-    , buffers_(buffers)
+  template <typename Self>
+  void operator()(Self& self)
   {
-    // ctor
+    error_code ec;
+    std::size_t bytes_transferred = 0;
+    if (cancel_token_.cancelled()) {
+      ec = asio::error::operation_aborted;
+    } else {
+      bytes_transferred = impl_(ec);
+    }
+    auto ex = get_associated_executor(self, svc_->get_io_context().get_executor());
+    asio::post(ex, self.complete_to_bound_handler(ec, bytes_transferred));
   }
 
-  void operator()();
-
 private:
-  file_handle handle_;
   cancellation_token cancel_token_;
-  ConstBufferSequence buffers_;
+  OperationImpl impl_;
+  thread_pool_file_service* svc_;
 };
 
-template <typename MutableBufferSequence, typename Handler>
-class read_some_at_op : public operation<Handler>
+struct thread_pool_fs_init
 {
-public:
-  read_some_at_op(const cancellation_token_source& source, file_handle handle,
-                  uint64_t offset, const MutableBufferSequence& buffers,
-                  Handler& handler, asio::io_service& io_service)
-    : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
-    , handle_(handle)
-    , cancel_token_(source)
-    , offset_(offset)
-    , buffers_(buffers)
+  template <typename Handler, typename Implementation>
+  void operator()(Handler&& handler,
+                  Implementation&& impl,
+                  const cancellation_token_source& source,
+                  thread_pool_file_service* svc)
   {
-    // ctor
+    auto ex = get_associated_executor(handler, svc->get_io_context().get_executor());
+    auto op = make_composed_operation(
+        thread_pool_fs_op<Implementation>(source, impl, svc),
+        std::move(handler), ex);
+
+    asio::post(asio::bind_executor(svc->get_thread_pool(), std::move(op)));
   }
-
-  void operator()();
-
-private:
-  file_handle handle_;
-  cancellation_token cancel_token_;
-  uint64_t offset_;
-  MutableBufferSequence buffers_;
 };
 
-template <typename ConstBufferSequence, typename Handler>
-class write_some_at_op : public operation<Handler>
+template <typename MutableBufferSequence>
+struct thread_pool_fs_read
 {
-public:
-  write_some_at_op(const cancellation_token_source& source, file_handle handle,
-                   uint64_t offset, const ConstBufferSequence& buffers,
-                   Handler& handler, asio::io_service& io_service)
-    : operation<Handler>(ASIOEXT_MOVE_CAST(Handler)(handler), io_service)
-    , handle_(handle)
-    , cancel_token_(source)
-    , offset_(offset)
-    , buffers_(buffers)
+  std::size_t operator()(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    // ctor
+    return handle.read_some(buffers, ec);
   }
 
-  void operator()();
-
-private:
-  file_handle handle_;
-  cancellation_token cancel_token_;
-  uint64_t offset_;
-  ConstBufferSequence buffers_;
+  file_handle handle;
+  MutableBufferSequence buffers;
 };
 
-template <typename MutableBufferSequence, typename Handler>
-void read_some_op<MutableBufferSequence, Handler>::operator()()
+template <typename ConstBufferSequence>
+struct thread_pool_fs_write
 {
-  error_code ec;
-  std::size_t bytes_transferred = 0;
-  if (cancel_token_.cancelled()) {
-    ec = asio::error::operation_aborted;
-  } else {
-    bytes_transferred = handle_.read_some(buffers_, ec);
+  std::size_t operator()(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle.write_some(buffers, ec);
   }
-  this->get_executor().dispatch(bind_handler(
-      ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
-}
 
-template <typename ConstBufferSequence, typename Handler>
-void write_some_op<ConstBufferSequence, Handler>::operator()()
-{
-  error_code ec;
-  std::size_t bytes_transferred = 0;
-  if (cancel_token_.cancelled()) {
-    ec = asio::error::operation_aborted;
-  } else {
-    bytes_transferred = handle_.write_some(buffers_, ec);
-  }
-  this->get_executor().dispatch(bind_handler(
-      ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
-}
+  file_handle handle;
+  ConstBufferSequence buffers;
+};
 
-template <typename MutableBufferSequence, typename Handler>
-void read_some_at_op<MutableBufferSequence, Handler>::operator()()
+template <typename MutableBufferSequence>
+struct thread_pool_fs_read_at
 {
-  error_code ec;
-  std::size_t bytes_transferred = 0;
-  if (cancel_token_.cancelled()) {
-    ec = asio::error::operation_aborted;
-  } else {
-    bytes_transferred = handle_.read_some_at(offset_, buffers_, ec);
+  std::size_t operator()(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle.read_some_at(offset, buffers, ec);
   }
-  this->get_executor().dispatch(bind_handler(
-      ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
-}
 
-template <typename ConstBufferSequence, typename Handler>
-void write_some_at_op<ConstBufferSequence, Handler>::operator()()
+  file_handle handle;
+  uint64_t offset;
+  MutableBufferSequence buffers;
+};
+
+template <typename ConstBufferSequence>
+struct thread_pool_fs_write_at
 {
-  error_code ec;
-  std::size_t bytes_transferred = 0;
-  if (cancel_token_.cancelled()) {
-    ec = asio::error::operation_aborted;
-  } else {
-    bytes_transferred = handle_.write_some_at(offset_, buffers_, ec);
+  std::size_t operator()(error_code& ec) ASIOEXT_NOEXCEPT
+  {
+    return handle.write_some_at(offset, buffers, ec);
   }
-  this->get_executor().dispatch(bind_handler(
-      ASIOEXT_MOVE_CAST(Handler)(this->handler_), ec, bytes_transferred));
-}
+
+  file_handle handle;
+  uint64_t offset;
+  ConstBufferSequence buffers;
+};
 
 }
 
@@ -206,77 +159,53 @@ size_t thread_pool_file_service::write_some_at(
   return impl.handle_.write_some_at(offset, buffers, ec);
 }
 
-template <typename MutableBufferSequence, typename Handler>
-ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
+template <typename MutableBufferSequence, typename CompletionToken>
+ASIOEXT_INITFN_RESULT_TYPE(CompletionToken, void(error_code, std::size_t))
 thread_pool_file_service::async_read_some(implementation_type& impl,
                                           const MutableBufferSequence& buffers,
-                                          ASIOEXT_MOVE_ARG(Handler) handler)
+                                          CompletionToken&& token)
 {
-  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
-  typedef detail::read_some_op<MutableBufferSequence,
-      typename init_t::completion_handler_type
-  > operation;
-
-  init_t init(handler);
-  operation op(impl.cancel_token_, impl.handle_, buffers,
-               init.completion_handler, this->get_io_service());
-  pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
-  return init.result.get();
+  return async_initiate<CompletionToken, void(error_code, std::size_t)>(
+      detail::thread_pool_fs_init(), token,
+      detail::thread_pool_fs_read<MutableBufferSequence>{impl.handle_, buffers},
+      impl.cancel_token_, this);
 }
 
-template <typename ConstBufferSequence, typename Handler>
-ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
+template <typename ConstBufferSequence, typename CompletionToken>
+ASIOEXT_INITFN_RESULT_TYPE(CompletionToken, void(error_code, std::size_t))
 thread_pool_file_service::async_write_some(implementation_type& impl,
                                            const ConstBufferSequence& buffers,
-                                           ASIOEXT_MOVE_ARG(Handler) handler)
+                                           CompletionToken&& token)
 {
-  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
-  typedef detail::write_some_op<ConstBufferSequence,
-      typename init_t::completion_handler_type
-  > operation;
-
-  init_t init(handler);
-  operation op(impl.cancel_token_, impl.handle_, buffers,
-               init.completion_handler, this->get_io_service());
-  pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
-  return init.result.get();
+  return async_initiate<CompletionToken, void(error_code, std::size_t)>(
+      detail::thread_pool_fs_init(), token,
+      detail::thread_pool_fs_write<ConstBufferSequence>{impl.handle_, buffers},
+      impl.cancel_token_, this);
 }
 
-template <typename MutableBufferSequence, typename Handler>
-ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
+template <typename MutableBufferSequence, typename CompletionToken>
+ASIOEXT_INITFN_RESULT_TYPE(CompletionToken, void(error_code, std::size_t))
 thread_pool_file_service::async_read_some_at(
     implementation_type& impl, uint64_t offset,
     const MutableBufferSequence& buffers,
-    ASIOEXT_MOVE_ARG(Handler) handler)
+    CompletionToken&& token)
 {
-  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
-  typedef detail::read_some_at_op<MutableBufferSequence,
-      typename init_t::completion_handler_type
-  > operation;
-
-  init_t init(handler);
-  operation op(impl.cancel_token_, impl.handle_, offset, buffers,
-               init.completion_handler, this->get_io_service());
-  pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
-  return init.result.get();
+  return async_initiate<CompletionToken, void(error_code, std::size_t)>(
+      detail::thread_pool_fs_init(), token,
+      detail::thread_pool_fs_read_at<MutableBufferSequence>{impl.handle_, offset, buffers},
+      impl.cancel_token_, this);
 }
 
-template <typename ConstBufferSequence, typename Handler>
-ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
+template <typename ConstBufferSequence, typename CompletionToken>
+ASIOEXT_INITFN_RESULT_TYPE(CompletionToken, void(error_code, std::size_t))
 thread_pool_file_service::async_write_some_at(
     implementation_type& impl, uint64_t offset,
-    const ConstBufferSequence& buffers, ASIOEXT_MOVE_ARG(Handler) handler)
+    const ConstBufferSequence& buffers, CompletionToken&& token)
 {
-  typedef async_completion<Handler, void (error_code, std::size_t)> init_t;
-  typedef detail::write_some_at_op<ConstBufferSequence,
-      typename init_t::completion_handler_type
-  > operation;
-
-  init_t init(handler);
-  operation op(impl.cancel_token_, impl.handle_, offset, buffers,
-               init.completion_handler, this->get_io_service());
-  pool_.post(ASIOEXT_MOVE_CAST(operation)(op));
-  return init.result.get();
+  return async_initiate<CompletionToken, void(error_code, std::size_t)>(
+      detail::thread_pool_fs_init(), token,
+      detail::thread_pool_fs_write_at<ConstBufferSequence>{impl.handle_, offset, buffers},
+      impl.cancel_token_, this);
 }
 
 ASIOEXT_NS_END

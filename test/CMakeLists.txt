@@ -5,7 +5,7 @@
 set(sources
 	basic_file.cpp
 	chrono.cpp
-	composed_operation.cpp
+	compose.cpp
 	file_handle.cpp
 	linear_buffer.cpp
 	main.cpp

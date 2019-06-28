@@ -23,12 +23,17 @@
 #include "asioext/cancellation_token.hpp"
 #include "asioext/async_result.hpp"
 
-#include "asioext/detail/move_support.hpp"
 #include "asioext/detail/cstdint.hpp"
 #include "asioext/detail/service_base.hpp"
 #include "asioext/detail/mutex.hpp"
-#include "asioext/detail/work.hpp"
-#include "asioext/detail/thread_group.hpp"
+
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# include <boost/asio/thread_pool.hpp>
+# include <boost/asio/io_context.hpp>
+#else
+# include <asio/thread_pool.hpp>
+# include <asio/io_context.hpp>
+#endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>
@@ -42,15 +47,15 @@ ASIOEXT_NS_BEGIN
 /// This FileService class uses a thread-pool to emulate asynchronous file I/O.
 class thread_pool_file_service
 #if !defined(ASIOEXT_IS_DOCUMENTATION)
-  : public asioext::detail::service_base<thread_pool_file_service>
+  : public asioext::detail::io_context_service_base<thread_pool_file_service>
 #else
-  : public asio::io_service::service
+  : public asio::io_context::service
 #endif
 {
 public:
 #if defined(ASIOEXT_IS_DOCUMENTATION)
   /// The unique service identifier.
-  static asio::io_service::id id;
+  static asio::io_context::id id;
 #endif
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)
@@ -87,13 +92,13 @@ public:
   };
 #endif
 
-  /// Construct a new file service for the specified io_service.
+  /// Construct a new file service for the specified io_context.
   ///
-  /// @param io_service The io_service that will own this service object.
+  /// @param owner The io_context that owns this service object.
   ///
   /// @param num_threads The number of threads that shall be spawned to
   /// execute file I/O operations. Defaults to 1.
-  ASIOEXT_DECL explicit thread_pool_file_service(asio::io_service& io_service,
+  ASIOEXT_DECL explicit thread_pool_file_service(asio::io_context& owner,
                                                  std::size_t num_threads = 1);
 
   /// Destroy all user-defined handler objects owned by the service.
@@ -250,7 +255,7 @@ public:
   ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
   async_read_some(implementation_type& impl,
                   const MutableBufferSequence& buffers,
-                  ASIOEXT_MOVE_ARG(Handler) handler);
+                  Handler&& handler);
 
   /// Start an asynchronous write. The data being written must be valid for the
   /// lifetime of the asynchronous operation.
@@ -258,7 +263,7 @@ public:
   ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
   async_write_some(implementation_type& impl,
                    const ConstBufferSequence& buffers,
-                   ASIOEXT_MOVE_ARG(Handler) handler);
+                   Handler&& handler);
 
   /// Start an asynchronous read at a specified offset. The buffer for the data
   /// being received must be valid for the lifetime of the asynchronous
@@ -267,7 +272,7 @@ public:
   ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
   async_read_some_at(implementation_type& impl, uint64_t offset,
                      const MutableBufferSequence& buffers,
-                     ASIOEXT_MOVE_ARG(Handler) handler);
+                     Handler&& handler);
 
   /// Start an asynchronous write at a specified offset. The data being written
   /// must be valid for the lifetime of the asynchronous operation.
@@ -275,34 +280,22 @@ public:
   ASIOEXT_INITFN_RESULT_TYPE(Handler, void(error_code, std::size_t))
   async_write_some_at(implementation_type& impl, uint64_t offset,
                       const ConstBufferSequence& buffers,
-                      ASIOEXT_MOVE_ARG(Handler) handler);
+                      Handler&& handler);
 
   /// @private
   // This is needed for tests.
-  asio::io_service& get_pool_io_service()
+  asio::thread_pool& get_thread_pool()
   {
     return pool_;
   }
 
 private:
-  struct thread_function
-  {
-    asio::io_service* service_;
-    void operator()();
-  };
-
   // Helper function to close a handle when the associated object is being
   // destroyed.
   ASIOEXT_DECL void close_for_destruction(implementation_type& impl);
 
-  // The io_service that runs on the thread pool.
-  asio::io_service pool_;
-
-  // A work helper to keep |pool_| running.
-  detail::work work_;
-
   // The thread pool.
-  detail::thread_group pool_threads_;
+  asio::thread_pool pool_;
 
   // Mutex to protect access to the linked list of implementations.
   detail::mutex mutex_;

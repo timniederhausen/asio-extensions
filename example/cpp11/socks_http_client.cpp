@@ -1,5 +1,6 @@
 #include <asioext/socks/client.hpp>
 #include <asioext/connect.hpp>
+#include <asioext/compose.hpp>
 
 #include <asio/ip/tcp.hpp>
 #include <asio/io_service.hpp>
@@ -7,6 +8,7 @@
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
 #include <asio/write.hpp>
+#include <asio/coroutine.hpp>
 
 #include <iostream>
 #include <istream>
@@ -23,36 +25,44 @@ async_socks_login(Socket& socket, const std::string& username,
                   const std::string& password, asioext::linear_buffer& buffer,
                   Handler&& handler)
 {
-  asioext::async_completion<
-      Handler, void (asioext::error_code, std::size_t)> init(handler);
-
-  auto op = [&socket, &buffer, &username, &password]
-            (auto&& handler, asioext::error_code ec,
-             asioext::socks::auth_method chosen_method) {
-    if (ec || chosen_method == asioext::socks::auth_method::none) {
-      handler(ec);
+  auto op = [
+    &socket, &buffer, &username, &password,
+    c = asio::coroutine()
+  ] (auto& self, asioext::error_code ec = asioext::error_code(),
+     asioext::socks::auth_method chosen_method =
+        asioext::socks::auth_method::none) mutable
+  {
+    if (ec) {
+      self.complete(ec);
       return;
     }
 
-    asioext::socks::async_login(
-        socket, username, password, asioext::dynamic_buffer(buffer),
-        std::move(handler));
-  };
+    static const asioext::socks::auth_method auth_methods[] = {
+      asioext::socks::auth_method::none,
+      asioext::socks::auth_method::username_password,
+    };
+    std::size_t auth_method_count = 2;
+    if (username.empty())
+      auth_method_count = 1;
 
-  static const asioext::socks::auth_method auth_methods[] = {
-    asioext::socks::auth_method::none,
-    asioext::socks::auth_method::username_password,
-  };
-  std::size_t auth_method_count = 2;
-  if (username.empty())
-    auth_method_count = 1;
+    ASIO_CORO_REENTER (c) {
+      ASIO_CORO_YIELD asioext::socks::async_greet(
+          socket, auth_methods, auth_method_count,
+          asioext::dynamic_buffer(buffer), std::move(self));
 
-  asioext::socks::async_greet(
-      socket, auth_methods, auth_method_count,
-      asioext::dynamic_buffer(buffer),
-      asioext::make_composed_operation(std::move(init.completion_handler),
-                                       std::move(op)));
-  return init.result.get();
+      if (chosen_method == asioext::socks::auth_method::none) {
+        self.complete(asioext::socks::error::no_acceptable_auth_method);
+        return;
+      }
+
+      ASIO_CORO_YIELD asioext::socks::async_login(
+          socket, username, password, asioext::dynamic_buffer(buffer),
+          std::move(self));
+      self.complete(ec);
+    }
+  };
+  return asioext::async_compose<Handler, void (asioext::error_code, std::size_t)>(
+      std::move(op), handler);
 }
 
 }

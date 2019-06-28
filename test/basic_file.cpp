@@ -6,10 +6,16 @@
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # include <boost/asio/write.hpp>
+# include <boost/asio/write_at.hpp>
 # include <boost/asio/read.hpp>
+# include <boost/asio/read_at.hpp>
+# include <boost/asio/post.hpp>
 #else
 # include <asio/write.hpp>
+# include <asio/write_at.hpp>
 # include <asio/read.hpp>
+# include <asio/read_at.hpp>
+# include <asio/post.hpp>
 #endif
 
 #include <boost/test/unit_test.hpp>
@@ -297,6 +303,44 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
   io_service.reset();
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write_at, FileService, service_types)
+{
+  test_file_rm_guard rguard1(test_filename);
+
+  asio::io_service io_service;
+  asioext::basic_file<FileService> file(io_service);
+
+  asioext::error_code ec;
+  file.open(test_filename,
+            open_flags::access_write | open_flags::create_always, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  BOOST_REQUIRE_NO_THROW(asio::async_write_at(
+      file, 0, asio::buffer(test_data, 0),
+      write_handler<FileService>(file)));
+
+  // Run the just enqueued operations.
+  io_service.run();
+  io_service.reset();
+
+  BOOST_REQUIRE_NO_THROW(file.close());
+
+  file.open(test_filename,
+            open_flags::access_read | open_flags::open_existing, ec);
+  BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
+
+  char buffer[128];
+  BOOST_REQUIRE_NO_THROW(asio::async_read_at(
+      file, 0, asio::buffer(buffer, 0),
+      read_handler<FileService>(file,
+                                asio::mutable_buffer(buffer, test_data_size))
+  ));
+
+  // Run the just enqueued operations.
+  io_service.run();
+  io_service.reset();
+}
+
 template <class FileService>
 struct write_cancel_handler
 {
@@ -352,7 +396,7 @@ BOOST_AUTO_TEST_CASE(async_read_write_cancel)
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
   BOOST_REQUIRE(file.is_open());
 
-  svc->get_pool_io_service().post(cancel_handler<FileService>(file));
+  asio::post(svc->get_thread_pool(), cancel_handler<FileService>(file));
 
   // Run the just enqueued operations.
   io_service.run();

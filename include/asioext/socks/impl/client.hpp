@@ -7,6 +7,7 @@
 #define ASIOEXT_SOCKS_IMPL_CLIENT_HPP
 
 #include "asioext/socks/detail/client.hpp"
+#include "asioext/compose.hpp"
 
 ASIOEXT_NS_BEGIN
 
@@ -22,15 +23,11 @@ async_execute(Socket& socket, command cmd,
               ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler)
 {
-  typedef async_completion<ExecuteHandler, void (error_code)> init_t;
-
-  init_t init(handler);
-  detail::v4_exec_op<Socket, DynamicBuffer,
-      typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, cmd, remote, std::string(), 0,
-    user_id, buffer);
-
-  return init.result.get();
+  return async_compose<ExecuteHandler, void (error_code)>(
+      detail::v4_exec_op<Socket, DynamicBuffer>(
+          socket, cmd, remote, std::string(), 0, user_id, buffer),
+      handler, socket
+  );
 }
 
 template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
@@ -41,17 +38,12 @@ async_execute(Socket& socket, command cmd,
               ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler)
 {
-  typedef async_completion<ExecuteHandler, void (error_code)> init_t;
-
-  init_t init(handler);
-  detail::v4_exec_op<Socket, DynamicBuffer,
-      typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, cmd, asio::ip::tcp::endpoint(),
-    remote, port, user_id, buffer);
-
-  return init.result.get();
+  return async_compose<ExecuteHandler, void (error_code)>(
+      detail::v4_exec_op<Socket, DynamicBuffer>(
+          socket, cmd, asio::ip::tcp::endpoint(), remote, 0, user_id, buffer),
+      handler, socket
+  );
 }
-
 
 // SOCKS5
 
@@ -63,16 +55,11 @@ async_greet(Socket& socket,
             ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
             ASIOEXT_MOVE_ARG(GreetHandler) handler)
 {
-  typedef async_completion<
-    GreetHandler, void (error_code, auth_method)
-  > init_t;
-
-  init_t init(handler);
-  detail::v5_greet_op<Socket, DynamicBuffer,
-      typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, auth_methods, num_auth_methods, buffer);
-
-  return init.result.get();
+  return async_compose<GreetHandler, void (error_code, auth_method)>(
+      detail::v5_greet_op<Socket, DynamicBuffer>(
+        socket, auth_methods, num_auth_methods, buffer),
+      handler, socket
+  );
 }
 
 template <typename Socket, typename DynamicBuffer, typename LoginHandler>
@@ -83,14 +70,11 @@ async_login(Socket& socket,
             ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
             ASIOEXT_MOVE_ARG(LoginHandler) handler)
 {
-  typedef async_completion<LoginHandler, void (error_code)> init_t;
-
-  init_t init(handler);
-  detail::v5_login_op<Socket, DynamicBuffer,
-      typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, username, password, buffer);
-
-  return init.result.get();
+  return async_compose<LoginHandler, void (error_code)>(
+      detail::v5_login_op<Socket, DynamicBuffer>(
+        socket, username, password, buffer),
+      handler, socket
+  );
 }
 
 template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
@@ -100,15 +84,11 @@ async_execute(Socket& socket, command cmd,
               ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler)
 {
-  typedef async_completion<ExecuteHandler, void (error_code)> init_t;
-
-  init_t init(handler);
-  detail::v5_exec_op<Socket, DynamicBuffer,
-      typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, cmd, remote, std::string(), 0,
-    buffer);
-
-  return init.result.get();
+  return async_compose<ExecuteHandler, void (error_code)>(
+      detail::v5_exec_op<Socket, DynamicBuffer>(
+        socket, cmd, remote, std::string(), 0, buffer),
+      handler, socket
+  );
 }
 
 template <typename Socket, typename DynamicBuffer, typename ExecuteHandler>
@@ -118,15 +98,11 @@ async_execute(Socket& socket, command cmd,
               ASIOEXT_MOVE_ARG(DynamicBuffer) buffer,
               ASIOEXT_MOVE_ARG(ExecuteHandler) handler)
 {
-  typedef async_completion<ExecuteHandler, void (error_code)> init_t;
-
-  init_t init(handler);
-  detail::v5_exec_op<Socket, DynamicBuffer,
-      typename init_t::completion_handler_type> op(
-    init.completion_handler, socket, cmd, asio::ip::tcp::endpoint(),
-    remote, port, buffer);
-
-  return init.result.get();
+  return async_compose<ExecuteHandler, void (error_code)>(
+      detail::v5_exec_op<Socket, DynamicBuffer>(
+        socket, cmd, asio::ip::tcp::endpoint(), remote, port, buffer),
+      handler, socket
+  );
 }
 
 }

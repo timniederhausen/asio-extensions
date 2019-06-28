@@ -11,8 +11,23 @@
 # pragma once
 #endif
 
-// gets us the macros we use below
-#include "asioext/composed_operation.hpp"
+#include "asioext/detail/asio_version.hpp"
+
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# include <boost/asio/detail/handler_alloc_helpers.hpp>
+# include <boost/asio/detail/handler_cont_helpers.hpp>
+# include <boost/asio/detail/handler_invoke_helpers.hpp>
+# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
+# define ASIOEXT_HANDLER_CONT_HELPERS_NS boost_asio_handler_cont_helpers
+# define ASIOEXT_HANDLER_INVOKE_HELPERS_NS boost_asio_handler_invoke_helpers
+#else
+# include <asio/detail/handler_alloc_helpers.hpp>
+# include <asio/detail/handler_cont_helpers.hpp>
+# include <asio/detail/handler_invoke_helpers.hpp>
+# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
+# define ASIOEXT_HANDLER_CONT_HELPERS_NS asio_handler_cont_helpers
+# define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
+#endif
 
 #include <tuple>
 #include <utility>
@@ -28,8 +43,8 @@ void invoke(Handler& handler, const Tuple& t, std::index_sequence<Is...>)
   handler(std::get<Is>(t)...);
 }
 
-template <typename Handler, typename... Args>
-class bound_handler
+template <typename Handler, typename Work, typename... Args>
+class bound_handler : private Work
 {
 #if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION >= 101100)
   template <typename T, typename Executor>
@@ -81,10 +96,12 @@ class bound_handler
   std::tuple<Args...> args_;
 
 public:
-  template <typename Handler2, typename... Args2>
-  explicit bound_handler(Handler2&& handler, Args2&&... args)
-    : handler_(std::forward<Handler2>(handler))
-    , args_(std::forward<Args2>(args)...)
+  template <typename RawHandler, typename RawWork, typename... RawArgs>
+  explicit bound_handler(RawHandler&& handler, RawWork&& work,
+                         RawArgs&&... args)
+    : Work(std::forward<RawWork>(work))
+    , handler_(std::forward<RawHandler>(handler))
+    , args_(std::forward<RawArgs>(args)...)
   {
     // ctor
   }
@@ -93,6 +110,7 @@ public:
     ASIOEXT_NOEXCEPT_IF(noexcept(asioext::detail::invoke(
           handler_, args_, args_indices_type{})))
   {
+    this->reset(); // defined in Work
     asioext::detail::invoke(handler_, args_, args_indices_type{});
   }
 };
@@ -107,26 +125,26 @@ namespace boost {
 # endif
 namespace asio {
 
-template <typename Handler, typename... Args, typename Allocator>
+template <typename Handler, typename Work, typename... Args, typename Allocator>
 struct associated_allocator<
-    asioext::detail::bound_handler<Handler, Args...>, Allocator>
+    asioext::detail::bound_handler<Handler, Work, Args...>, Allocator>
 {
   typedef typename associated_allocator<Handler, Allocator>::type type;
 
-  static type get(const asioext::detail::bound_handler<Handler, Args...>& h,
+  static type get(const asioext::detail::bound_handler<Handler, Work, Args...>& h,
                   const Allocator& a = Allocator()) ASIOEXT_NOEXCEPT
   {
     return associated_allocator<Handler, Allocator>::get(h.handler_, a);
   }
 };
 
-template <typename Handler, typename... Args, typename Executor>
+template <typename Handler, typename Work, typename... Args, typename Executor>
 struct associated_executor<
-    asioext::detail::bound_handler<Handler, Args...>, Executor>
+    asioext::detail::bound_handler<Handler, Work, Args...>, Executor>
 {
   typedef typename associated_executor<Handler, Executor>::type type;
 
-  static type get(const asioext::detail::bound_handler<Handler, Args...>& h,
+  static type get(const asioext::detail::bound_handler<Handler, Work, Args...>& h,
                   const Executor& ex = Executor()) ASIOEXT_NOEXCEPT
   {
     return associated_executor<Handler, Executor>::get(h.handler_, ex);

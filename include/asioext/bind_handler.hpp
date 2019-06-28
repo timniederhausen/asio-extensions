@@ -11,15 +11,16 @@
 # pragma once
 #endif
 
-#if defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && defined(ASIOEXT_HAS_STD_INDEX_SEQUENCE)
-# include "asioext/detail/bound_handler.hpp"
-#else
-# if defined(ASIOEXT_USE_BOOST_ASIO)
-#  include <boost/asio/detail/bind_handler.hpp>
-# else
-#  include <asio/detail/bind_handler.hpp>
-# endif
+#include "asioext/work.hpp"
+
+#if !defined(ASIOEXT_HAS_VARIADIC_TEMPLATES)
+# error "Your compiler doesn't support variadic templates (C++11)"
 #endif
+#if !defined(ASIOEXT_HAS_STD_INDEX_SEQUENCE)
+# error "Your compiler doesn't support std::index_sequence (C++14)"
+#endif
+
+#include "asioext/detail/bound_handler.hpp"
 
 #include <utility>
 
@@ -30,7 +31,7 @@ ASIOEXT_NS_BEGIN
 /// @brief Bind values to a Handler's arguments to create a CompletionHandler.
 ///
 /// This helper function binds the given @c args to the @c Handler,
-/// returning a nullary function object that satisfies the requirements of
+/// creating a nullary function object that satisfies the requirements of
 /// a CompletionHandler.
 ///
 /// The original handler's hooks and customization points are retained and
@@ -44,22 +45,60 @@ ASIOEXT_NS_BEGIN
 /// the original handler with the bound arguments.
 template <typename Handler, typename... Args>
 implementation_defined bind_handler(Handler&& handler, Args&&... args);
-#elif defined(ASIOEXT_HAS_VARIADIC_TEMPLATES) && defined(ASIOEXT_HAS_STD_INDEX_SEQUENCE)
+
+/// @ingroup core
+/// @brief Bind values to a Handler's arguments to create a CompletionHandler.
+///
+/// This helper function binds the given @c args to the @c Handler,
+/// creating a nullary function object that satisfies the requirements of
+/// a @c CompletionHandler. Additionally, the given tuple of
+/// @c asio::executor_work_guard is kept alive until after @c handler is invoked.
+///
+/// The original handler's hooks and customization points are retained and
+/// will be used for the returned CompletionHandler as well.
+///
+/// @param handler The @c Handler object you wish to bind values to.
+/// @param work Additional @c asio::executor_work_guard objects that must
+/// exist until after @c handler is invoked.
+/// @param args The arguments the handler should be invoked with.
+/// The values will be copied/moved and stored inside the returned function
+/// object.
+/// @returns A nullary function object that when called will invoke
+/// the original handler with the bound arguments.
+template <typename Handler, typename... Work, typename... Args>
+implementation_defined bind_handler(Handler&& handler,
+                                    work_tuple<Work...>&& work,
+                                    Args&&... args);
+#else
 template <typename Handler, typename... Args>
 detail::bound_handler<
     typename std::decay<Handler>::type,
+    work_tuple<void>,
     typename std::decay<Args>::type...
 > bind_handler(Handler&& handler, Args&&... args)
 {
   return detail::bound_handler<
     typename std::decay<Handler>::type,
+    work_tuple<void>,
     typename std::decay<Args>::type...
-  >(std::forward<Handler>(handler), std::forward<Args>(args)...);
+  >(std::forward<Handler>(handler), work_tuple<void>(),
+    std::forward<Args>(args)...);
 }
-#else
-// TODO: Write our own C++03 / C++11 version
-// (or drop support for them altogether)
-using asio::detail::bind_handler;
+
+template <typename Handler, typename... Work, typename... Args>
+detail::bound_handler<
+    typename std::decay<Handler>::type,
+    work_tuple<Work...>,
+    typename std::decay<Args>::type...
+> bind_handler(Handler&& handler, work_tuple<Work...>&& work, Args&&... args)
+{
+  return detail::bound_handler<
+    typename std::decay<Handler>::type,
+    work_tuple<Work...>,
+    typename std::decay<Args>::type...
+  >(std::forward<Handler>(handler), std::move(work),
+    std::forward<Args>(args)...);
+}
 #endif
 
 ASIOEXT_NS_END

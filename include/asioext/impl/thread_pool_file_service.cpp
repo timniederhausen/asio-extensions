@@ -10,23 +10,12 @@
 
 ASIOEXT_NS_BEGIN
 
-void thread_pool_file_service::thread_function::operator()()
-{
-  error_code ec;
-  // TODO: what to do about exceptions/errors?
-  service_->run(ec);
-}
-
 thread_pool_file_service::thread_pool_file_service(
-    asio::io_service& io_service, std::size_t num_threads)
-  : service_base(io_service)
-  , work_(pool_)
+    asio::io_context& owner, std::size_t num_threads)
+  : io_context_service_base(owner)
+  , pool_(num_threads)
   , impl_list_(0)
 {
-  work_.on_work_started();
-
-  thread_function f = { &pool_ };
-  pool_threads_.create_threads(f, num_threads);
 }
 
 void thread_pool_file_service::shutdown_service()
@@ -36,7 +25,6 @@ void thread_pool_file_service::shutdown_service()
   for (implementation_type* cur = impl_list_; cur; cur = cur->next_)
     close_for_destruction(*cur);
 
-  work_.on_work_finished();
   pool_.stop();
 }
 

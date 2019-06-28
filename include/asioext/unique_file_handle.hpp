@@ -95,7 +95,6 @@ public:
   ASIOEXT_DECL explicit unique_file_handle(
       const file_handle::native_handle_type& handle) ASIOEXT_NOEXCEPT;
 
-#ifdef ASIOEXT_HAS_MOVE
   /// @brief Move-construct a unique_file_handle from another.
   ///
   /// This constructor moves a handle from one object to another.
@@ -119,7 +118,6 @@ public:
   /// @note Following the move, the moved-from object is in the same state as if
   /// constructed using the @c unique_file_handle() constructor.
   ASIOEXT_DECL unique_file_handle& operator=(unique_file_handle&& other);
-#endif
 
   /// @brief Get a reference to the lowest layer.
   ///
