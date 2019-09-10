@@ -29,7 +29,6 @@ namespace win_file_ops {
 
 // Pulling in windows.h/windef.h for just one type is certainly overkill.
 // http://stackoverflow.com/questions/4121173/how-do-i-forward-declare-handle-win32
-// XXX This breaks with STRICT defined (which fortunately no one is doing).
 typedef void* handle_type;
 
 ASIOEXT_DECL void set_error(error_code& ec) ASIOEXT_NOEXCEPT;

@@ -3,8 +3,8 @@
 /// (See accompanying file LICENSE_1_0.txt or copy at
 /// http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ASIOEXT_DETAIL_CHRONO_HPP
-#define ASIOEXT_DETAIL_CHRONO_HPP
+#ifndef ASIOEXT_DETAIL_COROUTINE_HPP
+#define ASIOEXT_DETAIL_COROUTINE_HPP
 
 #include "asioext/detail/config.hpp"
 
