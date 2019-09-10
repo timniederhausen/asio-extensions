@@ -87,7 +87,8 @@ composed_operation<
     std::forward<Work>(work));
 }
 
-template <typename IoObject>
+template <typename IoObject, typename = typename std::enable_if<
+  !asio::is_executor<IoObject>::value>::type>
 inline typename IoObject::executor_type
 get_executor(IoObject& io_object)
 {
