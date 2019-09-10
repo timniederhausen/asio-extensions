@@ -18,8 +18,6 @@
 #include "asioext/error_code.hpp"
 #include "asioext/async_result.hpp"
 
-#include "asioext/detail/move_support.hpp"
-
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # include <boost/asio/ip/tcp.hpp>
 #else
@@ -105,7 +103,7 @@ ASIOEXT_INITFN_RESULT_TYPE(ComposedConnectHandler,
 async_connect(asio::ip::tcp::socket::lowest_layer_type& socket,
               asio::ip::tcp::resolver& resolver,
               const asio::ip::tcp::resolver::query& q,
-              ASIOEXT_MOVE_ARG(ComposedConnectHandler) handler);
+              ComposedConnectHandler&& handler);
 
 /// @}
 

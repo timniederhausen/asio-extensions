@@ -43,19 +43,16 @@ basic_linear_buffer<Allocator>& basic_linear_buffer<Allocator>::operator=(
   return *this;
 }
 
-#ifdef ASIOEXT_HAS_MOVE
-template <class Allocator>
+template <typename Allocator>
 basic_linear_buffer<Allocator>& basic_linear_buffer<Allocator>::operator=(
     basic_linear_buffer&& other) ASIOEXT_NOEXCEPT
 {
   move_assign(other, std::integral_constant<bool,
       allocator_traits_type::propagate_on_container_move_assignment::value>());
-
   return *this;
 }
-#endif
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::append(const void* data, std::size_t n)
 {
   if (size_ > max_size_ || max_size_ - size_ < n) {
@@ -73,7 +70,7 @@ void basic_linear_buffer<Allocator>::append(const void* data, std::size_t n)
   size_ += n;
 }
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::insert(std::size_t before_this,
                                             const void* data, std::size_t n)
 {
@@ -100,7 +97,7 @@ void basic_linear_buffer<Allocator>::insert(std::size_t before_this,
   size_ += n;
 }
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::erase(std::size_t pos)
 {
   // TODO: assert pos < size
@@ -108,7 +105,7 @@ void basic_linear_buffer<Allocator>::erase(std::size_t pos)
   --size_;
 }
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::erase(std::size_t first, std::size_t last)
 {
   const std::size_t n = last - first;
@@ -116,7 +113,7 @@ void basic_linear_buffer<Allocator>::erase(std::size_t first, std::size_t last)
   size_ -= n;
 }
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::reserve(std::size_t min_cap)
 {
   if (min_cap > max_size_) {
@@ -131,7 +128,7 @@ void basic_linear_buffer<Allocator>::reserve(std::size_t min_cap)
   }
 }
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::resize(std::size_t new_size)
 {
   if (new_size > max_size_) {
@@ -148,13 +145,12 @@ void basic_linear_buffer<Allocator>::resize(std::size_t new_size)
   size_ = new_size;
 }
 
-#ifdef ASIOEXT_HAS_MOVE
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::move_assign(basic_linear_buffer& other,
                                                  std::false_type)
-# if defined(ASIOEXT_HAS_ALLOCATOR_ALWAYS_EQUAL)
+#if defined(ASIOEXT_HAS_ALLOCATOR_ALWAYS_EQUAL)
   ASIOEXT_NOEXCEPT_IF(allocator_traits_type::is_always_equal::value)
-# endif
+#endif
 {
   if (static_cast<allocator_type&>(rep_) !=
       static_cast<allocator_type&>(other.rep_)) {
@@ -170,7 +166,7 @@ void basic_linear_buffer<Allocator>::move_assign(basic_linear_buffer& other,
   }
 }
 
-template <class Allocator>
+template <typename Allocator>
 void basic_linear_buffer<Allocator>::move_assign(basic_linear_buffer& other,
                                                  std::true_type)
   ASIOEXT_NOEXCEPT_IF(std::is_nothrow_move_assignable<allocator_type>::value)
@@ -184,9 +180,8 @@ void basic_linear_buffer<Allocator>::move_assign(basic_linear_buffer& other,
   other.rep_.data_ = nullptr;
   other.capacity_ = other.size_ = 0;
 }
-#endif
 
-template <class Allocator>
+template <typename Allocator>
 template <typename Function>
 void basic_linear_buffer<Allocator>::reallocate(std::size_t cap, Function&& fn)
 {
@@ -197,7 +192,7 @@ void basic_linear_buffer<Allocator>::reallocate(std::size_t cap, Function&& fn)
   capacity_ = cap;
 }
 
-template <class Allocator>
+template <typename Allocator>
 typename dynamic_linear_buffer<Allocator>::mutable_buffers_type
 dynamic_linear_buffer<Allocator>::prepare(std::size_t n)
 {
@@ -211,7 +206,7 @@ dynamic_linear_buffer<Allocator>::prepare(std::size_t n)
                               data_.size() - size_);
 }
 
-template <class Allocator>
+template <typename Allocator>
 typename dynamic_linear_buffer<Allocator>::mutable_buffers_type
 dynamic_linear_buffer<Allocator>::prepare(std::size_t n, error_code& ec)
 {

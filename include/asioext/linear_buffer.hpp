@@ -17,7 +17,6 @@
 #include "asioext/error_code.hpp"
 #include "asioext/detail/buffer.hpp"
 #include "asioext/detail/is_raw_byte_container.hpp"
-#include "asioext/detail/move_support.hpp"
 #include "asioext/detail/cstdint.hpp"
 
 #include <memory>
@@ -126,20 +125,18 @@ public:
   /// @brief Copy-construct a linear buffer.
   basic_linear_buffer(const basic_linear_buffer& other);
 
-#ifdef ASIOEXT_HAS_MOVE
   /// @brief Move-construct a linear buffer.
   ///
   /// After the move, @c other is an empty buffer with no allocated memory
   /// (as-if just default-constructed).
   basic_linear_buffer(basic_linear_buffer&& other) ASIOEXT_NOEXCEPT
-    : rep_(ASIOEXT_MOVE_CAST(representation_type)(other.rep_))
+    : rep_(std::move(other.rep_))
     , capacity_(other.capacity_)
     , size_(other.size_)
     , max_size_(other.max_size_)
   {
     other.capacity_ = other.size_ = 0;
   }
-#endif
 
   /// @brief Destroy the basic_linear_buffer.
   ///
@@ -153,13 +150,11 @@ public:
   /// @brief Copy-assign a linear buffer.
   basic_linear_buffer& operator=(const basic_linear_buffer& other);
 
-#ifdef ASIOEXT_HAS_MOVE
   /// @brief Move-assign a linear buffer.
   ///
   /// After the move, @c other is an empty buffer with no allocated memory
   /// (as-if just default-constructed).
   basic_linear_buffer& operator=(basic_linear_buffer&& other) ASIOEXT_NOEXCEPT;
-#endif
 
   /// @brief Get the size of the input sequence.
   std::size_t size() const ASIOEXT_NOEXCEPT
@@ -383,40 +378,31 @@ private:
     representation_type() ASIOEXT_NOEXCEPT
       : Allocator()
       , data_(nullptr)
-    {
-      // ctor
-    }
+    {}
 
     explicit representation_type(const Allocator& a) ASIOEXT_NOEXCEPT
       : Allocator(a)
       , data_(nullptr)
-    {
-      // ctor
-    }
+    {}
 
-#ifdef ASIOEXT_HAS_MOVE
     representation_type(representation_type&& other) ASIOEXT_NOEXCEPT
-      : Allocator(ASIOEXT_MOVE_CAST(allocator_type)(
-            static_cast<allocator_type&>(other)))
+      : Allocator(std::move(static_cast<allocator_type&>(other)))
       , data_(other.data_)
     {
       other.data_ = nullptr;
     }
-#endif
 
     uint8_t* data_;
   };
 
-#ifdef ASIOEXT_HAS_MOVE
   void move_assign(basic_linear_buffer& other, std::false_type)
-# if defined(ASIOEXT_HAS_ALLOCATOR_ALWAYS_EQUAL)
+#if defined(ASIOEXT_HAS_ALLOCATOR_ALWAYS_EQUAL)
     ASIOEXT_NOEXCEPT_IF(allocator_traits_type::is_always_equal::value)
-# endif
+#endif
     ;
 
   void move_assign(basic_linear_buffer& other, std::true_type)
     ASIOEXT_NOEXCEPT_IF(std::is_nothrow_move_assignable<allocator_type>::value);
-#endif
 
   template <typename Function>
   void reallocate(std::size_t cap, Function&& cb);
@@ -488,7 +474,6 @@ public:
   {
   }
 
-#if defined(ASIOEXT_HAS_MOVE)
   /// @brief Move-construct a dynamic buffer.
   ///
   /// The moved-from object should no longer be used afterwards.
@@ -498,7 +483,6 @@ public:
     , max_size_(other.max_size_)
   {
   }
-#endif
 
   /// @brief Get the size of the input sequence.
   std::size_t size() const ASIOEXT_NOEXCEPT

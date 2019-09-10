@@ -24,20 +24,20 @@
 #include "asioext/async_result.hpp"
 
 #include "asioext/detail/throw_error.hpp"
-#include "asioext/detail/move_support.hpp"
-#include "asioext/detail/handler_type.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
 # include <boost/asio/basic_io_object.hpp>
-# include <boost/asio/io_service.hpp>
+# include <boost/asio/io_context.hpp>
 #else
 # include <asio/basic_io_object.hpp>
-# include <asio/io_service.hpp>
+# include <asio/io_context.hpp>
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>
 #endif
+
+#include <utility>
 
 ASIOEXT_NS_BEGIN
 
@@ -72,10 +72,10 @@ public:
 
   /// @brief Construct an unopened file.
   ///
-  /// @param io_service The io_service object that the file will use to
+  /// @param io_context The io_context object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
-  explicit basic_file(asio::io_service& io_service) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_service)
+  explicit basic_file(asio::io_context& io_context) ASIOEXT_NOEXCEPT
+    : asio::basic_io_object<FileService>(io_context)
   {
     // ctor
   }
@@ -84,14 +84,14 @@ public:
   ///
   /// This constructor takes ownership of the given wrapped native handle.
   ///
-  /// @param io_service The io_service object that the file will use to
+  /// @param io_context The io_context object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
   ///
   /// @param handle The native handle object, wrapped in a file_handle,
   /// which shall be assigned to this basic_file object.
-  basic_file(asio::io_service& io_service,
+  basic_file(asio::io_context& io_context,
              const file_handle& handle) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     error_code ec;
     this->get_service().assign(this->get_implementation(),
@@ -103,14 +103,14 @@ public:
   ///
   /// This constructor takes ownership of the given native handle.
   ///
-  /// @param io_service The io_service object that the file will use to
+  /// @param io_context The io_context object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
   ///
   /// @param handle The native handle object which shall be assigned to
   /// this basic_file object.
-  basic_file(asio::io_service& io_service,
+  basic_file(asio::io_context& io_context,
              const native_handle_type& handle) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     error_code ec;
     this->get_service().assign(this->get_implementation(), handle, ec);
@@ -123,7 +123,7 @@ public:
   ///
   /// For details, see @ref open(const char*,const open_args&)
   ///
-  /// @param io_service The io_service object that the file will use to
+  /// @param io_context The io_context object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
   ///
   /// @param filename The path of the file to open.
@@ -133,9 +133,9 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  basic_file(asio::io_service& io_service,
+  basic_file(asio::io_context& io_context,
              const char* filename, const open_args& args)
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, args, ec);
@@ -148,7 +148,7 @@ public:
   ///
   /// For details, see @ref open(const char*,const open_args&)
   ///
-  /// @param io_service The io_service object that the file will use to
+  /// @param io_context The io_context object that the file will use to
   /// dispatch handlers for any asynchronous operations performed on it.
   ///
   /// @param filename The path of the file to open.
@@ -159,52 +159,52 @@ public:
   /// the object is reset.
   ///
   /// @see open_flags
-  basic_file(asio::io_service& io_service, const char* filename,
+  basic_file(asio::io_context& io_context, const char* filename,
              const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     this->get_service().open(this->get_implementation(), filename, args, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_service&,const char*,const open_args&)
+  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&)
   ///
   /// @note Only available on Windows.
-  basic_file(asio::io_service& io_service, const wchar_t* filename,
+  basic_file(asio::io_context& io_context, const wchar_t* filename,
              const open_args& args)
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, args, ec);
     detail::throw_error(ec, "construct");
   }
 
-  /// @copydoc basic_file(asio::io_service&,const char*,const open_args&,error_code&)
+  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&,error_code&)
   ///
   /// @note Only available on Windows.
-  basic_file(asio::io_service& io_service, const wchar_t* filename,
+  basic_file(asio::io_context& io_context, const wchar_t* filename,
              const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     this->get_service().open(this->get_implementation(), filename, args, ec);
   }
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_service&,const char*,const open_args&)
-  basic_file(asio::io_service& io_service,
+  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&)
+  basic_file(asio::io_context& io_context,
              const boost::filesystem::path& filename, const open_args& args)
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, args, ec);
     detail::throw_error(ec, "construct");
   }
 
-  /// @copydoc basic_file(asio::io_service&,const char*,const open_args&,error_code&)
-  basic_file(asio::io_service& io_service, const boost::filesystem::path& filename,
+  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&,error_code&)
+  basic_file(asio::io_context& io_context, const boost::filesystem::path& filename,
              const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_service)
+    : asio::basic_io_object<FileService>(io_context)
   {
     this->get_service().open(this->get_implementation(), filename, args, ec);
   }
@@ -928,7 +928,7 @@ public:
   /// Regardless of whether the asynchronous operation completes immediately or
   /// not, the handler will not be invoked from within this function. Invocation
   /// of the handler will be performed in a manner equivalent to using
-  /// asio::io_service::post().
+  /// asio::io_context::post().
   ///
   /// @note The read operation may not read all of the requested number of bytes.
   /// Consider using the @c asio::async_read function if you need to ensure
@@ -953,14 +953,10 @@ public:
   template <typename MutableBufferSequence, typename ReadHandler>
   ASIOEXT_INITFN_RESULT_TYPE(ReadHandler, void (error_code, std::size_t))
   async_read_some(const MutableBufferSequence& buffers,
-                  ASIOEXT_MOVE_ARG(ReadHandler) handler)
+                  ReadHandler&& handler)
   {
-    // If you get an error on the following line it means that your handler does
-    // not meet the documented type requirements for a ReadHandler.
-    ASIOEXT_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
-
     return this->get_service().async_read_some(this->get_implementation(),
-        buffers, ASIOEXT_MOVE_CAST(ReadHandler)(handler));
+        buffers, std::forward<ReadHandler>(handler));
   }
 
   /// @}
@@ -988,7 +984,7 @@ public:
   /// Regardless of whether the asynchronous operation completes immediately or
   /// not, the handler will not be invoked from within this function. Invocation
   /// of the handler will be performed in a manner equivalent to using
-  /// asio::io_service::post().
+  /// asio::io_context::post().
   ///
   /// @note The write operation may not write all of the data.
   /// Consider using the @c asio::async_write function if you need to ensure
@@ -1012,14 +1008,10 @@ public:
   template <typename ConstBufferSequence, typename WriteHandler>
   ASIOEXT_INITFN_RESULT_TYPE(WriteHandler, void (error_code, std::size_t))
   async_write_some(const ConstBufferSequence& buffers,
-                   ASIOEXT_MOVE_ARG(WriteHandler) handler)
+                   WriteHandler&& handler)
   {
-    // If you get an error on the following line it means that your handler does
-    // not meet the documented type requirements for a WriteHandler.
-    ASIOEXT_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
-
     return this->get_service().async_write_some(this->get_implementation(),
-        buffers, ASIOEXT_MOVE_CAST(WriteHandler)(handler));
+        buffers, std::forward<WriteHandler>(handler));
   }
 
   /// @}
@@ -1049,7 +1041,7 @@ public:
   /// Regardless of whether the asynchronous operation completes immediately or
   /// not, the handler will not be invoked from within this function. Invocation
   /// of the handler will be performed in a manner equivalent to using
-  /// asio::io_service::post().
+  /// asio::io_context::post().
   ///
   /// @note The read operation may not read all of the requested number of
   /// bytes.
@@ -1071,14 +1063,10 @@ public:
   ASIOEXT_INITFN_RESULT_TYPE(ReadHandler, void(error_code, std::size_t))
   async_read_some_at(uint64_t offset,
                      const MutableBufferSequence& buffers,
-                     ASIOEXT_MOVE_ARG(ReadHandler) handler)
+                     ReadHandler&& handler)
   {
-    // If you get an error on the following line it means that your handler does
-    // not meet the documented type requirements for a ReadHandler.
-    ASIOEXT_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
-
     return this->get_service().async_read_some_at(this->get_implementation(),
-        offset, buffers, ASIOEXT_MOVE_CAST(ReadHandler)(handler));
+        offset, buffers, std::forward<ReadHandler>(handler));
   }
 
   /// @}
@@ -1109,7 +1097,7 @@ public:
   /// Regardless of whether the asynchronous operation completes immediately or
   /// not, the handler will not be invoked from within this function. Invocation
   /// of the handler will be performed in a manner equivalent to using
-  /// asio::io_service::post().
+  /// asio::io_context::post().
   ///
   /// @note The write operation may not write all of the data.
   /// Consider using the asio::async_write_at function if you need to ensure
@@ -1128,14 +1116,10 @@ public:
   ASIOEXT_INITFN_RESULT_TYPE(WriteHandler, void(error_code, std::size_t))
   async_write_some_at(uint64_t offset,
                       const ConstBufferSequence& buffers,
-                      ASIOEXT_MOVE_ARG(WriteHandler) handler)
+                      WriteHandler&& handler)
   {
-    // If you get an error on the following line it means that your handler does
-    // not meet the documented type requirements for a WriteHandler.
-    ASIOEXT_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
-
     return this->get_service().async_write_some_at(this->get_implementation(),
-        offset, buffers, ASIOEXT_MOVE_CAST(WriteHandler)(handler));
+        offset, buffers, std::forward<WriteHandler>(handler));
   }
 
   /// @}

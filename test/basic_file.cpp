@@ -40,8 +40,8 @@ typedef boost::mpl::list<asioext::thread_pool_file_service> service_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(empty, FileService, service_types)
 {
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
   BOOST_CHECK(!file.is_open());
   BOOST_CHECK_NO_THROW(file.close());
 }
@@ -50,23 +50,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructor, FileService, service_types)
 {
   test_file_rm_guard rguard1(empty_filename);
 
-  asio::io_service io_service;
+  asio::io_context io_context;
   asioext::error_code ec;
-  asioext::basic_file<FileService> f1(io_service, "nosuchfile",
+  asioext::basic_file<FileService> f1(io_context, "nosuchfile",
                                       asioext::open_flags::access_read |
                                       asioext::open_flags::open_existing, ec);
   BOOST_REQUIRE(ec);
-  asioext::basic_file<FileService> f2(io_service, empty_filename,
+  asioext::basic_file<FileService> f2(io_context, empty_filename,
                                       asioext::open_flags::access_write |
                                       asioext::open_flags::open_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
 #if defined(ASIOEXT_WINDOWS)
   test_file_rm_guard rguard2(empty_filenamew);
-  asioext::basic_file<FileService> f3(io_service, L"nosuchfile",
+  asioext::basic_file<FileService> f3(io_context, L"nosuchfile",
                                       asioext::open_flags::access_read |
                                       asioext::open_flags::open_existing, ec);
   BOOST_REQUIRE(ec);
-  asioext::basic_file<FileService> f4(io_service, empty_filenamew,
+  asioext::basic_file<FileService> f4(io_context, empty_filenamew,
                                       asioext::open_flags::access_write |
                                       asioext::open_flags::open_always, ec);
   BOOST_REQUIRE_MESSAGE(!ec, "ec: " << ec);
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(open, FileService, service_types)
   test_file_rm_guard rguard2(empty_filenamew);
 #endif
 
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open("nosuchfile",
@@ -121,8 +121,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(read_write, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open(test_filename,
@@ -150,8 +150,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(position_and_size, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open(test_filename,
@@ -170,8 +170,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(seek, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open(test_filename,
@@ -270,8 +270,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open(test_filename,
@@ -282,8 +282,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
                                            write_handler<FileService>(file)));
 
   // Run the just enqueued operations.
-  io_service.run();
-  io_service.reset();
+  io_context.run();
+  io_context.reset();
 
   BOOST_REQUIRE_NO_THROW(file.close());
 
@@ -299,16 +299,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write, FileService, service_types)
   ));
 
   // Run the just enqueued operations.
-  io_service.run();
-  io_service.reset();
+  io_context.run();
+  io_context.reset();
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write_at, FileService, service_types)
 {
   test_file_rm_guard rguard1(test_filename);
 
-  asio::io_service io_service;
-  asioext::basic_file<FileService> file(io_service);
+  asio::io_context io_context;
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open(test_filename,
@@ -320,8 +320,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write_at, FileService, service_types)
       write_handler<FileService>(file)));
 
   // Run the just enqueued operations.
-  io_service.run();
-  io_service.reset();
+  io_context.run();
+  io_context.reset();
 
   BOOST_REQUIRE_NO_THROW(file.close());
 
@@ -337,8 +337,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write_at, FileService, service_types)
   ));
 
   // Run the just enqueued operations.
-  io_service.run();
-  io_service.reset();
+  io_context.run();
+  io_context.reset();
 }
 
 template <class FileService>
@@ -374,7 +374,7 @@ struct cancel_handler
   }
 
   asioext::basic_file<FileService>& file_;
-  asio::io_service::work work_;
+  asio::io_context::work work_;
 };
 
 BOOST_AUTO_TEST_CASE(async_read_write_cancel)
@@ -383,12 +383,12 @@ BOOST_AUTO_TEST_CASE(async_read_write_cancel)
 
   test_file_rm_guard rguard1(test_filename);
 
-  asio::io_service io_service;
+  asio::io_context io_context;
 
-  FileService* svc = new FileService(io_service, 1);
-  asio::add_service(io_service, svc);
+  FileService* svc = new FileService(io_context, 1);
+  asio::add_service(io_context, svc);
 
-  asioext::basic_file<FileService> file(io_service);
+  asioext::basic_file<FileService> file(io_context);
 
   asioext::error_code ec;
   file.open(test_filename,
@@ -399,8 +399,8 @@ BOOST_AUTO_TEST_CASE(async_read_write_cancel)
   asio::post(svc->get_thread_pool(), cancel_handler<FileService>(file));
 
   // Run the just enqueued operations.
-  io_service.run();
-  io_service.reset();
+  io_context.run();
+  io_context.reset();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

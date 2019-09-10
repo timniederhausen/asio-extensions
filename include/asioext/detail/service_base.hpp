@@ -13,17 +13,33 @@
 #endif
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/io_service.hpp>
+# include <boost/asio/io_context.hpp>
 #else
-# include <asio/io_service.hpp>
+# include <asio/io_context.hpp>
 #endif
 
 ASIOEXT_NS_BEGIN
 
 namespace detail {
 
-// TODO(tim): We shouldn't depend on asio's internals.
-using asio::detail::service_base;
+template <typename Service>
+struct service_id : asio::execution_context::id
+{};
+
+template <typename Service>
+class io_context_service_base : public asio::io_context::service
+{
+public:
+  static service_id<Service> id;
+
+  // Constructor.
+  io_context_service_base(asio::io_context& owner)
+    : asio::io_context::service(owner)
+  {}
+};
+
+template <typename Service>
+service_id<Service> io_context_service_base<Service>::id;
 
 }
 

@@ -34,8 +34,6 @@ unique_file_handle::~unique_file_handle()
   // error is swallowed
 }
 
-#ifdef ASIOEXT_HAS_MOVE
-
 unique_file_handle::unique_file_handle(unique_file_handle&& other) ASIOEXT_NOEXCEPT
   : handle_(other.handle_)
 {
@@ -52,8 +50,6 @@ unique_file_handle& unique_file_handle::operator=(unique_file_handle&& other)
   return *this;
 }
 
-#endif
-
 file_handle unique_file_handle::release() ASIOEXT_NOEXCEPT
 {
   file_handle handle = handle_;
@@ -65,7 +61,7 @@ void unique_file_handle::reset(file_handle handle)
 {
   error_code ec;
   reset(handle, ec);
-  detail::throw_error(ec);
+  detail::throw_error(ec, "reset");
 }
 
 void unique_file_handle::reset(file_handle handle,

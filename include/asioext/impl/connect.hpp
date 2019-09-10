@@ -81,7 +81,7 @@ ASIOEXT_INITFN_RESULT_TYPE(ComposedConnectHandler,
 async_connect(asio::ip::tcp::socket::lowest_layer_type& socket,
               asio::ip::tcp::resolver& resolver,
               const asio::ip::tcp::resolver::query& q,
-              ASIOEXT_MOVE_ARG(ComposedConnectHandler) handler)
+              ComposedConnectHandler&& handler)
 {
   return async_initiate<ComposedConnectHandler,
     void(error_code, asio::ip::tcp::resolver::iterator)>(
