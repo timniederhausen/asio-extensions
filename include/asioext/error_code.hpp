@@ -61,6 +61,70 @@ using std::generic_category;
 using std::errc;
 #endif
 
+// We want error_category objects without dynamic initialization.
+// Achieving this is quite tedious, as older versions of Boost and some
+// standard library implementations do not mark their error_category
+// constructors as `constexpr`.
+//
+// The following machinery allows us to fall back on dynamically initialized
+// error_category's if need be.
+
+// ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR: Is std::error_category's ctor constexpr?
+#if !defined(ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR)
+# if defined(ASIOEXT_HAS_CONSTEXPR14)
+#  if defined(ASIOEXT_USE_BOOST_ASIO)
+#   if (BOOST_VERSION >= 106900)
+#    define ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR 1
+#   endif
+#  elif !defined(ASIOEXT_MSVC)
+#   define ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR 1
+#  endif
+# endif
+#endif
+
+// ASIOEXT_ERRORCATEGORY_IN_HEADER: Do we need to define the error_category
+// subclass in the header?
+#if !defined(ASIOEXT_ERRORCATEGORY_IN_HEADER) && !defined(ASIOEXT_IS_DOCUMENTATION)
+# if defined(ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR)
+#  define ASIOEXT_ERRORCATEGORY_IN_HEADER 1
+# elif defined(ASIOEXT_HEADER_ONLY) || defined(ASIOEXT_SOURCE)
+#  define ASIOEXT_ERRORCATEGORY_IN_HEADER 1
+# endif
+#endif
+
+#if defined(ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR) && !defined(ASIOEXT_IS_DOCUMENTATION)
+// Use `extern template` if we're not header-only
+# if !defined(ASIOEXT_HEADER_ONLY)
+#  if defined(ASIOEXT_SOURCE)
+#   define ASIOEXT_DECLARE_ERRORCATEGORY_HOLDER(TYPE, NAME) \
+      template struct detail::NAME ## _holder<void>;
+#  else
+#   define ASIOEXT_DECLARE_ERRORCATEGORY_HOLDER(TYPE, NAME) \
+      extern template struct detail::NAME ## _holder<void>;
+#  endif
+# else
+#  define ASIOEXT_DECLARE_ERRORCATEGORY_HOLDER(TYPE, NAME)
+# endif
+
+# define ASIOEXT_DECLARE_ERRORCATEGORY(TYPE, NAME) \
+  constexpr const error_category& NAME() ASIOEXT_NOEXCEPT; \
+  namespace detail { \
+  template <typename T> struct NAME ## _holder { \
+    static constexpr TYPE instance{}; \
+  }; \
+  template<typename T> constexpr TYPE NAME ## _holder<T>::instance; } \
+  ASIOEXT_DECLARE_ERRORCATEGORY_HOLDER(TYPE, NAME) \
+  constexpr const error_category& NAME() ASIOEXT_NOEXCEPT \
+  { return detail::NAME ## _holder<void>::instance; }
+# define ASIOEXT_DEFINE_ERRORCATEGORY(TYPE, NAME)
+#else
+# define ASIOEXT_DECLARE_ERRORCATEGORY(TYPE, NAME) \
+  ASIOEXT_DECL const error_category& NAME() ASIOEXT_NOEXCEPT;
+# define ASIOEXT_DEFINE_ERRORCATEGORY(TYPE, NAME) \
+  const error_category& NAME() ASIOEXT_NOEXCEPT \
+  { static const TYPE instance; return instance; }
+#endif
+
 ASIOEXT_NS_END
 
 #endif

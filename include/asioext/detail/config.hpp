@@ -32,6 +32,7 @@
 // Note: Don't define platform-identification macros here!
 # define ASIOEXT_HAS_MOVE 1
 # define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
+# define ASIOEXT_HAS_DEFAULTED_FUNCTIONS 1
 # define ASIOEXT_DELETED = delete
 # define ASIOEXT_NOEXCEPT noexcept
 # define ASIOEXT_NOEXCEPT_IF(c) noexcept(c)
@@ -130,6 +131,22 @@
 # endif
 # if defined(ASIOEXT_MSVC) && (ASIOEXT_MSVC >= 1800)
 #  define ASIOEXT_HAS_VARIADIC_TEMPLATES 1
+# endif
+#endif
+
+// ASIOEXT_HAS_DEFAULTED_FUNCTIONS: Support for '= default' member functions.
+#if !defined(ASIOEXT_HAS_DEFAULTED_FUNCTIONS)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define ASIOEXT_HAS_DEFAULTED_FUNCTIONS 1
+#   endif
+#  endif
+# endif
+# if defined(__clang__)
+#  if __has_feature(cxx_defaulted_functions)
+#   define ASIOEXT_HAS_DEFAULTED_FUNCTIONS 1
+#  endif
 # endif
 #endif
 
@@ -380,6 +397,7 @@
 # endif
 #endif
 
+// ASIOEXT_HAS_BOOST_FILESYSTEM: Support for Boost.Filesystem
 #if !defined(ASIOEXT_HAS_BOOST_FILESYSTEM)
 # if !defined(ASIOEXT_DISABLE_BOOST_FILESYSTEM)
 #  if (BOOST_VERSION >= 104600)

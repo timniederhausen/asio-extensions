@@ -69,8 +69,23 @@ enum class error
   generic,
 };
 
+#if defined(ASIOEXT_ERRORCATEGORY_IN_HEADER)
+
+class error_category_impl : public error_category
+{
+public:
+#if defined(ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR)
+  constexpr error_category_impl() = default;
+#endif
+
+  ASIOEXT_DECL const char* name() const ASIOEXT_NOEXCEPT;
+  ASIOEXT_DECL std::string message(int value) const;
+};
+
+#endif
+
 /// @brief Get the @c error_category for @c error
-ASIOEXT_DECL const error_category& get_error_category() ASIOEXT_NOEXCEPT;
+ASIOEXT_DECLARE_ERRORCATEGORY(error_category_impl, get_error_category)
 
 inline error_code make_error_code(error e) ASIOEXT_NOEXCEPT
 {
@@ -107,7 +122,7 @@ struct is_error_code_enum<asioext::socks::error>
 }
 #endif
 
-#if defined(ASIOEXT_HEADER_ONLY)
+#if defined(ASIOEXT_HEADER_ONLY) || defined(ASIOEXT_HAS_CONSTEXPR_ERRORCATEGORY)
 # include "asioext/socks/impl/error.cpp"
 #endif
 
