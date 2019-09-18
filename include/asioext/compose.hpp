@@ -190,7 +190,12 @@ public:
   /// @endcode
   template <typename... Args>
   void operator()(Args&&... args)
+#if !defined(__GNUC__) || defined(__clang__)
+  // https://travis-ci.org/timniederhausen/asio-extensions/jobs/586780540
+  // GCC incorrectly rejects *this inside the noexcept clause
+  // see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52869
     ASIOEXT_NOEXCEPT_IF(noexcept(impl_(*this, std::forward<Args>(args)...)))
+#endif
   {
     if (state_ < 2)
       ++state_;

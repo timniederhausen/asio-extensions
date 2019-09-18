@@ -21,6 +21,7 @@
 #endif
 
 #include <type_traits>
+#include <utility>
 
 #if defined(ASIOEXT_IS_DOCUMENTATION)
 // @ingroup compat
@@ -211,7 +212,7 @@ inline typename std::enable_if<
                        CompletionToken& token,
                        Args&&... args)
 {
-  return async_result<typename decay<CompletionToken>::type,
+  return async_result<typename std::decay<CompletionToken>::type,
     Signature>::initiate(std::forward<Initiation>(initiation),
       token, std::forward<Args>(args)...);
 }

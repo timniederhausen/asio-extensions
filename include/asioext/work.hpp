@@ -73,7 +73,7 @@ class work_tuple<Head, Tail...>
 public:
   work_tuple(const Head& head, const Tail&... tail)
     : head_(head)
-    , tail_(tail)
+    , tail_(tail...)
   {}
 
   void reset()
