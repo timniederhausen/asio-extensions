@@ -3,11 +3,9 @@ language: cpp
 addons:
   apt:
     sources: &sources
-      - boost-latest
       # this is needed for gcc and clang
       - ubuntu-toolchain-r-test
     packages: &packages
-      - libboost1.55-all-dev
       - cmake
       - cmake-data
 
@@ -15,62 +13,91 @@ matrix:
   include:
     - compiler: gcc
       os: linux
+      env: TOOLSET=gcc BOOST_VERSION=default
       addons:
         apt:
           sources:
             - *sources
           packages:
-            - g++-4.8
+            - g++-8
             - *packages
 
     - compiler: gcc
       os: linux
-      env: CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
+      env: TOOLSET=gcc BOOST_VERSION=default CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
       addons:
         apt:
           sources:
             - *sources
           packages:
-            - g++-4.8
+            - g++-8
             - *packages
 
     - compiler: clang
       os: linux
+      env: TOOLSET=clang BOOST_VERSION=default
       addons:
         apt:
           sources:
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-xenial-8
             - *sources
           packages:
-            - clang-3.6
+            - clang-8
             - *packages
 
     - compiler: clang
       os: linux
-      env: CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
+      env: TOOLSET=clang BOOST_VERSION=default CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
       addons:
         apt:
           sources:
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-xenial-8
             - *sources
           packages:
-            - clang-3.6
+            - clang-8
             - *packages
 
     - compiler: clang
       os: osx
+      env: TOOLSET=clang BOOST_VERSION=default
 
 install:
-  # g++4.8
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" = "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  # clang 3.6
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CXX" == "clang++" ]]; then export CXX="clang++-3.6"; fi
+  # defaults
+  - if [[ "${BOOST_VERSION}" == "default" ]]; then BOOST_VERSION=1.66.0; fi
+
+  # g++8
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TOOLSET" = "gcc" ]]; then export CXX="g++-8" CC="gcc-8"; fi
+  # clang 8
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TOOLSET" == "clang" ]]; then export CXX="clang++-8"; fi
+
+  - DEPS_DIR="${HOME}/deps"
+  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+
+  ############################################################################
+  # Install Boost headers
+  ############################################################################
+  - |
+    if [[ "${BOOST_VERSION}" != "" ]]; then
+      BOOST_DIR=${DEPS_DIR}/boost-${BOOST_VERSION}
+      BOOST_URL="https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION//\./_}.tar.gz"
+
+      CXXFLAGS="-std=gnu++14"
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CXXFLAGS+="-Wno-variadic-macros -Wno-c99-extensions"; fi
+      echo "using $TOOLSET : : $CXX : <cxxflags>$CXXFLAGS ;" > ~/user-config.jam
+
+      mkdir -p ${BOOST_DIR}
+      { travis_retry wget -O - ${BOOST_URL} | tar --strip-components=1 -xz -C ${BOOST_DIR}; } || exit 1
+      (cd ${BOOST_DIR} && ./bootstrap.sh && ./b2 --with-filesystem --with-system --with-test variant=release toolset=$TOOLSET stage) || exit 1
+
+      CMAKE_OPTIONS+=" -DBOOST_ROOT=${BOOST_DIR}"
+    fi
 
 before_script:
-  - git clone --branch=asio-1-10-8 --depth=5 https://github.com/chriskohlhoff/asio.git
+  - cd "${TRAVIS_BUILD_DIR}"
+  - git clone --branch=master --depth=5 https://github.com/chriskohlhoff/asio.git
   - mkdir build
   - cd build
-  - cmake -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio ..
+  - cmake -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio .. ${CMAKE_OPTIONS}
 
 script:
   - make

@@ -31,10 +31,7 @@ if (NOT ASIOEXT_STANDALONE)
 	endif ()
 
 	set(Boost_USE_STATIC_LIBS ON)
-	find_package(Boost "1.55.0" COMPONENTS ${components} REQUIRED)
-else ()
-	# Standalone mode requires at least C++11
-	set(CMAKE_CXX_STANDARD 11)
+	find_package(Boost "1.66.0" COMPONENTS ${components} REQUIRED)
 endif ()
 
 add_subdirectory(src)

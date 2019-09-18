@@ -76,8 +76,6 @@ using std::errc;
 #   if (BOOST_VERSION >= 106900)
 #    define ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR 1
 #   endif
-#  elif !defined(ASIOEXT_MSVC)
-#   define ASIOEXT_ERRORCATEGORY_CONSTEXPR_CTOR 1
 #  endif
 # endif
 #endif
