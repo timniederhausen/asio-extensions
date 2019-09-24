@@ -25,8 +25,8 @@ std::size_t file_handle::read_some(const MutableBufferSequence& buffers,
                                    error_code& ec) ASIOEXT_NOEXCEPT
 {
   const asio::mutable_buffer buf = asioext::first_mutable_buffer(buffers);
-  return detail::win_file_ops::read(handle_, asio::buffer_cast<void*>(buf),
-                                    asio::buffer_size(buf), ec);
+  return detail::win_file_ops::read(
+      handle_, buf.data(), static_cast<uint32_t>(buf.size()), ec);
 }
 
 template <typename ConstBufferSequence>
@@ -35,7 +35,7 @@ std::size_t file_handle::write_some(const ConstBufferSequence& buffers,
 {
   const asio::const_buffer buf = asioext::first_const_buffer(buffers);
   return detail::win_file_ops::write(
-      handle_, asio::buffer_cast<const void*>(buf), asio::buffer_size(buf), ec);
+      handle_, buf.data(), static_cast<uint32_t>(buf.size()), ec);
 }
 
 template <typename MutableBufferSequence>
@@ -44,8 +44,8 @@ std::size_t file_handle::read_some_at(uint64_t offset,
                                       error_code& ec) ASIOEXT_NOEXCEPT
 {
   const asio::mutable_buffer buf = asioext::first_mutable_buffer(buffers);
-  return detail::win_file_ops::pread(handle_, asio::buffer_cast<void*>(buf),
-                                     asio::buffer_size(buf), offset, ec);
+  return detail::win_file_ops::pread(
+      handle_, buf.data(), static_cast<uint32_t>(buf.size()), offset, ec);
 }
 
 template <typename ConstBufferSequence>
@@ -54,9 +54,8 @@ std::size_t file_handle::write_some_at(uint64_t offset,
                                        error_code& ec) ASIOEXT_NOEXCEPT
 {
   const asio::const_buffer buf = asioext::first_const_buffer(buffers);
-  return detail::win_file_ops::pwrite(handle_,
-                                      asio::buffer_cast<const void*>(buf),
-                                      asio::buffer_size(buf), offset, ec);
+  return detail::win_file_ops::pwrite(
+      handle_, buf.data(), static_cast<uint32_t>(buf.size()), offset, ec);
 }
 
 ASIOEXT_NS_END
