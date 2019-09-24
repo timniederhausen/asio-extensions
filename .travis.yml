@@ -82,7 +82,7 @@ install:
       BOOST_URL="https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION//\./_}.tar.gz"
 
       CXXFLAGS="-std=gnu++14"
-      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CXXFLAGS+="-Wno-variadic-macros -Wno-c99-extensions"; fi
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CXXFLAGS+=" -Wno-variadic-macros -Wno-c99-extensions"; fi
       echo "using $TOOLSET : : $CXX : <cxxflags>$CXXFLAGS ;" > ~/user-config.jam
 
       mkdir -p ${BOOST_DIR}
