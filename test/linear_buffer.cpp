@@ -1,8 +1,25 @@
 #include "asioext/linear_buffer.hpp"
 
+#include "asioext/detail/asio_version.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 ASIOEXT_NS_BEGIN
+
+#if (ASIOEXT_ASIO_VERSION >= 101400)
+# if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
+static_assert(asio::is_dynamic_buffer_v1<asioext::dynamic_linear_buffer<
+                  std::allocator<char>>>::value,
+              "concept check");
+# endif
+static_assert(asio::is_dynamic_buffer_v2<asioext::dynamic_linear_buffer<
+                  std::allocator<char>>>::value,
+              "concept check");
+#else
+static_assert(asio::is_dynamic_buffer<asioext::dynamic_linear_buffer<
+                  std::allocator<char>>>::value,
+              "concept check");
+#endif
 
 BOOST_AUTO_TEST_SUITE(asioext_linear_buffer)
 
@@ -97,6 +114,23 @@ BOOST_AUTO_TEST_CASE(prepare_commit)
   BOOST_REQUIRE_EQUAL('C', asio::buffer_cast<const char*>(x1.data())[2]);
   BOOST_REQUIRE_EQUAL('D', asio::buffer_cast<const char*>(x1.data())[3]);
   BOOST_REQUIRE_EQUAL('F', asio::buffer_cast<const char*>(x1.data())[4]);
+}
+
+BOOST_AUTO_TEST_CASE(grow_shrink)
+{
+  linear_buffer a;
+  dynbuf_type x1(a);
+  BOOST_CHECK_EQUAL(0, x1.size());
+
+  x1.grow(4);
+  BOOST_CHECK_EQUAL(4, x1.size());
+  x1.grow(4);
+  BOOST_CHECK_EQUAL(8, x1.size());
+
+  x1.shrink(4);
+  BOOST_CHECK_EQUAL(4, x1.size());
+  x1.shrink(4);
+  BOOST_CHECK_EQUAL(0, x1.size());
 }
 
 BOOST_AUTO_TEST_CASE(consume)

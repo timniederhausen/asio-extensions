@@ -469,7 +469,9 @@ public:
       std::size_t maximum_size =
         (std::numeric_limits<std::size_t>::max)()) ASIOEXT_NOEXCEPT
     : data_(b)
-    , size_(data_.size())
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
+    , size_((std::numeric_limits<std::size_t>::max)())
+#endif
     , max_size_(std::min(b.max_size(), maximum_size))
   {
   }
@@ -479,7 +481,9 @@ public:
   /// The moved-from object should no longer be used afterwards.
   dynamic_linear_buffer(dynamic_linear_buffer&& other) ASIOEXT_NOEXCEPT
     : data_(other.data_)
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
     , size_(other.size_)
+#endif
     , max_size_(other.max_size_)
   {
   }
@@ -487,7 +491,11 @@ public:
   /// @brief Get the size of the input sequence.
   std::size_t size() const ASIOEXT_NOEXCEPT
   {
-    return size_;
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
+    if (size_ != (std::numeric_limits<std::size_t>::max)())
+      return size_;
+#endif
+    return (std::min)(data_.size(), max_size_);
   }
 
   /// @brief Get the maximum size of the dynamic buffer.
@@ -505,9 +513,11 @@ public:
   /// sequence and output sequence.
   std::size_t capacity() const ASIOEXT_NOEXCEPT
   {
-    return data_.capacity();
+    return (std::min)(data_.capacity(), max_size());
   }
 
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
+  // XXX: This is an extension anyway
   /// Get a list of buffers that represents the input sequence.
   ///
   /// @returns An object of type @c mutable_buffers_type that satisfies
@@ -533,7 +543,44 @@ public:
   {
     return const_buffers_type(data_.data(), size_);
   }
+#endif
 
+  /// @brief Get a sequence of buffers that represents the underlying memory.
+  ///
+  /// @param pos Position of the first byte to represent in the buffer sequence
+  ///
+  /// @param n The number of bytes to return in the buffer sequence. If the
+  /// underlying memory is shorter, the buffer sequence represents as many bytes
+  /// as are available.
+  ///
+  /// @returns An object of type @c mutable_buffers_type that satisfies
+  /// MutableBufferSequence requirements, representing the linear_buffer memory.
+  ///
+  /// @note The returned object is invalidated by any @c dynamic_linear_buffer
+  /// or @c linear_buffer member function that resizes or erases the linear_buffer.
+  ///
+  mutable_buffers_type data(std::size_t pos, std::size_t n) ASIOEXT_NOEXCEPT
+  {
+    return mutable_buffers_type(asio::buffer(data_.data(), size()) + pos, n);
+  }
+
+  /// @brief Get a sequence of buffers that represents the underlying memory.
+  /**
+   * @param pos Position of the first byte to represent in the buffer sequence
+   *
+   * @param n The number of bytes to return in the buffer sequence. If the
+   * underlying memory is shorter, the buffer sequence represents as many bytes
+   * as are available.
+   *
+   * @note The returned object is invalidated by any @c dynamic_linear_buffer
+   * or @c linear_buffer member function that resizes or erases the linear_buffer.
+   */
+  const_buffers_type data(std::size_t pos, std::size_t n) const ASIOEXT_NOEXCEPT
+  {
+    return const_buffers_type(asio::buffer(data_.data(), size()) + pos, n);
+  }
+
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
   /// @brief Get a list of buffers that represents the output sequence, with
   /// the given size.
   ///
@@ -589,6 +636,28 @@ public:
     size_ += (std::min)(n, data_.size() - size_);
     data_.resize(size_);
   }
+#endif
+
+  /// @brief Grow the underlying memory by the specified number of bytes.
+  ///
+  /// Resizes the @c linear_buffer to accommodate an additional @c n bytes
+  /// at the end.
+  ///
+  /// @throws std::length_error If <tt>size() + n > max_size()</tt>.
+  ///
+  void grow(std::size_t n);
+
+  /// @b Shrink the underlying memory by the specified number of bytes.
+  ///
+  /// Erases @c n bytes from the end of the vector by resizing the vector
+  /// object. If @c n is greater than the current size of the vector, the vector
+  /// is emptied.
+  ///
+  void shrink(std::size_t n)
+  {
+    const std::size_t siz = size();
+    data_.resize(siz - (std::min)(siz, n));
+  }
 
   /// @brief Remove characters from the input sequence.
   ///
@@ -598,14 +667,22 @@ public:
   /// input sequence is consumed and no error is issued.
   void consume(std::size_t n)
   {
-    const std::size_t consume_length = (std::min)(n, size_);
-    data_.erase(0, consume_length);
-    size_ -= consume_length;
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
+    if (size_ != (std::numeric_limits<std::size_t>::max)()) {
+      const std::size_t consume_length = (std::min)(n, size_);
+      data_.erase(0, consume_length);
+      size_ -= consume_length;
+      return;
+    }
+#endif
+    data_.erase(0, (std::min)((std::min)(data_.size(), max_size_), n));
   }
 
 private:
   basic_linear_buffer<Allocator>& data_;
+#if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
   std::size_t size_;
+#endif
   std::size_t max_size_;
 };
 
