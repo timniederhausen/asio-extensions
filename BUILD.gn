@@ -27,6 +27,10 @@ config("asioext_config") {
   defines = []
   include_dirs = [ "include" ]
 
+  if (is_win) {
+    defines += [ "_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING" ]
+  }
+
   if (!asioext_header_only) {
     defines += [ "ASIOEXT_SEPARATE_COMPILATION" ]
   }
@@ -88,6 +92,7 @@ source_set("asioext") {
     "include/asioext/detail/thread_group.hpp",
     "include/asioext/detail/throw_error.hpp",
     "include/asioext/detail/throw_exception.hpp",
+    "include/asioext/detail/url_parser.hpp",
     "include/asioext/detail/win_file_ops.hpp",
     "include/asioext/detail/win_path.hpp",
     "include/asioext/duplicate.hpp",
@@ -119,16 +124,18 @@ source_set("asioext") {
     "include/asioext/thread_pool_file_service.hpp",
     "include/asioext/unique_file_handle.hpp",
     "include/asioext/version.hpp",
-    "include/asioext/write_file.hpp",
     "include/asioext/work.hpp",
+    "include/asioext/write_file.hpp",
   ]
 
   if (!asioext_header_only) {
     sources += [
+      "include/asioext/detail/impl/url_parser.cpp",
       "include/asioext/impl/cancellation_token.cpp",
       "include/asioext/impl/chrono.cpp",
       "include/asioext/impl/connect.cpp",
       "include/asioext/impl/duplicate.cpp",
+      "include/asioext/impl/error.cpp",
       "include/asioext/impl/file_handle.cpp",
       "include/asioext/impl/open.cpp",
       "include/asioext/impl/open_flags.cpp",
@@ -136,7 +143,7 @@ source_set("asioext") {
       "include/asioext/impl/thread_pool_file_service.cpp",
       "include/asioext/impl/unique_file_handle.cpp",
       "include/asioext/socks/detail/impl/protocol.cpp",
-      "include/asioext/socks/impl/error.cpp",
+      "include/asioext/socks/impl/socks_error.cpp",
     ]
   }
 
@@ -202,6 +209,7 @@ executable("asioext_unittests") {
     "test/read_file.cpp",
     "test/test_file_rm_guard.cpp",
     "test/test_file_writer.cpp",
+    "test/url_parser.cpp",
     "test/write_file.cpp",
   ]
 

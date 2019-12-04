@@ -123,7 +123,7 @@ struct is_error_code_enum<asioext::socks::error>
 #endif
 
 #if defined(ASIOEXT_HEADER_ONLY) || defined(ASIOEXT_HAS_CONSTEXPR_ERRORCATEGORY)
-# include "asioext/socks/impl/error.cpp"
+# include "asioext/socks/impl/socks_error.cpp"
 #endif
 
 #endif

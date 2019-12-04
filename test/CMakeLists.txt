@@ -14,6 +14,7 @@ set(sources
 	read_file.cpp
 	test_file_rm_guard.cpp
 	test_file_writer.cpp
+	url_parser.cpp
 	write_file.cpp
 )
 

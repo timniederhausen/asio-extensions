@@ -43,7 +43,7 @@ if (WIN32)
 endif ()
 
 add_library(asioext ${asioext_source_files})
-target_compile_features(asioext PUBLIC cxx_constexpr cxx_relaxed_constexpr cxx_strong_enums cxx_return_type_deduction)
+target_compile_features(asioext PUBLIC cxx_std_17)
 target_include_directories(asioext PUBLIC ${asioext_SOURCE_DIR}/include)
 target_compile_definitions(asioext PUBLIC ASIOEXT_SEPARATE_COMPILATION)
 target_link_libraries(asioext PUBLIC asioext.asio)

@@ -12,13 +12,15 @@
 #include "asioext/impl/chrono.cpp"
 #include "asioext/impl/connect.cpp"
 #include "asioext/impl/duplicate.cpp"
+#include "asioext/impl/error.cpp"
 #include "asioext/impl/file_handle.cpp"
 #include "asioext/impl/open.cpp"
 #include "asioext/impl/open_flags.cpp"
 #include "asioext/impl/standard_streams.cpp"
 #include "asioext/impl/thread_pool_file_service.cpp"
 #include "asioext/impl/unique_file_handle.cpp"
-#include "asioext/socks/impl/error.cpp"
+#include "asioext/detail/impl/url_parser.cpp"
+#include "asioext/socks/impl/socks_error.cpp"
 #include "asioext/socks/detail/impl/protocol.cpp"
 
 #if defined(ASIOEXT_WINDOWS)
