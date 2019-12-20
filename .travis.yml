@@ -63,7 +63,7 @@ matrix:
 
 install:
   # defaults
-  - if [[ "${BOOST_VERSION}" == "default" ]]; then BOOST_VERSION=1.66.0; fi
+  - if [[ "${BOOST_VERSION}" == "default" ]]; then BOOST_VERSION=1.67.0; fi
 
   # g++8
   - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TOOLSET" = "gcc" ]]; then export CXX="g++-8" CC="gcc-8"; fi
@@ -73,6 +73,30 @@ install:
   - DEPS_DIR="${HOME}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
 
+  # following install steps are taken from
+  # https://github.com/boostorg/hana/blob/master/.travis.yml
+
+  ############################################################################
+  # Install libc++ and libc++abi if needed
+  ############################################################################
+  - |
+    if [[ "$TOOLSET" == "clang" ]]; then
+      LLVM_VERSION="8.0.1"
+      LLVM_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
+      LIBCXX_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
+      LIBCXXABI_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
+      mkdir -p llvm llvm/build llvm/projects/libcxx llvm/projects/libcxxabi
+      travis_retry wget -O - ${LLVM_URL} | tar --strip-components=1 -xJ -C llvm || exit 1
+      travis_retry wget -O - ${LIBCXX_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxx || exit 1
+      travis_retry wget -O - ${LIBCXXABI_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxxabi || exit 1
+      (cd llvm/build && cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_DIR}/llvm/install) || exit 1
+      (cd llvm/build/projects/libcxx && make install -j2) || exit 1
+      (cd llvm/build/projects/libcxxabi && make install -j2) || exit 1
+      export CXXFLAGS="-stdlib=libc++ -nostdinc++ -cxx-isystem ${DEPS_DIR}/llvm/install/include/c++/v1"
+      export LDFLAGS="-L ${DEPS_DIR}/llvm/install/lib -l c++ -l c++abi"
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
+    fi
+
   ############################################################################
   # Install Boost headers
   ############################################################################
@@ -81,9 +105,9 @@ install:
       BOOST_DIR=${DEPS_DIR}/boost-${BOOST_VERSION}
       BOOST_URL="https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION//\./_}.tar.gz"
 
-      CXXFLAGS="-std=gnu++14"
+      CXXFLAGS+=" -std=gnu++14"
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then CXXFLAGS+=" -Wno-variadic-macros -Wno-c99-extensions"; fi
-      echo "using $TOOLSET : : $CXX : <cxxflags>$CXXFLAGS ;" > ~/user-config.jam
+      echo "using $TOOLSET : : $CXX : <cxxflags>\"$CXXFLAGS\" ;" > ~/user-config.jam
 
       mkdir -p ${BOOST_DIR}
       { travis_retry wget -O - ${BOOST_URL} | tar --strip-components=1 -xz -C ${BOOST_DIR}; } || exit 1
@@ -97,7 +121,7 @@ before_script:
   - git clone --branch=master --depth=5 https://github.com/chriskohlhoff/asio.git
   - mkdir build
   - cd build
-  - cmake -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio .. ${CMAKE_OPTIONS}
+  - cmake -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio/asio -DCMAKE_CXX_FLAGS="${CXXFLAGS}" -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" ${CMAKE_OPTIONS} ..
 
 script:
   - make
