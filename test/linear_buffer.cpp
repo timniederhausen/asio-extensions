@@ -182,6 +182,24 @@ BOOST_AUTO_TEST_CASE(max_size)
   BOOST_CHECK_EQUAL(asio::error::no_memory, ec);
 }
 
+BOOST_AUTO_TEST_CASE(v2_data_access)
+{
+  linear_buffer a;
+  a.append("HELLO", 5);
+
+  dynbuf_type x1(a);
+  BOOST_REQUIRE_EQUAL(5, x1.data(0, 5).size());
+  BOOST_REQUIRE_EQUAL(4, x1.data(1, 4).size());
+  BOOST_CHECK(0 == std::memcmp(x1.data(0, 5).data(), "HELLO", 5));
+  BOOST_CHECK(0 == std::memcmp(x1.data(1, 4).data(), "ELLO", 4));
+
+  const auto& x1c = x1;
+  BOOST_REQUIRE_EQUAL(5, x1c.data(0, 5).size());
+  BOOST_REQUIRE_EQUAL(4, x1c.data(1, 4).size());
+  BOOST_CHECK(0 == std::memcmp(x1c.data(0, 5).data(), "HELLO", 5));
+  BOOST_CHECK(0 == std::memcmp(x1c.data(1, 4).data(), "ELLO", 4));
+}
+
 #if defined(ASIOEXT_HAS_MOVE)
 BOOST_AUTO_TEST_CASE(move)
 {

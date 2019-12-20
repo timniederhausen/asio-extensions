@@ -197,36 +197,40 @@ template <typename Allocator>
 typename dynamic_linear_buffer<Allocator>::mutable_buffers_type
 dynamic_linear_buffer<Allocator>::prepare(std::size_t n)
 {
-  if (size_ == (std::numeric_limits<std::size_t>::max)())
-    size_ = data_.size();
+  std::size_t siz = size_;
+  if (siz == (std::numeric_limits<std::size_t>::max)())
+    siz = data_.size();
 
-  if (size_ > max_size_ || max_size_ - size_ < n) {
+  if (siz > max_size_ || max_size_ - siz < n) {
     std::length_error ex("dynamic_linear_buffer too long");
     detail::throw_exception(ex);
   }
 
-  data_.resize(size_ + n);
-  return mutable_buffers_type(data_.data() + size_,
-                              data_.size() - size_);
+  size_ = siz;
+  data_.resize(siz + n);
+  return mutable_buffers_type(data_.data() + siz,
+                              data_.size() - siz);
 }
 
 template <typename Allocator>
 typename dynamic_linear_buffer<Allocator>::mutable_buffers_type
 dynamic_linear_buffer<Allocator>::prepare(std::size_t n, error_code& ec)
 {
-  if (size_ == (std::numeric_limits<std::size_t>::max)())
-    size_ = data_.size();
+  std::size_t siz = size_;
+  if (siz == (std::numeric_limits<std::size_t>::max)())
+    siz = data_.size();
 
-  if (size_ > max_size_ || max_size_ - size_ < n) {
+  if (siz > max_size_ || max_size_ - siz < n) {
     ec = asio::error::no_memory;
     return mutable_buffers_type(nullptr, 0);
   }
 
   ec = error_code();
 
-  data_.resize(size_ + n);
-  return mutable_buffers_type(data_.data() + size_,
-                              data_.size() - size_);
+  size_ = siz;
+  data_.resize(siz + n);
+  return mutable_buffers_type(data_.data() + siz,
+                              data_.size() - siz);
 }
 #endif
 

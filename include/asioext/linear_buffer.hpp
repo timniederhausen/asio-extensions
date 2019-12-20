@@ -561,7 +561,12 @@ public:
   ///
   mutable_buffers_type data(std::size_t pos, std::size_t n) ASIOEXT_NOEXCEPT
   {
-    return mutable_buffers_type(asio::buffer(data_.data(), size()) + pos, n);
+    const std::size_t siz = data_.size();
+    if (pos > siz)
+      pos = siz;
+    if (pos + n > siz)
+      n = siz - pos;
+    return mutable_buffers_type(data_.data() + pos, n);
   }
 
   /// @brief Get a sequence of buffers that represents the underlying memory.
@@ -577,7 +582,12 @@ public:
    */
   const_buffers_type data(std::size_t pos, std::size_t n) const ASIOEXT_NOEXCEPT
   {
-    return const_buffers_type(asio::buffer(data_.data(), size()) + pos, n);
+    const std::size_t siz = data_.size();
+    if (pos > siz)
+      pos = siz;
+    if (pos + n > siz)
+      n = siz - pos;
+    return const_buffers_type(data_.data() + pos, n);
   }
 
 #if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)
