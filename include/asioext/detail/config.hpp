@@ -418,6 +418,16 @@
 # endif
 #endif
 
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# if defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
+#  define ASIOEXT_NO_DYNAMIC_BUFFER_V1
+# endif
+#else
+# if defined(ASIO_NO_DYNAMIC_BUFFER_V1)
+#  define ASIOEXT_NO_DYNAMIC_BUFFER_V1
+# endif
+#endif
+
 // ASIOEXT_USE_BOOST_ASIO: Defines whether the standalone or
 // Boost version of Asio is used.
 //
