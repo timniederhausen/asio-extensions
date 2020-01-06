@@ -98,6 +98,7 @@ source_set("asioext") {
     "include/asioext/duplicate.hpp",
     "include/asioext/error.hpp",
     "include/asioext/exception.hpp",
+    "include/asioext/experimental/buffered_stream.hpp",
     "include/asioext/file.hpp",
     "include/asioext/file_attrs.hpp",
     "include/asioext/file_handle.hpp",
@@ -144,8 +145,8 @@ source_set("asioext") {
       "include/asioext/impl/open_flags.cpp",
       "include/asioext/impl/standard_streams.cpp",
       "include/asioext/impl/thread_pool_file_service.cpp",
-      "include/asioext/impl/unique_handler.cpp",
       "include/asioext/impl/unique_file_handle.cpp",
+      "include/asioext/impl/unique_handler.cpp",
       "include/asioext/socks/detail/impl/protocol.cpp",
       "include/asioext/socks/impl/socks_error.cpp",
     ]
