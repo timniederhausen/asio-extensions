@@ -18,6 +18,7 @@
 #include "asioext/impl/open_flags.cpp"
 #include "asioext/impl/standard_streams.cpp"
 #include "asioext/impl/thread_pool_file_service.cpp"
+#include "asioext/impl/unique_handler.cpp"
 #include "asioext/impl/unique_file_handle.cpp"
 #include "asioext/detail/impl/url_parser.cpp"
 #include "asioext/socks/impl/socks_error.cpp"
