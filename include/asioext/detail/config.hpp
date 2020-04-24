@@ -439,4 +439,12 @@ namespace asio = boost::asio;
 ASIOEXT_NS_END
 #endif
 
+ASIOEXT_NS_BEGIN
+
+// TODO: Detect std::void_t support and use that instead
+template <typename... Ts> struct make_void { typedef void type;};
+template <typename... Ts> using void_t = typename make_void<Ts...>::type;
+
+ASIOEXT_NS_END
+
 #endif

@@ -82,7 +82,6 @@ source_set("asioext") {
     "include/asioext/detail/error_code.hpp",
     "include/asioext/detail/handler_type.hpp",
     "include/asioext/detail/impl/chrono.hpp",
-    "include/asioext/detail/is_raw_byte_container.hpp",
     "include/asioext/detail/memory.hpp",
     "include/asioext/detail/move_support.hpp",
     "include/asioext/detail/mutex.hpp",

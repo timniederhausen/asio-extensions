@@ -16,7 +16,6 @@
 
 #include "asioext/error_code.hpp"
 #include "asioext/detail/buffer.hpp"
-#include "asioext/detail/is_raw_byte_container.hpp"
 #include "asioext/detail/cstdint.hpp"
 
 #include <memory>
@@ -38,6 +37,7 @@ public:
   typedef Allocator allocator_type;
   typedef std::allocator_traits<allocator_type> allocator_traits_type;
 
+  typedef uint8_t value_type;
   typedef std::size_t size_type;
 
   /// The type used to represent an iterator for the buffer's data.
@@ -438,10 +438,6 @@ inline asio::mutable_buffers_1 buffer(basic_linear_buffer<Allocator>& b)
 /// @brief A linear buffer using the default allocator.
 typedef basic_linear_buffer<> linear_buffer;
 
-template <class Allocator>
-struct is_raw_byte_container<basic_linear_buffer<Allocator>> : std::true_type
-{};
-
 /// @ingroup core
 /// @brief Adapt a @c basic_linear_buffer to the DynamicBuffer requirements.
 template <typename Allocator>
@@ -513,7 +509,7 @@ public:
   /// sequence and output sequence.
   std::size_t capacity() const ASIOEXT_NOEXCEPT
   {
-    return (std::min)(data_.capacity(), max_size());
+    return (std::min)(data_.capacity(), max_size_);
   }
 
 #if !defined(ASIOEXT_NO_DYNAMIC_BUFFER_V1)

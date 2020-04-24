@@ -15,10 +15,6 @@
 # pragma once
 #endif
 
-#include "asioext/detail/is_raw_byte_container.hpp"
-
-#include <string>
-#include <vector>
 #include <type_traits>
 
 ASIOEXT_NS_BEGIN
@@ -35,7 +31,7 @@ ASIOEXT_NS_BEGIN
 /// * The type X satisfies ContiguousContainer and
 /// * The type @c X::value_type satisfies PODType and
 /// * The type @c X::value_type has a size of 1 byte
-///   (<code>sizeof(X::value_type) == 1</code>) and
+///   (<code>sizeof(X::value_type) == 1</code>)
 ///
 /// Given:
 ///
@@ -54,11 +50,10 @@ ASIOEXT_NS_BEGIN
 /// @brief Determines whether T satisfies the @ref concept-RawByteContainer
 /// requirements.
 ///
-/// @note Currently there is no automatic way of determining conformance,
-/// so by default @c value is false. There are partial specializations for
-/// std::vector and std::basic_string that define value as @c true if the
-/// contained type is one of `char`, `unsigned char`, `signed char`.
-template <class T>
+/// @note This current only verifies that `value_type` is a 1 byte POD and the
+/// `data()`, `size()` and `resize()` member functions with the correct
+/// signature exist.
+template <typename T>
 struct is_raw_byte_container
 {
   /// @c true if T satisfies the @ref concept-RawByteContainer requirements,
@@ -66,35 +61,24 @@ struct is_raw_byte_container
   static const bool value;
 };
 #else
-template <class Traits, class Allocator>
-struct is_raw_byte_container<std::basic_string<char, Traits, Allocator> >
-  : std::true_type
+
+template <typename T, typename = void>
+struct is_raw_byte_container : std::false_type
 {};
 
-template <class Traits, class Allocator>
-struct is_raw_byte_container<std::basic_string<unsigned char, Traits, Allocator> >
-  : std::true_type
+template <typename T>
+struct is_raw_byte_container<T, void_t<
+  decltype(std::declval<T&>().data()),
+  decltype(std::declval<T&>().size()),
+  decltype(std::declval<T&>().resize(std::size_t())),
+  std::enable_if_t<
+    std::is_convertible<decltype(std::declval<T&>().data()), typename T::value_type*>::value &&
+    sizeof(typename T::value_type) == 1 &&
+    std::is_pod<typename T::value_type>::value
+  >
+>> : std::true_type
 {};
 
-template <class Traits, class Allocator>
-struct is_raw_byte_container<std::basic_string<signed char, Traits, Allocator> >
-  : std::true_type
-{};
-
-template <class Allocator>
-struct is_raw_byte_container<std::vector<char, Allocator> >
-  : std::true_type
-{};
-
-template <class Allocator>
-struct is_raw_byte_container<std::vector<unsigned char, Allocator> >
-  : std::true_type
-{};
-
-template <class Allocator>
-struct is_raw_byte_container<std::vector<signed char, Allocator> >
-  : std::true_type
-{};
 #endif
 
 /// @}
