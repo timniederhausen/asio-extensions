@@ -162,9 +162,10 @@ file_attrs native_to_file_attrs(uint32_t native) ASIOEXT_NOEXCEPT
 # define ASIOEXT_BIRTHTIME_NANOSECONDS 0
 #endif
 
-bool stat_to_times(const struct stat& st,
-                   file_time_type& ctime, file_time_type& atime,
-                   file_time_type& mtime) ASIOEXT_NOEXCEPT
+// Deliberately unlisted in the header so we don't have to #include <sys/stat.h>
+inline bool stat_to_times(const struct stat& st,
+                          file_time_type& ctime, file_time_type& atime,
+                          file_time_type& mtime) ASIOEXT_NOEXCEPT
 {
   file_time_type::duration ctim, atim, mtim;
   if (compose_time(chrono::seconds(ASIOEXT_BIRTHTIME_SECONDS),
@@ -231,6 +232,7 @@ int parse_open_flags(open_flags flags) ASIOEXT_NOEXCEPT
     case open_flags::access_read_write: native_flags |= O_RDWR; break;
     case open_flags::access_read: native_flags |= O_RDONLY; break;
     case open_flags::access_write: native_flags |= O_WRONLY; break;
+    default: break; // silence warning
   }
   return native_flags;
 }
