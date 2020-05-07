@@ -47,6 +47,18 @@ matrix:
 
     - compiler: clang
       os: linux
+      env: TOOLSET=clang BOOST_VERSION=default CMAKE_OPTIONS="-DASIOEXT_HEADER_ONLY=ON"
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-8
+            - *sources
+          packages:
+            - clang-8
+            - *packages
+
+    - compiler: clang
+      os: linux
       env: TOOLSET=clang BOOST_VERSION=default CMAKE_OPTIONS="-DASIOEXT_USE_BOOST_ASIO=ON"
       addons:
         apt:

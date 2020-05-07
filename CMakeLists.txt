@@ -3,12 +3,13 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.1)
-project(asioext)
+project(asioext VERSION 0.4.0 LANGUAGES CXX)
 
 include(CMakeDependentOption)
 
 option(ASIOEXT_BUILD_DOC "Build documentation" ON)
 option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
+option(ASIOEXT_HEADER_ONLY "Don't build any code, just setup a target" OFF)
 option(ASIOEXT_BUILD_SHARED "Build the shared library as well" OFF)
 option(ASIOEXT_WINDOWS_XP "Build with Windows XP support" OFF)
 cmake_dependent_option(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES
