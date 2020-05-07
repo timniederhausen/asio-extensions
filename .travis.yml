@@ -9,6 +9,11 @@ addons:
       - cmake
       - cmake-data
 
+cache:
+  directories:
+    - $HOME/deps/llvm
+    - $HOME/deps/boost-1.67
+
 matrix:
   include:
     - compiler: gcc
@@ -92,7 +97,7 @@ install:
   # Install libc++ and libc++abi if needed
   ############################################################################
   - |
-    if [[ "$TOOLSET" == "clang" ]]; then
+    if [[ "$TOOLSET" == "clang" ]] && [[ ! -d "${DEPS_DIR}/llvm/install" ]]; then
       LLVM_VERSION="8.0.1"
       LLVM_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
       LIBCXX_URL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
@@ -112,9 +117,9 @@ install:
   ############################################################################
   # Install Boost headers
   ############################################################################
+  - BOOST_DIR=${DEPS_DIR}/boost-${BOOST_VERSION}
   - |
-    if [[ "${BOOST_VERSION}" != "" ]]; then
-      BOOST_DIR=${DEPS_DIR}/boost-${BOOST_VERSION}
+    if [[ "${BOOST_VERSION}" != "" ]] && [[ ! -d "${BOOST_DIR}/boost" ]]; then
       BOOST_URL="https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION//\./_}.tar.gz"
 
       CXXFLAGS+=" -std=gnu++14"
