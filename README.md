@@ -1,6 +1,6 @@
 # Asio Extensions (_AsioExt_)
 
-[![Build Status](https://travis-ci.org/timniederhausen/asio-extensions.svg?branch=master)](https://travis-ci.org/timniederhausen/asio-extensions)
+[![Build Status](https://travis-ci.com/timniederhausen/asio-extensions.svg?branch=master)](https://travis-ci.com/timniederhausen/asio-extensions)
 [![Build status](https://ci.appveyor.com/api/projects/status/696yog08f0fbpck0/branch/master?svg=true)](https://ci.appveyor.com/project/timniederhausen/asio-extensions/branch/master)
 
 AsioExt is a collection of various components and functionality that builds on (Boost.)Asio.
@@ -19,7 +19,7 @@ It is compatible with standalone Asio, as well as the Boost version.
 **Networking:**
 
 * SOCKS 5 client library
-* Utility functions that simplify common operations (e.g. resolve and connect)
+* Utilities for common operations (e.g. resolve and connect)
 
 *This is a very coarse overview of the project's features.
 The [documentation](http://timniederhausen.github.io/asio-extensions) has all the details.*
