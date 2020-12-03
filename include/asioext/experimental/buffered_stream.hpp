@@ -27,10 +27,12 @@
 # include <boost/asio/associated_executor.hpp>
 # include <boost/asio/read.hpp>
 # include <boost/asio/write.hpp>
+# include <boost/asio/post.hpp>
 #else
 # include <asio/associated_executor.hpp>
 # include <asio/read.hpp>
 # include <asio/write.hpp>
+# include <asio/post.hpp>
 #endif
 
 #include <type_traits>
