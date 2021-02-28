@@ -154,7 +154,7 @@ public:
   /// After this operation the handler is considered <em>completed</em>,
   /// meaning it cannot be invoked again.
   /// The @c unique_handler object is reset to an empty state.
-  void operator()(Args... args)
+  void complete(Args... args)
   {
     // Reset storage_ before invoking user-code - we might get a new handler.
     auto storage = storage_;

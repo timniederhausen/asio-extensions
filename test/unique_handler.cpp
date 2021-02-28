@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(ctor)
   test::counters ctrs;
   unique_handler<void ()> uh(test::handler_with_allocator{&ctrs});
   BOOST_CHECK(uh);
-  uh();
+  uh.complete();
   BOOST_CHECK(!uh);
   BOOST_CHECK(ctrs.allocations == 1);
   BOOST_CHECK(ctrs.deallocations == 1);
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(ctor_move)
   unique_handler<void ()> uh2(std::move(uh));
   BOOST_CHECK(!uh);
   BOOST_CHECK(uh2);
-  uh2();
+  uh2.complete();
   BOOST_CHECK(!uh2);
   BOOST_CHECK(ctrs.allocations == 1);
   BOOST_CHECK(ctrs.deallocations == 1);
