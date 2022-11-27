@@ -49,6 +49,14 @@
 # endif
 #endif
 
+#if (ASIOEXT_ASIO_VERSION >= 102400)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+#  include <boost/asio/compose.hpp>
+# else
+#  include <asio/compose.hpp>
+# endif
+#endif
+
 ASIOEXT_NS_BEGIN
 
 template <typename Handler, typename Implementation, typename Work>
@@ -65,9 +73,9 @@ struct initiate_composed_op
       typename std::decay<Handler>::type,
       typename std::decay<Impl>::type,
       typename std::decay<Work>::type
-    >(std::forward<Handler>(handler),
-      std::forward<Impl>(impl),
-      std::forward<Work>(work))();
+    >(std::move(handler),
+      std::move(impl),
+      std::move(work))();
   }
 };
 
@@ -82,13 +90,17 @@ composed_operation<
     typename std::decay<Handler>::type,
     typename std::decay<Impl>::type,
     typename std::decay<Work>::type
-  >(std::forward<Handler>(handler),
-    std::forward<Impl>(impl),
-    std::forward<Work>(work));
+  >(std::move(handler),
+    std::move(impl),
+    std::move(work));
 }
 
 template <typename IoObject, typename = typename std::enable_if<
-  !asio::is_executor<IoObject>::value>::type>
+  !asio::is_executor<IoObject>::value
+#if (ASIOEXT_ASIO_VERSION >= 102400)
+  && !asio::execution::is_executor<IoObject>::value
+#endif
+>::type>
 inline typename IoObject::executor_type
 get_executor(IoObject& io_object)
 {
@@ -96,7 +108,11 @@ get_executor(IoObject& io_object)
 }
 
 template <typename Executor, typename = typename std::enable_if<
-  asio::is_executor<Executor>::value>::type>
+  asio::is_executor<Executor>::value
+#if (ASIOEXT_ASIO_VERSION >= 102400)
+  || asio::execution::is_executor<Executor>::value
+#endif
+>::type>
 inline const Executor& get_executor(const Executor& ex)
 { return ex; }
 
@@ -171,12 +187,11 @@ public:
   /// @param impl The operation's implementation.
   /// @param work @c asio::executor_work_guard objects
   /// that must be kept alive until after the operation's complete.
-  explicit composed_operation(Handler&& handler,
-                              Implementation&& impl,
-                              Work&& work)
-    : handler_(std::move(handler))
-    , impl_(std::move(impl))
-    , work_(std::move(work))
+  template <typename HandlerArg, typename ImplementationArg, typename WorkArg>
+  composed_operation(HandlerArg&& handler, ImplementationArg&& impl, WorkArg&& work)
+    : handler_(std::forward<HandlerArg>(handler))
+    , impl_(std::forward<ImplementationArg>(impl))
+    , work_(std::forward<WorkArg>(work))
     , state_(0)
   {
     // ctor
@@ -253,7 +268,7 @@ public:
 /// @brief Construct a @c composed_operation
 template <typename CompletionToken, typename Signature,
           typename Implementation, typename... IoObjectsOrExecutors>
-composed_operation<Handler, make_composed_operation(
+implementation_defined make_composed_operation(
     Implementation&& implementation, CompletionToken& token,
     IoObjectsOrExecutors&&... io_objects_or_executors);
 
@@ -281,6 +296,9 @@ auto make_composed_operation(Implementation&& implementation, Handler&& handler,
       ));
 }
 
+# if (ASIOEXT_ASIO_VERSION >= 102400)
+using asio::async_compose;
+# else
 template <typename CompletionToken, typename Signature,
           typename Implementation, typename... IoObjectsOrExecutors>
 ASIOEXT_INITFN_RESULT_TYPE(CompletionToken, Signature)
@@ -296,6 +314,7 @@ async_compose(Implementation&& implementation, CompletionToken& token,
       )
   );
 }
+# endif
 #endif
 
 ASIOEXT_NS_END
