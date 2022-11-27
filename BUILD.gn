@@ -126,6 +126,7 @@ source_set("asioext") {
     "include/asioext/thread_pool_file_service.hpp",
     "include/asioext/unique_file_handle.hpp",
     "include/asioext/unique_handler.hpp",
+    "include/asioext/url_view.hpp",
     "include/asioext/version.hpp",
     "include/asioext/work.hpp",
     "include/asioext/write_file.hpp",
@@ -146,6 +147,7 @@ source_set("asioext") {
       "include/asioext/impl/thread_pool_file_service.cpp",
       "include/asioext/impl/unique_file_handle.cpp",
       "include/asioext/impl/unique_handler.cpp",
+      "include/asioext/impl/url_view.cpp",
       "include/asioext/socks/detail/impl/protocol.cpp",
       "include/asioext/socks/impl/socks_error.cpp",
     ]
