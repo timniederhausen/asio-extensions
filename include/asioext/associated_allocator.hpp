@@ -87,15 +87,15 @@ struct associated_allocator_aux<Handler, std::allocator<T> >
 template <typename T, typename Handler>
 class hook_allocator
 {
-  template <class U, typename Handler2>
+  template <typename U, typename Handler2>
   friend class hook_allocator;
 
-  template <class U>
+  template <typename U>
   friend bool operator==(const hook_allocator&,
                          const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
 
-  template <class U>
+  template <typename U>
   friend bool operator!=(const hook_allocator&,
                          const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
@@ -134,15 +134,15 @@ private:
 template <typename Handler>
 class hook_allocator<void, Handler>
 {
-  template <class U, typename Handler2>
+  template <typename U, typename Handler2>
   friend class hook_allocator;
 
-  template <class U>
+  template <typename U>
   friend bool operator==(const hook_allocator&,
                          const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
 
-  template <class U>
+  template <typename U>
   friend bool operator!=(const hook_allocator&,
                          const hook_allocator<U, Handler>&)
       ASIOEXT_NOEXCEPT;
@@ -166,12 +166,12 @@ private:
 };
 #endif
 
-template <typename Handler, class T, class U>
+template <typename Handler, typename T, typename U>
 bool operator==(const hook_allocator<T, Handler>& a,
                 const hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
 { return std::addressof(a.handler_) == std::addressof(b.handler_); }
 
-template <typename Handler, class T, class U>
+template <typename Handler, typename T, typename U>
 bool operator!=(const hook_allocator<T, Handler>& a,
                 const hook_allocator<U, Handler>& b) ASIOEXT_NOEXCEPT
 { return std::addressof(a.handler_) != std::addressof(b.handler_); }

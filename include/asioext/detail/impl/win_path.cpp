@@ -15,7 +15,7 @@ win_path::win_path(const char* s, std::size_t len,
                    error_code& ec) ASIOEXT_NOEXCEPT
   : heap_memory_(nullptr)
 {
-  int new_length;
+  std::size_t new_length;
   if (len >= kMaxPath) {
     new_length = ::MultiByteToWideChar(CP_UTF8, 0, s, len, nullptr, 0);
     heap_memory_ = new (std::nothrow) wchar_t[new_length + 1];
