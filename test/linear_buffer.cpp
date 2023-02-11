@@ -69,6 +69,22 @@ BOOST_AUTO_TEST_CASE(move)
 }
 #endif
 
+BOOST_AUTO_TEST_CASE(max_size)
+{
+  linear_buffer x1(0, 4);
+  x1.resize(4);
+  BOOST_CHECK_THROW(x1.append("A", 1), std::length_error);
+  BOOST_CHECK_THROW(x1.insert(std::size_t(0), "A", 1), std::length_error);
+}
+
+BOOST_AUTO_TEST_CASE(resize)
+{
+  linear_buffer b(4, 64);
+  b.resize(4 + 60);
+  BOOST_REQUIRE_EQUAL(b.size(), 64);
+  BOOST_REQUIRE_LE(b.capacity(), 64);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(asioext_dynamic_linear_buffer)

@@ -84,7 +84,7 @@ void basic_linear_buffer<Allocator>::insert(std::size_t before_this,
                [this, before_this, data, n] (uint8_t* new_buffer) {
       std::memcpy(new_buffer, rep_.data_, before_this);
       std::memcpy(new_buffer + before_this, data, n);
-      std::memcpy(new_buffer + before_this + n, rep_.data + before_this,
+      std::memcpy(new_buffer + before_this + n, rep_.data_ + before_this,
                   size_ - before_this);
     });
   } else {

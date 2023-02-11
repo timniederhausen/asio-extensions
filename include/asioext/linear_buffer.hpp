@@ -410,9 +410,7 @@ private:
   ASIOEXT_CONSTEXPR std::size_t calculate_capacity(std::size_t n)
       const ASIOEXT_NOEXCEPT
   {
-    return capacity_ < max_size_ / 2 ?
-        (std::max)(size_ + n, 2 * capacity_) :
-        max_size_ - 1;
+    return (capacity_ * 2) < max_size_ ? (std::max)(n, capacity_ * 2) : max_size_;
   }
 
   representation_type rep_;
