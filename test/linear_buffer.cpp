@@ -85,6 +85,74 @@ BOOST_AUTO_TEST_CASE(resize)
   BOOST_REQUIRE_LE(b.capacity(), 64);
 }
 
+BOOST_AUTO_TEST_CASE(insert_pos)
+{
+  linear_buffer b;
+  b.insert(std::size_t(0), "AAA", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 3);
+  BOOST_REQUIRE_GE(b.capacity(), 3);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 3),
+                      "AAA");
+
+  b.insert(std::size_t(0), "BBB", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 6);
+  BOOST_REQUIRE_GE(b.capacity(), 6);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 6),
+                      "BBBAAA");
+
+  b.insert(3, "CCC", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 9);
+  BOOST_REQUIRE_GE(b.capacity(), 9);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 9),
+                      "BBBCCCAAA");
+}
+
+BOOST_AUTO_TEST_CASE(insert_iterator)
+{
+  linear_buffer b;
+  b.insert(b.begin(), "AAA", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 3);
+  BOOST_REQUIRE_GE(b.capacity(), 3);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 3),
+                      "AAA");
+
+  b.insert(b.begin(), "BBB", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 6);
+  BOOST_REQUIRE_GE(b.capacity(), 6);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 6),
+                      "BBBAAA");
+
+  b.insert(b.begin() + 3, "CCC", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 9);
+  BOOST_REQUIRE_GE(b.capacity(), 9);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 9),
+                      "BBBCCCAAA");
+}
+
+BOOST_AUTO_TEST_CASE(append)
+{
+  linear_buffer b;
+  b.append("AAA", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 3);
+  BOOST_REQUIRE_GE(b.capacity(), 3);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 3),
+                      "AAA");
+
+  b.append("BBB", 3);
+
+  BOOST_REQUIRE_EQUAL(b.size(), 6);
+  BOOST_REQUIRE_GE(b.capacity(), 6);
+  BOOST_REQUIRE_EQUAL(std::string_view(reinterpret_cast<const char*>(b.data()), 6),
+                      "AAABBB");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(asioext_dynamic_linear_buffer)
