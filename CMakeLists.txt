@@ -5,10 +5,18 @@
 cmake_minimum_required(VERSION 3.22)
 project(asioext VERSION 0.4.0 LANGUAGES CXX)
 
+# Determine if RapidXML is built as a subproject (using add_subdirectory) or if it is the root project.
+if(NOT DEFINED ASIOEXT_ROOT_PROJECT)
+  set(ASIOEXT_ROOT_PROJECT OFF)
+  if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(ASIOEXT_ROOT_PROJECT ON)
+  endif()
+endif()
+
 include(CMakeDependentOption)
 include(FetchContent)
 
-option(ASIOEXT_BUILD_DOC "Build documentation" ON)
+option(ASIOEXT_BUILD_DOC "Build documentation" ${ASIOEXT_ROOT_PROJECT})
 option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
 option(ASIOEXT_HEADER_ONLY "Don't build any code, just setup a target" OFF)
 option(ASIOEXT_BUILD_SHARED "Build the shared library as well" OFF)
@@ -19,13 +27,16 @@ cmake_dependent_option(ASIOEXT_WINDOWS_USE_UTF8_FILENAMES
 cmake_dependent_option(ASIOEXT_USE_BOOST_ASIO
                        "Use Boost.Asio instead of standalone Asio" OFF
                        "NOT ASIOEXT_STANDALONE" OFF)
-cmake_dependent_option(ASIOEXT_BUILD_TESTS "Build tests" ON
+cmake_dependent_option(ASIOEXT_BUILD_TESTS "Build tests" ${ASIOEXT_ROOT_PROJECT}
                        "NOT ASIOEXT_STANDALONE" OFF)
-option(ASIOEXT_BUILD_EXAMPLES "Build examples" OFF)
+option(ASIOEXT_BUILD_EXAMPLES "Build examples" ${ASIOEXT_ROOT_PROJECT})
 
 find_package(Threads REQUIRED)
 
-add_subdirectory(external EXCLUDE_FROM_ALL)
+if(ASIOEXT_ROOT_PROJECT)
+  add_subdirectory(external EXCLUDE_FROM_ALL)
+endif()
+
 add_subdirectory(src)
 
 if (ASIOEXT_BUILD_DOC)
