@@ -2,29 +2,26 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(sources
-	basic_file.cpp
-	chrono.cpp
-	compose.cpp
-	file_handle.cpp
-	linear_buffer.cpp
-	main.cpp
-	open.cpp
-	open_flags.cpp
-	read_file.cpp
-	test_file_rm_guard.cpp
-	test_file_writer.cpp
-	unique_handler.cpp
-	url_parser.cpp
-	write_file.cpp
-)
-
+add_executable(asioext-tests)
+target_sources(asioext-tests PRIVATE 
+  basic_file.cpp
+  chrono.cpp
+  compose.cpp
+  file_handle.cpp
+  linear_buffer.cpp
+  main.cpp
+  open.cpp
+  open_flags.cpp
+  read_file.cpp
+  test_file_rm_guard.cpp
+  test_file_writer.cpp
+  unique_handler.cpp
+  url_parser.cpp
+  write_file.cpp)
 if (WIN32)
-	list(APPEND sources
-		win_path.cpp
-	)
+  target_sources(asioext-tests PRIVATE
+    win_path.cpp
+  )
 endif ()
 
-add_executable(asioext.test ${sources})
-
-target_link_libraries(asioext.test asioext)
+target_link_libraries(asioext-tests asioext::asioext Boost::unit_test_framework)

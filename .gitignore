@@ -1,5 +1,5 @@
 # gn-build checkout
-/build
+/build*
 
 # asio checkout (development)
 /asio

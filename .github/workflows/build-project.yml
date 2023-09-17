@@ -22,7 +22,6 @@ concurrency:
 jobs:
   build-cmake-posix:
     name: build-cmake
-    runs-on: ubuntu-20.04
     continue-on-error: false
 
     strategy:
@@ -35,7 +34,7 @@ jobs:
             ldflags: "-m64"
             libflags: "-m64"
             os: ubuntu-22.04
-            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=asio/asio
+            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio
 
           - slug: linux-amd64-hdronly
             cc: gcc
@@ -44,7 +43,7 @@ jobs:
             ldflags: "-m64"
             libflags: "-m64"
             os: ubuntu-22.04
-            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=asio/asio -DASIOEXT_HEADER_ONLY=ON
+            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio -DASIOEXT_HEADER_ONLY=ON
 
           - slug: macos-amd64
             cc: clang
@@ -53,7 +52,9 @@ jobs:
             ldflags: "-m64"
             libflags: "-m64"
             os: macos-12
-            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=asio/asio
+            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: checkout
@@ -71,17 +72,13 @@ jobs:
       - name: Get vanilla Asio
         run: |
           mkdir -p asio
-          wget -O - https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-24-0.tar.gz | tar --strip-components=1 -xz -C asio
+          wget -O - https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-24-0.tar.gz | tar --strip-components=2 -xz -C asio
 
-      - name: Build Boost
-        id: boost
-        uses: egor-tensin/build-boost@v1
+      - name: Cache Boost
+        uses: actions/cache@v3
         with:
-          version: 1.81.0
-          toolset: ${{ matrix.cc }}
-          libraries: filesystem system test
-          platform: x64
-          configuration: Release
+          path: '${{ github.workspace }}/build-downloads/boost/*'
+          key: 'boost-1.81.0'
 
       - name: CMake
         env:

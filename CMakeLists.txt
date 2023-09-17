@@ -2,10 +2,11 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.22)
 project(asioext VERSION 0.4.0 LANGUAGES CXX)
 
 include(CMakeDependentOption)
+include(FetchContent)
 
 option(ASIOEXT_BUILD_DOC "Build documentation" ON)
 option(ASIOEXT_STANDALONE "Only depend on Asio" ON)
@@ -24,27 +25,17 @@ option(ASIOEXT_BUILD_EXAMPLES "Build examples" OFF)
 
 find_package(Threads REQUIRED)
 
-if (NOT ASIOEXT_STANDALONE)
-	set(components system filesystem)
-
-	if (ASIOEXT_BUILD_TESTS)
-		list(APPEND components unit_test_framework)
-	endif ()
-
-	set(Boost_USE_STATIC_LIBS ON)
-	find_package(Boost "1.66.0" COMPONENTS ${components} REQUIRED)
-endif ()
-
+add_subdirectory(external EXCLUDE_FROM_ALL)
 add_subdirectory(src)
 
 if (ASIOEXT_BUILD_DOC)
-	add_subdirectory(doc)
+  add_subdirectory(doc)
 endif ()
 
 if (ASIOEXT_BUILD_EXAMPLES)
-	add_subdirectory(example)
+  add_subdirectory(example)
 endif ()
 
 if (ASIOEXT_BUILD_TESTS)
-	add_subdirectory(test)
+  add_subdirectory(test)
 endif ()
