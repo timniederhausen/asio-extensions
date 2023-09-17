@@ -1,8 +1,5 @@
 # Asio Extensions (_AsioExt_)
 
-[![Build Status](https://travis-ci.com/timniederhausen/asio-extensions.svg?branch=master)](https://travis-ci.com/timniederhausen/asio-extensions)
-[![Build status](https://ci.appveyor.com/api/projects/status/696yog08f0fbpck0/branch/master?svg=true)](https://ci.appveyor.com/project/timniederhausen/asio-extensions/branch/master)
-
 AsioExt is a collection of various components and functionality that builds on (Boost.)Asio.
 It is compatible with standalone Asio, as well as the Boost version.
 
