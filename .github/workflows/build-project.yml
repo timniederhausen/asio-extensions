@@ -1,0 +1,101 @@
+name: Build Project
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+      - feature/**
+  push:
+    branches:
+      - master
+      - develop
+      - feature/**
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-cmake-posix:
+    name: build-cmake
+    runs-on: ubuntu-20.04
+    continue-on-error: false
+
+    strategy:
+      matrix:
+        include:
+          - slug: linux-amd64
+            cc: gcc
+            cxx: g++
+            cflags: "-m64"
+            ldflags: "-m64"
+            libflags: "-m64"
+            os: ubuntu-22.04
+            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=asio/asio
+
+          - slug: linux-amd64-hdronly
+            cc: gcc
+            cxx: g++
+            cflags: "-m64"
+            ldflags: "-m64"
+            libflags: "-m64"
+            os: ubuntu-22.04
+            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=asio/asio -DASIOEXT_HEADER_ONLY=ON
+
+          - slug: macos-amd64
+            cc: clang
+            cxx: clang++
+            cflags: "-m64"
+            ldflags: "-m64"
+            libflags: "-m64"
+            os: macos-12
+            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=asio/asio
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Make dependencies directory
+        run: |
+          echo 'export CC="${{ matrix.cc }}"' >> "${{ github.workspace }}/.env"
+          echo 'export CXX="${{ matrix.cxx }}"' >> "${{ github.workspace }}/.env"
+          echo 'export CFLAGS="${{ matrix.cflags }}"' >> "${{ github.workspace }}/.env"
+          echo 'export LDFLAGS="${{ matrix.ldflags }}"' >> "${{ github.workspace }}/.env"
+          echo 'export LIBFLAGS="${{ matrix.libflags }}"' >> "${{ github.workspace }}/.env"
+          echo 'export PATH="$(pwd):$PATH"' >> "${{ github.workspace }}/.env"
+
+      - name: Get vanilla Asio
+        run: |
+          mkdir -p asio
+          wget -O - https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-24-0.tar.gz | tar --strip-components=1 -xz -C asio
+
+      - name: Build Boost
+        id: boost
+        uses: egor-tensin/build-boost@v1
+        with:
+          version: 1.81.0
+          toolset: ${{ matrix.cc }}
+          libraries: filesystem system test
+          platform: x64
+          configuration: Release
+
+      - name: CMake
+        env:
+          BOOST_ROOT: ${{ steps.boost.outputs.root  }}
+          BOOST_LIBRARYDIR: ${{ steps.boost.outputs.librarydir }}
+        run: |
+          source .env
+          cmake -B ${{ github.workspace }}/build ${{ matrix.cmake_options }}
+
+      - name: Build
+        run: |
+          cmake --build ${{ github.workspace }}/build
+
+      - name: Run tests
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ctest
