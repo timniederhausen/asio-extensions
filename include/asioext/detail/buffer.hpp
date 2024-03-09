@@ -17,34 +17,39 @@
 # include <asio/buffer.hpp>
 #endif
 
+#if defined(ASIOEXT_USE_BOOST_ASIO)
+# define ASIOEXT_MUTABLE_BUFFER boost::asio::BOOST_ASIO_MUTABLE_BUFFER
+# define ASIOEXT_CONST_BUFFER boost::asio::BOOST_ASIO_CONST_BUFFER
+#else
+# define ASIOEXT_MUTABLE_BUFFER asio::ASIO_MUTABLE_BUFFER
+# define ASIOEXT_CONST_BUFFER asio::ASIO_CONST_BUFFER
+#endif
+
 ASIOEXT_NS_BEGIN
 
 // If we only can process one buffer at a time, we previously just used the
 // first. On newer asio versions (1.11.0+) this fails if the first buffer has
 // a length of zero, in which case we end up in an infinite loop.
-// TODO: Is this a bug?
 template <typename MutableBufferSequence>
-asio::mutable_buffer first_mutable_buffer(
-    const MutableBufferSequence& buffers) ASIOEXT_NOEXCEPT
+asio::mutable_buffer first_mutable_buffer(const MutableBufferSequence& buffers) ASIOEXT_NOEXCEPT
 {
-  typename MutableBufferSequence::const_iterator it = buffers.begin();
-  while (it != buffers.end()) {
-    if (asio::buffer_size(*it) != 0)
-      return *it;
-    ++it;
+  const auto last = asio::buffer_sequence_end(buffers);
+  for (auto first = asio::buffer_sequence_begin(buffers); first != last; ) {
+    if (asio::buffer_size(*first) != 0)
+      return *first;
+    ++first;
   }
   return asio::mutable_buffer();
 }
 
 template <typename ConstBufferSequence>
-asio::const_buffer first_const_buffer(
-    const ConstBufferSequence& buffers) ASIOEXT_NOEXCEPT
+asio::const_buffer first_const_buffer(const ConstBufferSequence& buffers) ASIOEXT_NOEXCEPT
 {
-  typename ConstBufferSequence::const_iterator it = buffers.begin();
-  while (it != buffers.end()) {
-    if (asio::buffer_size(*it) != 0)
-      return *it;
-    ++it;
+  const auto last = asio::buffer_sequence_end(buffers);
+  for (auto first = asio::buffer_sequence_begin(buffers); first != last; ) {
+    if (asio::buffer_size(*first) != 0)
+      return *first;
+    ++first;
   }
   return asio::const_buffer();
 }

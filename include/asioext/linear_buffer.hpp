@@ -55,10 +55,10 @@ public:
   typedef const uint8_t& const_reference;
 
   /// The type used to represent a const object as a list of buffers.
-  typedef asio::const_buffers_1 const_buffers_type;
+  typedef ASIOEXT_CONST_BUFFER const_buffers_type;
 
   /// The type used to represent a non-const object as a list of buffers.
-  typedef asio::mutable_buffers_1 mutable_buffers_type;
+  typedef ASIOEXT_MUTABLE_BUFFER mutable_buffers_type;
 
   static_assert(std::is_same<typename allocator_type::value_type, uint8_t>::value,
                 "Allocator::value_type must be uint8_t");
@@ -420,14 +420,14 @@ private:
 };
 
 template <typename Allocator>
-inline asio::const_buffers_1 buffer(const basic_linear_buffer<Allocator>& b)
+inline ASIOEXT_CONST_BUFFER buffer(const basic_linear_buffer<Allocator>& b)
     ASIOEXT_NOEXCEPT
 {
   return asio::buffer(b.data(), b.size());
 }
 
 template <typename Allocator>
-inline asio::mutable_buffers_1 buffer(basic_linear_buffer<Allocator>& b)
+inline ASIOEXT_MUTABLE_BUFFER buffer(basic_linear_buffer<Allocator>& b)
     ASIOEXT_NOEXCEPT
 {
   return asio::buffer(b.data(), b.size());
@@ -443,10 +443,10 @@ class dynamic_linear_buffer
 {
 public:
   /// The type used to represent the input sequence as a list of buffers.
-  typedef asio::const_buffers_1 const_buffers_type;
+  typedef ASIOEXT_CONST_BUFFER const_buffers_type;
 
   /// The type used to represent the output sequence as a list of buffers.
-  typedef asio::mutable_buffers_1 mutable_buffers_type;
+  typedef ASIOEXT_MUTABLE_BUFFER mutable_buffers_type;
 
   /// @brief Construct a dynamic buffer from a @c basic_linear_buffer.
   ///
