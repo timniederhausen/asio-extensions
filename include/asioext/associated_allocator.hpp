@@ -18,10 +18,14 @@
 
 #include "asioext/detail/asio_version.hpp"
 
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/detail/handler_alloc_helpers.hpp>
-#else
-# include <asio/detail/handler_alloc_helpers.hpp>
+#if (ASIOEXT_ASIO_VERSION < 101700)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+#  include <boost/asio/detail/handler_alloc_helpers.hpp>
+#  define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
+# else
+#  include <asio/detail/handler_alloc_helpers.hpp>
+#  define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
+# endif
 #endif
 
 #if (ASIOEXT_ASIO_VERSION >= 101100)
@@ -30,12 +34,6 @@
 # else
 #  include <asio/associated_allocator.hpp>
 # endif
-#endif
-
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
-#else
-# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
 #endif
 
 ASIOEXT_NS_BEGIN
@@ -57,6 +55,7 @@ struct associated_allocator_aux
   }
 };
 
+#if (ASIOEXT_ASIO_VERSION < 101700)
 template <typename Handler, typename T>
 struct associated_allocator_aux<Handler, std::allocator<T> >
 {
@@ -67,6 +66,7 @@ struct associated_allocator_aux<Handler, std::allocator<T> >
     return type(handler);
   }
 };
+#endif
 
 }
 #endif
@@ -115,6 +115,7 @@ public:
   {
   }
 
+#if (ASIOEXT_ASIO_VERSION < 101700)
   T* allocate(std::size_t n)
   {
     return static_cast<T*>(
@@ -125,6 +126,7 @@ public:
   {
     ASIOEXT_HANDLER_ALLOC_HELPERS_NS::deallocate(p, sizeof(T) * n, handler_);
   }
+#endif
 
 private:
   Handler& handler_;

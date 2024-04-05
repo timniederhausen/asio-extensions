@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(asioext VERSION 0.4.0 LANGUAGES CXX)
 
-# Determine if RapidXML is built as a subproject (using add_subdirectory) or if it is the root project.
+# Determine if AsioExt is built as a subproject (using add_subdirectory) or if it is the root project.
 if(NOT DEFINED ASIOEXT_ROOT_PROJECT)
   set(ASIOEXT_ROOT_PROJECT OFF)
   if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)

@@ -14,19 +14,26 @@
 #include "asioext/detail/asio_version.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/detail/handler_alloc_helpers.hpp>
 # include <boost/asio/detail/handler_cont_helpers.hpp>
-# include <boost/asio/detail/handler_invoke_helpers.hpp>
-# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
 # define ASIOEXT_HANDLER_CONT_HELPERS_NS boost_asio_handler_cont_helpers
-# define ASIOEXT_HANDLER_INVOKE_HELPERS_NS boost_asio_handler_invoke_helpers
 #else
-# include <asio/detail/handler_alloc_helpers.hpp>
 # include <asio/detail/handler_cont_helpers.hpp>
-# include <asio/detail/handler_invoke_helpers.hpp>
-# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
 # define ASIOEXT_HANDLER_CONT_HELPERS_NS asio_handler_cont_helpers
-# define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
+#endif
+
+#if (ASIOEXT_ASIO_VERSION < 101700)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+#  include <boost/asio/detail/handler_alloc_helpers.hpp>
+#  include <boost/asio/detail/handler_cont_helpers.hpp>
+#  include <boost/asio/detail/handler_invoke_helpers.hpp>
+#  define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
+#  define ASIOEXT_HANDLER_INVOKE_HELPERS_NS boost_asio_handler_invoke_helpers
+# else
+#  include <asio/detail/handler_alloc_helpers.hpp>
+#  include <asio/detail/handler_invoke_helpers.hpp>
+#  define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
+#  define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
+# endif
 #endif
 
 #include <tuple>
@@ -54,6 +61,7 @@ class bound_handler : private Work
   friend struct asio::associated_executor;
 #endif
 
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION < 101700)
   friend void* asio_handler_allocate(std::size_t size,
                                      bound_handler* this_handler)
   {
@@ -66,12 +74,6 @@ class bound_handler : private Work
   {
     ASIOEXT_HANDLER_ALLOC_HELPERS_NS::deallocate(
         pointer, size, this_handler->handler_);
-  }
-
-  friend bool asio_handler_is_continuation(bound_handler* this_handler)
-  {
-    return ASIOEXT_HANDLER_CONT_HELPERS_NS::is_continuation(
-        this_handler->handler_);
   }
 
   template <typename Function>
@@ -89,6 +91,15 @@ class bound_handler : private Work
     ASIOEXT_HANDLER_INVOKE_HELPERS_NS::invoke(
         function, this_handler->handler_);
   }
+#endif
+
+#if !defined(ASIOEXT_IS_DOCUMENTATION)
+  friend bool asio_handler_is_continuation(bound_handler* this_handler)
+  {
+    return ASIOEXT_HANDLER_CONT_HELPERS_NS::is_continuation(
+        this_handler->handler_);
+  }
+#endif
 
   typedef std::index_sequence_for<Args...> args_indices_type;
 

@@ -22,19 +22,26 @@
 #include "asioext/detail/move_support.hpp"
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/detail/handler_alloc_helpers.hpp>
 # include <boost/asio/detail/handler_cont_helpers.hpp>
-# include <boost/asio/detail/handler_invoke_helpers.hpp>
-# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
 # define ASIOEXT_HANDLER_CONT_HELPERS_NS boost_asio_handler_cont_helpers
-# define ASIOEXT_HANDLER_INVOKE_HELPERS_NS boost_asio_handler_invoke_helpers
 #else
-# include <asio/detail/handler_alloc_helpers.hpp>
 # include <asio/detail/handler_cont_helpers.hpp>
-# include <asio/detail/handler_invoke_helpers.hpp>
-# define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
 # define ASIOEXT_HANDLER_CONT_HELPERS_NS asio_handler_cont_helpers
-# define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
+#endif
+
+#if (ASIOEXT_ASIO_VERSION < 101700)
+# if defined(ASIOEXT_USE_BOOST_ASIO)
+#  include <boost/asio/detail/handler_alloc_helpers.hpp>
+#  include <boost/asio/detail/handler_cont_helpers.hpp>
+#  include <boost/asio/detail/handler_invoke_helpers.hpp>
+#  define ASIOEXT_HANDLER_ALLOC_HELPERS_NS boost_asio_handler_alloc_helpers
+#  define ASIOEXT_HANDLER_INVOKE_HELPERS_NS boost_asio_handler_invoke_helpers
+# else
+#  include <asio/detail/handler_alloc_helpers.hpp>
+#  include <asio/detail/handler_invoke_helpers.hpp>
+#  define ASIOEXT_HANDLER_ALLOC_HELPERS_NS asio_handler_alloc_helpers
+#  define ASIOEXT_HANDLER_INVOKE_HELPERS_NS asio_handler_invoke_helpers
+# endif
 #endif
 
 #if (ASIOEXT_ASIO_VERSION >= 101100)
@@ -135,7 +142,7 @@ inline const Executor& get_executor(const Executor& ex)
 template <typename Handler, typename Implementation, typename Work>
 class composed_operation
 {
-#if !defined(ASIOEXT_IS_DOCUMENTATION)
+#if !defined(ASIOEXT_IS_DOCUMENTATION) && (ASIOEXT_ASIO_VERSION < 101700)
   friend void* asio_handler_allocate(std::size_t size,
                                      composed_operation* this_handler)
   {
@@ -148,14 +155,6 @@ class composed_operation
   {
     ASIOEXT_HANDLER_ALLOC_HELPERS_NS::deallocate(
         pointer, size, this_handler->handler_);
-  }
-
-  friend bool asio_handler_is_continuation(composed_operation* this_handler)
-  {
-    if (this_handler->state_ > 1)
-      return true;
-    return ASIOEXT_HANDLER_CONT_HELPERS_NS::is_continuation(
-        this_handler->handler_);
   }
 
   template <typename Function>
@@ -172,6 +171,16 @@ class composed_operation
   {
     ASIOEXT_HANDLER_INVOKE_HELPERS_NS::invoke(
         function, this_handler->handler_);
+  }
+#endif
+
+#if !defined(ASIOEXT_IS_DOCUMENTATION)
+  friend bool asio_handler_is_continuation(composed_operation* this_handler)
+  {
+    if (this_handler->state_ > 1)
+      return true;
+    return ASIOEXT_HANDLER_CONT_HELPERS_NS::is_continuation(
+        this_handler->handler_);
   }
 #endif
 
