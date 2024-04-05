@@ -62,66 +62,39 @@ config("internal") {
 
 source_set("asioext") {
   sources = [
+    # experimental
+    "include/asioext/experimental/buffered_stream.hpp",
+
+    # SOCKS
+    "include/asioext/socks/client.hpp",
+    "include/asioext/socks/constants.hpp",
+    "include/asioext/socks/error.hpp",
+
+    # main headers
     "include/asioext/asioext.hpp",
+    "include/asioext/associated_allocator.hpp",
+    "include/asioext/async_result.hpp",
     "include/asioext/basic_file.hpp",
+    "include/asioext/bind_handler.hpp",
     "include/asioext/cancellation_token.hpp",
     "include/asioext/chrono.hpp",
     "include/asioext/compose.hpp",
     "include/asioext/connect.hpp",
-    "include/asioext/detail/asio_version.hpp",
-    "include/asioext/detail/async_result.hpp",
-    "include/asioext/detail/bind_handler.hpp",
-    "include/asioext/detail/buffer.hpp",
-    "include/asioext/detail/buffer_sequence_adapter.hpp",
-    "include/asioext/detail/chrono.hpp",
-    "include/asioext/detail/config.hpp",
-    "include/asioext/detail/coroutine.hpp",
-    "include/asioext/detail/cstdint.hpp",
-    "include/asioext/detail/enum.hpp",
-    "include/asioext/detail/error.hpp",
-    "include/asioext/detail/error_code.hpp",
-    "include/asioext/detail/handler_type.hpp",
-    "include/asioext/detail/impl/chrono.hpp",
-    "include/asioext/detail/memory.hpp",
-    "include/asioext/detail/move_support.hpp",
-    "include/asioext/detail/mutex.hpp",
-    "include/asioext/detail/posix_file_ops.hpp",
-    "include/asioext/detail/service_base.hpp",
-    "include/asioext/detail/thread.hpp",
-    "include/asioext/detail/thread_group.hpp",
-    "include/asioext/detail/throw_error.hpp",
-    "include/asioext/detail/throw_exception.hpp",
-    "include/asioext/detail/url_parser.hpp",
-    "include/asioext/detail/win_file_ops.hpp",
-    "include/asioext/detail/win_path.hpp",
     "include/asioext/duplicate.hpp",
     "include/asioext/error.hpp",
+    "include/asioext/error_code.hpp",
     "include/asioext/exception.hpp",
-    "include/asioext/experimental/buffered_stream.hpp",
     "include/asioext/file.hpp",
     "include/asioext/file_attrs.hpp",
     "include/asioext/file_handle.hpp",
     "include/asioext/file_perms.hpp",
-    "include/asioext/impl/connect.hpp",
-    "include/asioext/impl/file_handle.hpp",
-    "include/asioext/impl/file_handle_posix.hpp",
-    "include/asioext/impl/file_handle_win.hpp",
-    "include/asioext/impl/read_file.hpp",
-    "include/asioext/impl/thread_pool_file_service.hpp",
-    "include/asioext/impl/write_file.hpp",
     "include/asioext/is_raw_byte_container.hpp",
     "include/asioext/linear_buffer.hpp",
     "include/asioext/open.hpp",
+    "include/asioext/open_args.hpp",
     "include/asioext/open_flags.hpp",
     "include/asioext/read_file.hpp",
-    "include/asioext/scoped_file_handle.hpp",
     "include/asioext/seek_origin.hpp",
-    "include/asioext/socks/client.hpp",
-    "include/asioext/socks/constants.hpp",
-    "include/asioext/socks/detail/client.hpp",
-    "include/asioext/socks/detail/protocol.hpp",
-    "include/asioext/socks/error.hpp",
-    "include/asioext/socks/impl/client.hpp",
     "include/asioext/standard_streams.hpp",
     "include/asioext/thread_pool_file_service.hpp",
     "include/asioext/unique_file_handle.hpp",
@@ -132,9 +105,56 @@ source_set("asioext") {
     "include/asioext/write_file.hpp",
   ]
 
+  # detail headers
+  sources += [
+    "include/asioext/detail/asio_version.hpp",
+    "include/asioext/detail/bound_handler.hpp",
+    "include/asioext/detail/buffer.hpp",
+    "include/asioext/detail/buffer_sequence_adapter.hpp",
+    "include/asioext/detail/chrono.hpp",
+    "include/asioext/detail/config.hpp",
+    "include/asioext/detail/coroutine.hpp",
+    "include/asioext/detail/cstdint.hpp",
+    "include/asioext/detail/enum.hpp",
+    "include/asioext/detail/error.hpp",
+    "include/asioext/detail/memory.hpp",
+    "include/asioext/detail/move_support.hpp",
+    "include/asioext/detail/mutex.hpp",
+    "include/asioext/detail/service_base.hpp",
+    "include/asioext/detail/thread.hpp",
+    "include/asioext/detail/thread_group.hpp",
+    "include/asioext/detail/throw_error.hpp",
+    "include/asioext/detail/throw_exception.hpp",
+    "include/asioext/detail/url_parser.hpp",
+
+    "include/asioext/socks/detail/client.hpp",
+    "include/asioext/socks/detail/protocol.hpp",
+  ]
+
+  # implementation files
+  sources += [
+    "include/asioext/detail/impl/chrono.hpp",
+
+    "include/asioext/socks/impl/client.hpp",
+
+    "include/asioext/impl/connect.hpp",
+    "include/asioext/impl/file_handle.hpp",
+    "include/asioext/impl/file_handle_posix.hpp",
+    "include/asioext/impl/file_handle_win.hpp",
+    "include/asioext/impl/linear_buffer.hpp",
+    "include/asioext/impl/open_args.hpp",
+    "include/asioext/impl/read_file.hpp",
+    "include/asioext/impl/thread_pool_file_service.hpp",
+    "include/asioext/impl/write_file.hpp",
+  ]
+
   if (!asioext_header_only) {
     sources += [
       "include/asioext/detail/impl/url_parser.cpp",
+
+      "include/asioext/socks/detail/impl/protocol.cpp",
+      "include/asioext/socks/impl/socks_error.cpp",
+
       "include/asioext/impl/cancellation_token.cpp",
       "include/asioext/impl/chrono.cpp",
       "include/asioext/impl/connect.cpp",
@@ -148,8 +168,6 @@ source_set("asioext") {
       "include/asioext/impl/unique_file_handle.cpp",
       "include/asioext/impl/unique_handler.cpp",
       "include/asioext/impl/url_view.cpp",
-      "include/asioext/socks/detail/impl/protocol.cpp",
-      "include/asioext/socks/impl/socks_error.cpp",
     ]
   }
 
