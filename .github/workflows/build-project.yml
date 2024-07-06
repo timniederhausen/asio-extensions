@@ -21,53 +21,28 @@ concurrency:
 
 jobs:
   build-cmake-posix:
-    name: build-cmake
+    name: cmake
     continue-on-error: false
 
     strategy:
       matrix:
+        os: [ubuntu-22.04]
+        cxx: [g++, clang++]
+        standalone: [OFF, ON]
+        header-only: [OFF, ON]
+
+        # macOS builds are kind of slow, so let's just do one configuration
         include:
-          - slug: linux-amd64
-            cc: gcc
-            cxx: g++
-            cflags: "-m64"
-            ldflags: "-m64"
-            libflags: "-m64"
-            os: ubuntu-22.04
-            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio
-
-          - slug: linux-amd64-hdronly
-            cc: gcc
-            cxx: g++
-            cflags: "-m64"
-            ldflags: "-m64"
-            libflags: "-m64"
-            os: ubuntu-22.04
-            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio -DASIOEXT_HEADER_ONLY=ON
-
-          - slug: macos-amd64
-            cc: clang
+          - os: macos-12
             cxx: clang++
-            cflags: "-m64"
-            ldflags: "-m64"
-            libflags: "-m64"
-            os: macos-12
-            cmake_options: -DASIOEXT_STANDALONE=OFF -DASIOEXT_ASIO_ROOT=../asio
+            standalone: OFF
+            header-only: OFF
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
-
-      - name: Make dependencies directory
-        run: |
-          echo 'export CC="${{ matrix.cc }}"' >> "${{ github.workspace }}/.env"
-          echo 'export CXX="${{ matrix.cxx }}"' >> "${{ github.workspace }}/.env"
-          echo 'export CFLAGS="${{ matrix.cflags }}"' >> "${{ github.workspace }}/.env"
-          echo 'export LDFLAGS="${{ matrix.ldflags }}"' >> "${{ github.workspace }}/.env"
-          echo 'export LIBFLAGS="${{ matrix.libflags }}"' >> "${{ github.workspace }}/.env"
-          echo 'export PATH="$(pwd):$PATH"' >> "${{ github.workspace }}/.env"
+        uses: actions/checkout@v4
 
       - name: Get vanilla Asio
         run: |
@@ -75,18 +50,16 @@ jobs:
           wget -O - https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-24-0.tar.gz | tar --strip-components=2 -xz -C asio
 
       - name: Cache Boost
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: '${{ github.workspace }}/build-downloads/boost/*'
           key: 'boost-1.81.0'
 
       - name: CMake
         env:
-          BOOST_ROOT: ${{ steps.boost.outputs.root  }}
-          BOOST_LIBRARYDIR: ${{ steps.boost.outputs.librarydir }}
+          CXX: ${{ matrix.cxx }}
         run: |
-          source .env
-          cmake -B ${{ github.workspace }}/build ${{ matrix.cmake_options }}
+          cmake -B ${{ github.workspace }}/build -DASIOEXT_ASIO_ROOT=../asio -DASIOEXT_STANDALONE=${{ matrix.standalone }} -DASIOEXT_HEADER_ONLY=${{ matrix.header-only }}
 
       - name: Build
         run: |
