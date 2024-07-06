@@ -5,16 +5,16 @@
 
 add_executable(asioext.ex.cpp11.simple simple.cpp)
 set_target_properties(asioext.ex.cpp11.simple PROPERTIES OUTPUT_NAME simple CXX_STANDARD 11)
-target_link_libraries(asioext.ex.cpp11.simple asioext)
+target_link_libraries(asioext.ex.cpp11.simple asioext::asioext)
 
 add_executable(asioext.ex.cpp11.cp cp.cpp)
 set_target_properties(asioext.ex.cpp11.cp PROPERTIES OUTPUT_NAME cp CXX_STANDARD 11)
-target_link_libraries(asioext.ex.cpp11.cp asioext)
+target_link_libraries(asioext.ex.cpp11.cp asioext::asioext)
 
 add_executable(asioext.ex.cpp11.tee tee.cpp)
 set_target_properties(asioext.ex.cpp11.tee PROPERTIES OUTPUT_NAME tee CXX_STANDARD 11)
-target_link_libraries(asioext.ex.cpp11.tee asioext)
+target_link_libraries(asioext.ex.cpp11.tee asioext::asioext)
 
 add_executable(asioext.ex.cpp11.tee_async tee_async.cpp)
 set_target_properties(asioext.ex.cpp11.tee_async PROPERTIES OUTPUT_NAME tee_async CXX_STANDARD 11)
-target_link_libraries(asioext.ex.cpp11.tee_async asioext)
+target_link_libraries(asioext.ex.cpp11.tee_async asioext::asioext)

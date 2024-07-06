@@ -4,5 +4,9 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 
 add_executable(asioext.ex.cpp03.cp cp.cpp)
-set_property(TARGET asioext.ex.cpp03.cp PROPERTY OUTPUT_NAME cp)
-target_link_libraries(asioext.ex.cpp03.cp asioext)
+set_property(TARGET asioext.ex.cpp03.cp PROPERTY OUTPUT_NAME cp03)
+target_link_libraries(asioext.ex.cpp03.cp asioext::asioext)
+
+add_executable(asioext.ex.cpp03.tee tee.cpp)
+set_property(TARGET asioext.ex.cpp03.tee PROPERTY OUTPUT_NAME tee03)
+target_link_libraries(asioext.ex.cpp03.tee asioext::asioext)
