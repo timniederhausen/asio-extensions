@@ -53,7 +53,7 @@ public:
     if (0 != size) {
       asio::mutable_buffer buf = buffer_.prepare(size);
       encode_exec_packet(cmd, remote, remote_host, port,
-                         asio::buffer_cast<uint8_t*>(buf));
+                         static_cast<uint8_t*>(buf.data()));
       buffer_.commit(size);
     }
   }
@@ -93,7 +93,7 @@ void v4_exec_op<Socket, DynamicBuffer>::operator()(
         std::move(self));
     buffer_.commit(1 + 1 + 2 + 4);
 
-    const uint8_t* data = asio::buffer_cast<const uint8_t*>(buffer_.data());
+    const uint8_t* data = static_cast<const uint8_t*>(buffer_.data().data());
 
     const uint8_t null_byte = data[0];
     const uint8_t status_code = data[1];
@@ -133,7 +133,7 @@ public:
     if (0 != size) {
       asio::mutable_buffer buf = buffer_.prepare(size);
       encode_greet_packet(auth_methods, num_auth_methods,
-                          asio::buffer_cast<uint8_t*>(buf));
+                          static_cast<uint8_t*>(buf.data()));
       buffer_.commit(size);
     }
   }
@@ -173,7 +173,7 @@ void v5_greet_op<Socket, DynamicBuffer>::operator()(
                                         std::move(self));
     buffer_.commit(2);
 
-    const uint8_t* data = asio::buffer_cast<const uint8_t*>(buffer_.data());
+    const uint8_t* data = static_cast<const uint8_t*>(buffer_.data().data());
 
     const uint8_t version = data[0];
     const auth_method chosen_method = static_cast<auth_method>(data[1]);
@@ -212,7 +212,7 @@ public:
     if (0 != size) {
       asio::mutable_buffer buf = buffer_.prepare(size);
       encode_login_packet(username, password,
-                          asio::buffer_cast<uint8_t*>(buf));
+                          static_cast<uint8_t*>(buf.data()));
       buffer_.commit(size);
     }
   }
@@ -252,7 +252,7 @@ void v5_login_op<Socket, DynamicBuffer>::operator()(
 
     buffer_.commit(2);
 
-    const uint8_t* data = asio::buffer_cast<const uint8_t*>(buffer_.data());
+    const uint8_t* data = static_cast<const uint8_t*>(buffer_.data().data());
 
     const uint8_t version = data[0];
     const uint8_t status_code = data[1];
@@ -291,7 +291,7 @@ public:
     if (0 != size) {
       asio::mutable_buffer buf = buffer_.prepare(size);
       encode_exec_packet(cmd, remote, remote_host, port,
-                         asio::buffer_cast<uint8_t*>(buf));
+                         static_cast<uint8_t*>(buf.data()));
       buffer_.commit(size);
     }
   }
@@ -334,7 +334,7 @@ void v5_exec_op<Socket, DynamicBuffer>::operator()(
     {
       buffer_.commit(5);
 
-      const uint8_t* data = asio::buffer_cast<const uint8_t*>(buffer_.data());
+      const uint8_t* data = static_cast<const uint8_t*>(buffer_.data().data());
 
       const uint8_t version = data[0];
       const uint8_t status_code = data[1];

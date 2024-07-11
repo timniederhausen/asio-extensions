@@ -45,9 +45,7 @@ std::size_t file_handle::read_some_at(uint64_t offset,
                                         offset, ec);
 #else
   const asio::mutable_buffer buf = asioext::first_mutable_buffer(buffers);
-  return detail::posix_file_ops::pread(handle_,
-                                       asio::buffer_cast<void*>(buf),
-                                       asio::buffer_size(buf),
+  return detail::posix_file_ops::pread(handle_, buf.data(), buf.size(),
                                        offset, ec);
 #endif
 }
@@ -64,9 +62,7 @@ std::size_t file_handle::write_some_at(uint64_t offset,
                                          offset, ec);
 #else
   const asio::const_buffer buf = asioext::first_const_buffer(buffers);
-  return detail::posix_file_ops::pwrite(handle_,
-                                        asio::buffer_cast<const void*>(buf),
-                                        asio::buffer_size(buf),
+  return detail::posix_file_ops::pwrite(handle_, buf.data(), buf.size(),
                                         offset, ec);
 #endif
 }
