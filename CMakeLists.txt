@@ -48,5 +48,6 @@ if (ASIOEXT_BUILD_EXAMPLES)
 endif ()
 
 if (ASIOEXT_BUILD_TESTS)
+  enable_testing()
   add_subdirectory(test)
 endif ()

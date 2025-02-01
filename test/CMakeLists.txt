@@ -25,3 +25,4 @@ if (WIN32)
 endif ()
 
 target_link_libraries(asioext-tests asioext::asioext Boost::unit_test_framework)
+add_test(asioext-tests "${CMAKE_CURRENT_BUILD_DIR}/asioext-tests")
