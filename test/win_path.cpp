@@ -29,11 +29,11 @@ BOOST_AUTO_TEST_CASE(simple)
 
   win_path p1(s1, std::strlen(s1), ec);
   BOOST_REQUIRE(!ec);
-  BOOST_CHECK_EQUAL(p1.c_str(), L"D:\\test\\abcdef.ghi");
+  BOOST_CHECK_EQUAL(p1.c_str(), static_cast<const wchar_t*>(L"D:\\test\\abcdef.ghi"));
 
   win_path p2(s1, std::size(s1) - 1, ec);
   BOOST_REQUIRE(!ec);
-  BOOST_CHECK_EQUAL(p2.c_str(), L"D:\\test\\abcdef.ghi");
+  BOOST_CHECK_EQUAL(p2.c_str(), static_cast<const wchar_t*>(L"D:\\test\\abcdef.ghi"));
 }
 
 BOOST_AUTO_TEST_CASE(error_reset)
@@ -68,11 +68,11 @@ BOOST_AUTO_TEST_CASE(large)
 
   win_path p1(s1, std::strlen(s1), ec);
   BOOST_REQUIRE(!ec);
-  BOOST_CHECK_EQUAL(p1.c_str(), s2);
+  BOOST_CHECK_EQUAL(p1.c_str(), static_cast<const wchar_t*>(s2));
 
   win_path p2(s1, std::size(s1) - 1, ec);
   BOOST_REQUIRE(!ec);
-  BOOST_CHECK_EQUAL(p2.c_str(), s2);
+  BOOST_CHECK_EQUAL(p2.c_str(), static_cast<const wchar_t*>(s2));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
