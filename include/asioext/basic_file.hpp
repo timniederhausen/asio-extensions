@@ -96,7 +96,7 @@ public:
     error_code ec;
     this->get_service().assign(this->get_implementation(),
                                handle.native_handle(), ec);
-    detail::throw_error(ec, "construct");
+    detail::throw_error(ec, "basic_file construct");
   }
 
   /// @brief Construct a file using a native handle object.
@@ -114,7 +114,7 @@ public:
   {
     error_code ec;
     this->get_service().assign(this->get_implementation(), handle, ec);
-    detail::throw_error(ec, "construct");
+    detail::throw_error(ec, "basic_file construct");
   }
 
   /// @brief Open a file and construct a basic_file.
@@ -139,7 +139,7 @@ public:
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, args, ec);
-    detail::throw_error(ec, "construct");
+    detail::throw_error(ec, "basic_file construct");
   }
 
   /// @brief Open a file and construct a basic_file.
@@ -176,7 +176,7 @@ public:
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, args, ec);
-    detail::throw_error(ec, "construct");
+    detail::throw_error(ec, "basic_file construct");
   }
 
   /// @copydoc basic_file(asio::io_context&,const char*,const open_args&,error_code&)
@@ -198,7 +198,7 @@ public:
   {
     error_code ec;
     this->get_service().open(this->get_implementation(), filename, args, ec);
-    detail::throw_error(ec, "construct");
+    detail::throw_error(ec, "basic_file construct");
   }
 
   /// @copydoc basic_file(asio::io_context&,const char*,const open_args&,error_code&)
