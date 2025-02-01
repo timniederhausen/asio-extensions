@@ -33,7 +33,7 @@ jobs:
 
         # macOS builds are kind of slow, so let's just do one configuration
         include:
-          - os: macos-12
+          - os: macos-13
             cxx: clang++
             standalone: OFF
             header-only: OFF
