@@ -21,6 +21,7 @@
 #include "asioext/impl/unique_handler.cpp"
 #include "asioext/impl/unique_file_handle.cpp"
 #include "asioext/impl/url_view.cpp"
+#include "asioext/detail/impl/throw_error.cpp"
 #include "asioext/detail/impl/url_parser.cpp"
 #include "asioext/socks/impl/socks_error.cpp"
 #include "asioext/socks/detail/impl/protocol.cpp"

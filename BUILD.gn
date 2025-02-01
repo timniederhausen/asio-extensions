@@ -150,6 +150,7 @@ source_set("asioext") {
 
   if (!asioext_header_only) {
     sources += [
+      "include/asioext/detail/impl/throw_error.cpp",
       "include/asioext/detail/impl/url_parser.cpp",
 
       "include/asioext/socks/detail/impl/protocol.cpp",

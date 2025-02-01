@@ -16,11 +16,17 @@ ASIOEXT_NS_BEGIN
 
 namespace detail {
 
+// Declare the throw_exception function for all targets.
+template <typename Exception>
+void throw_exception(const Exception& e);
+
+#if !defined(ASIOEXT_NO_EXCEPTIONS)
 template <typename Exception>
 void throw_exception(const Exception& e)
 {
   throw e;
 }
+#endif
 
 }
 

@@ -11,21 +11,33 @@
 # pragma once
 #endif
 
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-#include <boost/asio/detail/throw_error.hpp>
-#else
-#include <asio/detail/throw_error.hpp>
-#endif
+#include "asioext/error_code.hpp"
 
 ASIOEXT_NS_BEGIN
 
 namespace detail {
 
-// TODO(tim): We shouldn't depend on asio's internals.
-using asio::detail::throw_error;
+ASIOEXT_DECL void do_throw_error(const error_code& ec);
+ASIOEXT_DECL void do_throw_error(const error_code& ec, const char* location);
+
+inline void throw_error(const error_code& ec)
+{
+  if (ec)
+    do_throw_error(ec);
+}
+
+inline void throw_error(const error_code& ec, const char* location)
+{
+  if (ec)
+    do_throw_error(ec, location);
+}
 
 }
 
 ASIOEXT_NS_END
+
+#if defined(ASIOEXT_HEADER_ONLY)
+# include "asioext/detail/impl/throw_error.cpp"
+#endif
 
 #endif
