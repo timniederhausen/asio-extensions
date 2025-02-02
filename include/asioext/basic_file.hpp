@@ -21,17 +21,10 @@
 #include "asioext/file_attrs.hpp"
 #include "asioext/seek_origin.hpp"
 #include "asioext/error_code.hpp"
+#include "asioext/io_object_holder.hpp"
 #include "asioext/async_result.hpp"
 
 #include "asioext/detail/throw_error.hpp"
-
-#if defined(ASIOEXT_USE_BOOST_ASIO)
-# include <boost/asio/basic_io_object.hpp>
-# include <boost/asio/io_context.hpp>
-#else
-# include <asio/basic_io_object.hpp>
-# include <asio/io_context.hpp>
-#endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
 # include <boost/filesystem/path.hpp>
@@ -60,10 +53,25 @@ ASIOEXT_NS_BEGIN
 /// @par Thread Safety:
 /// @e Distinct @e objects: Safe.@n
 /// @e Shared @e objects: Unsafe.
-template <class FileService>
-class basic_file : public asio::basic_io_object<FileService>
+template <typename FileService, typename Executor = asio::any_io_executor>
+class basic_file
 {
+  // All files have access to each other's implementations.
+  template <typename FileService1, typename Executor1>
+  friend class basic_file;
+
 public:
+  /// The type of the executor associated with the object.
+  typedef Executor executor_type;
+
+  /// Rebinds the file type to another executor.
+  template <typename Executor1>
+  struct rebind_executor
+  {
+    /// The file type when rebound to the specified executor.
+    typedef basic_file<FileService, Executor1> other;
+  };
+
   /// The operating system's native file handle type.
   typedef typename FileService::native_handle_type native_handle_type;
 
@@ -72,10 +80,22 @@ public:
 
   /// @brief Construct an unopened file.
   ///
-  /// @param io_context The io_context object that the file will use to
-  /// dispatch handlers for any asynchronous operations performed on it.
-  explicit basic_file(asio::io_context& io_context) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_context)
+  /// @param ex The I/O executor that the file will use, by default, to
+  /// dispatch handlers for any asynchronous operations performed on the file.
+  explicit basic_file(const executor_type& ex)
+    : holder_(ex)
+  {
+    // ctor
+  }
+
+  /// @brief Construct an unopened file.
+  ///
+  /// @param context An execution context which provides the I/O executor that
+  /// the file will use, by default, to dispatch handlers for any asynchronous
+  /// operations performed on the file.
+  template <execution_context ExecutionContext>
+  explicit basic_file(ExecutionContext& context)
+    : holder_(context)
   {
     // ctor
   }
@@ -84,18 +104,35 @@ public:
   ///
   /// This constructor takes ownership of the given wrapped native handle.
   ///
-  /// @param io_context The io_context object that the file will use to
-  /// dispatch handlers for any asynchronous operations performed on it.
+  /// @param ex The I/O executor that the file will use, by default, to
+  /// dispatch handlers for any asynchronous operations performed on the file.
   ///
   /// @param handle The native handle object, wrapped in a file_handle,
   /// which shall be assigned to this basic_file object.
-  basic_file(asio::io_context& io_context,
-             const file_handle& handle) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_context)
+  basic_file(const executor_type& ex, const file_handle& handle)
+    : holder_(ex)
   {
     error_code ec;
-    this->get_service().assign(this->get_implementation(),
-                               handle.native_handle(), ec);
+    holder_.get_service().assign(holder_.get_implementation(), handle.native_handle(), ec);
+    detail::throw_error(ec, "basic_file construct");
+  }
+
+  /// @brief Construct a file using a native handle object.
+  ///
+  /// This constructor takes ownership of the given wrapped native handle.
+  ///
+  /// @param context An execution context which provides the I/O executor that
+  /// the file will use, by default, to dispatch handlers for any asynchronous
+  /// operations performed on the file.
+  ///
+  /// @param handle The native handle object, wrapped in a file_handle,
+  /// which shall be assigned to this basic_file object.
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const file_handle& handle)
+    : holder_(context)
+  {
+    error_code ec;
+    holder_.get_service().assign(holder_.get_implementation(), handle.native_handle(), ec);
     detail::throw_error(ec, "basic_file construct");
   }
 
@@ -103,17 +140,35 @@ public:
   ///
   /// This constructor takes ownership of the given native handle.
   ///
-  /// @param io_context The io_context object that the file will use to
-  /// dispatch handlers for any asynchronous operations performed on it.
+  /// @param ex The I/O executor that the file will use, by default, to
+  /// dispatch handlers for any asynchronous operations performed on the file.
   ///
   /// @param handle The native handle object which shall be assigned to
   /// this basic_file object.
-  basic_file(asio::io_context& io_context,
-             const native_handle_type& handle) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_context)
+  basic_file(const executor_type& ex, const native_handle_type& handle)
+    : holder_(ex)
   {
     error_code ec;
-    this->get_service().assign(this->get_implementation(), handle, ec);
+    holder_.get_service().assign(holder_.get_implementation(), handle.native_handle(), ec);
+    detail::throw_error(ec, "basic_file construct");
+  }
+
+  /// @brief Construct a file using a native handle object.
+  ///
+  /// This constructor takes ownership of the given native handle.
+  ///
+  /// @param context An execution context which provides the I/O executor that
+  /// the file will use, by default, to dispatch handlers for any asynchronous
+  /// operations performed on the file.
+  ///
+  /// @param handle The native handle object which shall be assigned to
+  /// this basic_file object.
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const native_handle_type& handle)
+    : holder_(context)
+  {
+    error_code ec;
+    holder_.get_service().assign(holder_.get_implementation(), handle.native_handle(), ec);
     detail::throw_error(ec, "basic_file construct");
   }
 
@@ -123,8 +178,8 @@ public:
   ///
   /// For details, see @ref open(const char*,const open_args&)
   ///
-  /// @param io_context The io_context object that the file will use to
-  /// dispatch handlers for any asynchronous operations performed on it.
+  /// @param ex The I/O executor that the file will use, by default, to
+  /// dispatch handlers for any asynchronous operations performed on the file.
   ///
   /// @param filename The path of the file to open.
   ///
@@ -133,12 +188,11 @@ public:
   /// @throws asio::system_error Thrown on failure.
   ///
   /// @see open_flags
-  basic_file(asio::io_context& io_context,
-             const char* filename, const open_args& args)
-    : asio::basic_io_object<FileService>(io_context)
+  basic_file(const executor_type& ex, const char* filename, const open_args& args)
+    : holder_(ex)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
     detail::throw_error(ec, "basic_file construct");
   }
 
@@ -148,8 +202,34 @@ public:
   ///
   /// For details, see @ref open(const char*,const open_args&)
   ///
-  /// @param io_context The io_context object that the file will use to
-  /// dispatch handlers for any asynchronous operations performed on it.
+  /// @param context An execution context which provides the I/O executor that
+  /// the file will use, by default, to dispatch handlers for any asynchronous
+  /// operations performed on the file.
+  ///
+  /// @param filename The path of the file to open.
+  ///
+  /// @param args Additional options used to open the file.
+  ///
+  /// @throws asio::system_error Thrown on failure.
+  ///
+  /// @see open_flags
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const char* filename, const open_args& args)
+    : holder_(context)
+  {
+    error_code ec;
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
+    detail::throw_error(ec, "basic_file construct");
+  }
+
+  /// @brief Open a file and construct a basic_file.
+  ///
+  /// This constructor opens a new handle to the given file.
+  ///
+  /// For details, see @ref open(const char*,const open_args&)
+  ///
+  /// @param ex The I/O executor that the file will use, by default, to
+  /// dispatch handlers for any asynchronous operations performed on the file.
   ///
   /// @param filename The path of the file to open.
   ///
@@ -159,56 +239,123 @@ public:
   /// the object is reset.
   ///
   /// @see open_flags
-  basic_file(asio::io_context& io_context, const char* filename,
-             const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_context)
+  basic_file(const executor_type& ex, const char* filename, const open_args& args, error_code& ec)
+    : holder_(ex)
   {
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
+  }
+
+  /// @brief Open a file and construct a basic_file.
+  ///
+  /// This constructor opens a new handle to the given file.
+  ///
+  /// For details, see @ref open(const char*,const open_args&)
+  ///
+  /// @param context An execution context which provides the I/O executor that
+  /// the file will use, by default, to dispatch handlers for any asynchronous
+  /// operations performed on the file.
+  ///
+  /// @param filename The path of the file to open.
+  ///
+  /// @param args Additional options used to open the file.
+  ///
+  /// @param ec Set to indicate what error occurred. If no error occurred,
+  /// the object is reset.
+  ///
+  /// @see open_flags
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const char* filename, const open_args& args, error_code& ec)
+    : holder_(context)
+  {
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&)
+  /// @copydoc basic_file(const executor_type&,const char*,const open_args&)
   ///
   /// @note Only available on Windows.
-  basic_file(asio::io_context& io_context, const wchar_t* filename,
-             const open_args& args)
-    : asio::basic_io_object<FileService>(io_context)
+  basic_file(const executor_type& ex, const wchar_t* filename, const open_args& args)
+    : holder_(ex)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
     detail::throw_error(ec, "basic_file construct");
   }
 
-  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&,error_code&)
+  /// @copydoc basic_file(ExecutionContext&,const char*,const open_args&)
   ///
   /// @note Only available on Windows.
-  basic_file(asio::io_context& io_context, const wchar_t* filename,
-             const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_context)
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const wchar_t* filename, const open_args& args)
+    : holder_(context)
   {
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    error_code ec;
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
+    detail::throw_error(ec, "basic_file construct");
+  }
+
+  /// @copydoc basic_file(const executor_type&,const char*,const open_args&,error_code&)
+  ///
+  /// @note Only available on Windows.
+  basic_file(const executor_type& ex, const wchar_t* filename,
+             const open_args& args, error_code& ec)
+    : holder_(ex)
+  {
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
+  }
+
+  /// @copydoc basic_file(ExecutionContext&,const char*,const open_args&,error_code&)
+  ///
+  /// @note Only available on Windows.
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const wchar_t* filename, const open_args& args, error_code& ec)
+    : holder_(context)
+  {
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
   }
 #endif
 
 #if defined(ASIOEXT_HAS_BOOST_FILESYSTEM) || defined(ASIOEXT_IS_DOCUMENTATION)
-  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&)
-  basic_file(asio::io_context& io_context,
-             const boost::filesystem::path& filename, const open_args& args)
-    : asio::basic_io_object<FileService>(io_context)
+  /// @copydoc basic_file(const executor_type&,const char*,const open_args&)
+  basic_file(const executor_type& ex, const boost::filesystem::path& filename, const open_args& args)
+    : holder_(ex)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
     detail::throw_error(ec, "basic_file construct");
   }
 
-  /// @copydoc basic_file(asio::io_context&,const char*,const open_args&,error_code&)
-  basic_file(asio::io_context& io_context, const boost::filesystem::path& filename,
-             const open_args& args, error_code& ec) ASIOEXT_NOEXCEPT
-    : asio::basic_io_object<FileService>(io_context)
+  /// @copydoc basic_file(ExecutionContext&,const char*,const open_args&)
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const boost::filesystem::path& filename, const open_args& args)
+    : holder_(context)
   {
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    error_code ec;
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
+    detail::throw_error(ec, "basic_file construct");
+  }
+
+  /// @copydoc basic_file(const executor_type&,const char*,const open_args&,error_code&)
+  basic_file(const executor_type& ex, const boost::filesystem::path& filename, const open_args& args, error_code& ec)
+    : holder_(ex)
+  {
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
+  }
+
+  /// @copydoc basic_file(ExecutionContext&,const char*,const open_args&,error_code&)
+  template <execution_context ExecutionContext>
+  basic_file(ExecutionContext& context, const boost::filesystem::path& filename, const open_args& args, error_code& ec)
+    : holder_(context)
+  {
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
   }
 #endif
+
+  /// Get the executor associated with the object.
+  const executor_type& get_executor() noexcept
+  {
+    return holder_.get_executor();
+  }
 
   /// @brief Get a reference to the lowest layer.
   ///
@@ -243,7 +390,7 @@ public:
   /// that is not otherwise provided.
   native_handle_type native_handle() ASIOEXT_NOEXCEPT
   {
-    return this->get_service().native_handle(this->get_implementation());
+    return holder_.get_service().native_handle(holder_.get_implementation());
   }
 
   /// @brief Cancel all asynchronous operations associated with the file.
@@ -256,7 +403,7 @@ public:
   void cancel()
   {
     error_code ec;
-    this->get_service().cancel(this->get_implementation(), ec);
+    holder_.get_service().cancel(holder_.get_implementation(), ec);
     detail::throw_error(ec, "cancel");
   }
 
@@ -270,7 +417,7 @@ public:
   /// the object is reset.
   void cancel(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().cancel(this->get_implementation(), ec);
+    return holder_.get_service().cancel(holder_.get_implementation(), ec);
   }
 
   /// @name Handle-management functions
@@ -294,7 +441,7 @@ public:
   void open(const char* filename, const open_args& args)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
     detail::throw_error(ec, "open");
   }
 
@@ -317,7 +464,7 @@ public:
   void open(const char* filename, const open_args& args,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
   }
 
 #if defined(ASIOEXT_WINDOWS) || defined(ASIOEXT_IS_DOCUMENTATION)
@@ -327,7 +474,7 @@ public:
   void open(const wchar_t* filename, const open_args& args)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
     detail::throw_error(ec, "open");
   }
 
@@ -337,7 +484,7 @@ public:
   void open(const wchar_t* filename, const open_args& args,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
   }
 #endif
 
@@ -349,7 +496,7 @@ public:
   void open(const boost::filesystem::path& filename, const open_args& args)
   {
     error_code ec;
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
     detail::throw_error(ec, "open");
   }
 
@@ -360,14 +507,14 @@ public:
   void open(const boost::filesystem::path& filename, const open_args& args,
             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().open(this->get_implementation(), filename, args, ec);
+    holder_.get_service().open(holder_.get_implementation(), filename, args, ec);
   }
 #endif
 
   /// Determine whether the handle is open.
   bool is_open() const ASIOEXT_NOEXCEPT
   {
-    return this->get_service().is_open(this->get_implementation());
+    return holder_.get_service().is_open(holder_.get_implementation());
   }
 
   /// @brief Close the handle.
@@ -378,7 +525,7 @@ public:
   void close()
   {
     error_code ec;
-    this->get_service().close(this->get_implementation(), ec);
+    holder_.get_service().close(holder_.get_implementation(), ec);
     detail::throw_error(ec, "close");
   }
 
@@ -390,7 +537,7 @@ public:
   /// the object is reset.
   void close(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().close(this->get_implementation(), ec);
+    holder_.get_service().close(holder_.get_implementation(), ec);
   }
 
   /// @}
@@ -409,7 +556,7 @@ public:
   uint64_t position()
   {
     error_code ec;
-    uint64_t p = this->get_service().position(this->get_implementation(), ec);
+    uint64_t p = holder_.get_service().position(holder_.get_implementation(), ec);
     detail::throw_error(ec, "position");
     return p;
   }
@@ -425,7 +572,7 @@ public:
   /// the object is reset.
   uint64_t position(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().position(this->get_implementation(), ec);
+    return holder_.get_service().position(holder_.get_implementation(), ec);
   }
 
   /// @brief Change the read/write position.
@@ -444,7 +591,7 @@ public:
   uint64_t seek(seek_origin origin, int64_t offset)
   {
     error_code ec;
-    uint64_t p = this->get_service().seek(this->get_implementation(), origin,
+    uint64_t p = holder_.get_service().seek(holder_.get_implementation(), origin,
                                           offset, ec);
     detail::throw_error(ec, "seek");
     return p;
@@ -467,7 +614,7 @@ public:
   uint64_t seek(seek_origin origin, int64_t offset,
                 error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().seek(this->get_implementation(), origin, offset,
+    return holder_.get_service().seek(holder_.get_implementation(), origin, offset,
                                     ec);
   }
 
@@ -480,7 +627,7 @@ public:
   uint64_t size()
   {
     error_code ec;
-    uint64_t s = this->get_service().size(this->get_implementation(), ec);
+    uint64_t s = holder_.get_service().size(holder_.get_implementation(), ec);
     detail::throw_error(ec, "size");
     return s;
   }
@@ -488,21 +635,21 @@ public:
   /// @copydoc file_handle::size(error_code&)
   uint64_t size(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().size(this->get_implementation(), ec);
+    return holder_.get_service().size(holder_.get_implementation(), ec);
   }
 
   /// @copydoc file_handle::truncate(uint64_t)
   void truncate(uint64_t new_size)
   {
     error_code ec;
-    this->get_service().truncate(this->get_implementation(), new_size, ec);
+    holder_.get_service().truncate(holder_.get_implementation(), new_size, ec);
     detail::throw_error(ec, "truncate");
   }
 
   /// @copydoc file_handle::truncate(uint64_t,error_code&)
   void truncate(uint64_t new_size, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().truncate(this->get_implementation(), new_size, ec);
+    holder_.get_service().truncate(holder_.get_implementation(), new_size, ec);
   }
 
   /// @copydoc file_handle::permissions()
@@ -510,7 +657,7 @@ public:
   file_perms permissions()
   {
     error_code ec;
-    file_perms p = this->get_service().permissions(this->get_implementation(),
+    file_perms p = holder_.get_service().permissions(holder_.get_implementation(),
                                                    ec);
     detail::throw_error(ec, "get_permissions");
     return p;
@@ -520,7 +667,7 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   file_perms permissions(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().permissions(this->get_implementation(), ec);
+    return holder_.get_service().permissions(holder_.get_implementation(), ec);
   }
 
   /// @copydoc file_handle::permissions(file_perms,file_perm_options)
@@ -529,7 +676,7 @@ public:
                     file_perm_options::replace)
   {
     error_code ec;
-    this->get_service().permissions(this->get_implementation(), perms,
+    holder_.get_service().permissions(holder_.get_implementation(), perms,
                                     opts, ec);
     detail::throw_error(ec, "set_permissions");
   }
@@ -538,7 +685,7 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   void permissions(file_perms perms, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().permissions(this->get_implementation(), perms, ec);
+    holder_.get_service().permissions(holder_.get_implementation(), perms, ec);
   }
 
   /// @copydoc file_handle::permissions(file_perms,file_perm_options,error_code&)
@@ -546,7 +693,7 @@ public:
   void permissions(file_perms perms, file_perm_options opts,
                    error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().permissions(this->get_implementation(), perms,
+    holder_.get_service().permissions(holder_.get_implementation(), perms,
                                     opts, ec);
   }
 
@@ -555,7 +702,7 @@ public:
   file_attrs attributes()
   {
     error_code ec;
-    file_attrs a = this->get_service().attributes(this->get_implementation(), ec);
+    file_attrs a = holder_.get_service().attributes(holder_.get_implementation(), ec);
     detail::throw_error(ec, "get_attributes");
     return a;
   }
@@ -564,7 +711,7 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   file_attrs attributes(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().attributes(this->get_implementation(), ec);
+    return holder_.get_service().attributes(holder_.get_implementation(), ec);
   }
 
   /// @copydoc file_handle::attributes(file_attrs,file_attr_options)
@@ -573,7 +720,7 @@ public:
                     file_attr_options::replace)
   {
     error_code ec;
-    this->get_service().attributes(this->get_implementation(),
+    holder_.get_service().attributes(holder_.get_implementation(),
                                    attrs, opts, ec);
     detail::throw_error(ec, "set_attributes");
   }
@@ -582,7 +729,7 @@ public:
   ASIOEXT_WINDOWS_NO_HANDLEINFO_WARNING
   void attributes(file_attrs attrs, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().attributes(this->get_implementation(),
+    holder_.get_service().attributes(holder_.get_implementation(),
                                    attrs, ec);
   }
 
@@ -591,7 +738,7 @@ public:
   void attributes(file_attrs attrs, file_attr_options opts,
                   error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().attributes(this->get_implementation(),
+    holder_.get_service().attributes(holder_.get_implementation(),
                                    attrs, opts, ec);
   }
 
@@ -599,7 +746,7 @@ public:
   file_times times()
   {
     error_code ec;
-    file_times t = this->get_service().times(this->get_implementation(), ec);
+    file_times t = holder_.get_service().times(holder_.get_implementation(), ec);
     detail::throw_error(ec, "get_times");
     return t;
   }
@@ -607,21 +754,21 @@ public:
   /// @copydoc file_handle::times(error_code&)
   file_times times(error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().times(this->get_implementation(), ec);
+    return holder_.get_service().times(holder_.get_implementation(), ec);
   }
 
   /// @copydoc file_handle::times(const file_times&)
   void times(const file_times& new_times)
   {
     error_code ec;
-    this->get_service().times(this->get_implementation(), new_times, ec);
+    holder_.get_service().times(holder_.get_implementation(), new_times, ec);
     detail::throw_error(ec, "set_times");
   }
 
   /// @copydoc file_handle::times(const file_times&,error_code&)
   void times(const file_times& new_times, error_code& ec) ASIOEXT_NOEXCEPT
   {
-    this->get_service().times(this->get_implementation(), new_times, ec);
+    holder_.get_service().times(holder_.get_implementation(), new_times, ec);
   }
 
   /// @}
@@ -662,7 +809,7 @@ public:
   {
     error_code ec;
     const std::size_t s =
-        this->get_service().read_some(this->get_implementation(), buffers, ec);
+        holder_.get_service().read_some(holder_.get_implementation(), buffers, ec);
     detail::throw_error(ec, "read_some");
     return s;
   }
@@ -689,7 +836,7 @@ public:
   std::size_t read_some(const MutableBufferSequence& buffers,
                         error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().read_some(this->get_implementation(), buffers,
+    return holder_.get_service().read_some(holder_.get_implementation(), buffers,
                                          ec);
   }
 
@@ -728,7 +875,7 @@ public:
   {
     error_code ec;
     const std::size_t s =
-        this->get_service().write_some(this->get_implementation(), buffers, ec);
+        holder_.get_service().write_some(holder_.get_implementation(), buffers, ec);
     detail::throw_error(ec, "write_some");
     return s;
   }
@@ -754,7 +901,7 @@ public:
   std::size_t write_some(const ConstBufferSequence& buffers,
                          error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().write_some(this->get_implementation(), buffers,
+    return holder_.get_service().write_some(holder_.get_implementation(), buffers,
                                           ec);
   }
 
@@ -798,8 +945,8 @@ public:
                            const MutableBufferSequence& buffers)
   {
     error_code ec;
-    const std::size_t s = this->get_service().read_some_at(
-        this->get_implementation(), offset, buffers, ec);
+    const std::size_t s = holder_.get_service().read_some_at(
+        holder_.get_implementation(), offset, buffers, ec);
     detail::throw_error(ec, "read_some_at");
     return s;
   }
@@ -829,7 +976,7 @@ public:
                            const MutableBufferSequence& buffers,
                            error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().read_some_at(this->get_implementation(), offset,
+    return holder_.get_service().read_some_at(holder_.get_implementation(), offset,
                                             buffers, ec);
   }
 
@@ -869,8 +1016,8 @@ public:
   std::size_t write_some_at(uint64_t offset, const ConstBufferSequence& buffers)
   {
     error_code ec;
-    const std::size_t s = this->get_service().write_some_at(
-        this->get_implementation(), offset, buffers, ec);
+    const std::size_t s = holder_.get_service().write_some_at(
+        holder_.get_implementation(), offset, buffers, ec);
     detail::throw_error(ec, "write_some_at");
     return s;
   }
@@ -899,7 +1046,7 @@ public:
                             const ConstBufferSequence& buffers,
                             error_code& ec) ASIOEXT_NOEXCEPT
   {
-    return this->get_service().write_some_at(this->get_implementation(), offset,
+    return holder_.get_service().write_some_at(holder_.get_implementation(), offset,
                                              buffers, ec);
   }
 
@@ -955,7 +1102,7 @@ public:
   async_read_some(const MutableBufferSequence& buffers,
                   ReadHandler&& handler)
   {
-    return this->get_service().async_read_some(this->get_implementation(),
+    return holder_.get_service().async_read_some(holder_.get_implementation(),
         buffers, std::forward<ReadHandler>(handler));
   }
 
@@ -1010,7 +1157,7 @@ public:
   async_write_some(const ConstBufferSequence& buffers,
                    WriteHandler&& handler)
   {
-    return this->get_service().async_write_some(this->get_implementation(),
+    return holder_.get_service().async_write_some(holder_.get_implementation(),
         buffers, std::forward<WriteHandler>(handler));
   }
 
@@ -1065,7 +1212,7 @@ public:
                      const MutableBufferSequence& buffers,
                      ReadHandler&& handler)
   {
-    return this->get_service().async_read_some_at(this->get_implementation(),
+    return holder_.get_service().async_read_some_at(holder_.get_implementation(),
         offset, buffers, std::forward<ReadHandler>(handler));
   }
 
@@ -1118,11 +1265,14 @@ public:
                       const ConstBufferSequence& buffers,
                       WriteHandler&& handler)
   {
-    return this->get_service().async_write_some_at(this->get_implementation(),
+    return holder_.get_service().async_write_some_at(holder_.get_implementation(),
         offset, buffers, std::forward<WriteHandler>(handler));
   }
 
   /// @}
+
+private:
+  io_object_holder<FileService, Executor> holder_;
 };
 
 ASIOEXT_NS_END

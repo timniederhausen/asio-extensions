@@ -84,10 +84,12 @@ source_set("asioext") {
     "include/asioext/error.hpp",
     "include/asioext/error_code.hpp",
     "include/asioext/exception.hpp",
+    "include/asioext/execution_context.hpp",
     "include/asioext/file.hpp",
     "include/asioext/file_attrs.hpp",
     "include/asioext/file_handle.hpp",
     "include/asioext/file_perms.hpp",
+    "include/asioext/io_object_holder.hpp",
     "include/asioext/is_raw_byte_container.hpp",
     "include/asioext/linear_buffer.hpp",
     "include/asioext/open.hpp",
@@ -137,7 +139,6 @@ source_set("asioext") {
 
     "include/asioext/socks/impl/client.hpp",
 
-    "include/asioext/impl/connect.hpp",
     "include/asioext/impl/file_handle.hpp",
     "include/asioext/impl/file_handle_posix.hpp",
     "include/asioext/impl/file_handle_win.hpp",

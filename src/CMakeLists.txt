@@ -4,7 +4,7 @@
 
 # Header-only target for asioext
 add_library(asioext-headers INTERFACE)
-target_compile_features(asioext-headers INTERFACE cxx_std_17)
+target_compile_features(asioext-headers INTERFACE cxx_std_20)
 target_include_directories(asioext-headers INTERFACE ${asioext_SOURCE_DIR}/include)
 
 # TODO: only do this if we're the main project!

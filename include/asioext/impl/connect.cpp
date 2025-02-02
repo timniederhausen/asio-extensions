@@ -11,28 +11,34 @@ ASIOEXT_NS_BEGIN
 
 void connect(asio::ip::tcp::socket::lowest_layer_type& socket,
              asio::ip::tcp::resolver& resolver,
-             const asio::ip::tcp::resolver::query& q)
+             std::string_view host,
+             std::string_view service,
+             asio::ip::resolver_base::flags resolve_flags)
 {
   error_code ec;
-  connect(socket, resolver, q, ec);
+  connect(socket, resolver, host, service, resolve_flags, ec);
   detail::throw_error(ec, "connect");
 }
 
 void connect(asio::ip::tcp::socket::lowest_layer_type& socket,
              asio::ip::tcp::resolver& resolver,
-             const asio::ip::tcp::resolver::query& q,
+             std::string_view host,
+             std::string_view service,
+             asio::ip::resolver_base::flags resolve_flags,
              error_code& ec)
 {
   // Get a list of endpoints corresponding to the query.
-  asio::ip::tcp::resolver::iterator iter = resolver.resolve(q, ec);
+  const asio::ip::tcp::resolver::results_type results = resolver.resolve(host, service, resolve_flags, ec);
   if (ec)
     return;
 
   // Try each endpoint until we successfully establish a connection.
   ec = asio::error::host_not_found;
-  while (ec && iter != asio::ip::tcp::resolver::iterator()) {
+  for (const auto& entry : results) {
     socket.close(ec);
-    socket.connect(*iter++, ec);
+    socket.connect(entry, ec);
+    if (!ec)
+      return;
   }
 }
 

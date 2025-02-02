@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(seek, FileService, service_types)
   BOOST_REQUIRE_EQUAL(10, file.seek(asioext::seek_origin::from_end, -10));
 }
 
-template <class FileService>
+template <typename FileService>
 struct write_handler
 {
   write_handler(asioext::basic_file<FileService>& file)
@@ -226,7 +226,7 @@ struct write_handler
   int state_;
 };
 
-template <class FileService>
+template <typename FileService>
 struct read_handler
 {
   read_handler(asioext::basic_file<FileService>& file,
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(async_read_write_at, FileService, service_types)
   io_context.reset();
 }
 
-template <class FileService>
+template <typename FileService>
 struct write_cancel_handler
 {
   void operator()(const error_code& ec, std::size_t bytes_transferred)
@@ -350,12 +350,12 @@ struct write_cancel_handler
   }
 };
 
-template <class FileService>
+template <typename FileService>
 struct cancel_handler
 {
   cancel_handler(asioext::basic_file<FileService>& file)
     : file_(file)
-    , work_(file.get_io_service())
+    , work_(file.get_executor())
   {
     // ctor
   }
@@ -374,7 +374,7 @@ struct cancel_handler
   }
 
   asioext::basic_file<FileService>& file_;
-  asio::io_context::work work_;
+  asio::executor_work_guard<asio::any_io_executor> work_;
 };
 
 BOOST_AUTO_TEST_CASE(async_read_write_cancel)
