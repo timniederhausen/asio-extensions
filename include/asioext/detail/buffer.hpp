@@ -18,11 +18,21 @@
 #endif
 
 #if defined(ASIOEXT_USE_BOOST_ASIO)
-# define ASIOEXT_MUTABLE_BUFFER boost::asio::BOOST_ASIO_MUTABLE_BUFFER
-# define ASIOEXT_CONST_BUFFER boost::asio::BOOST_ASIO_CONST_BUFFER
+# if defined(BOOST_ASIO_MUTABLE_BUFFER) && defined(BOOST_ASIO_CONST_BUFFER)
+#  define ASIOEXT_MUTABLE_BUFFER boost::asio::BOOST_ASIO_MUTABLE_BUFFER
+#  define ASIOEXT_CONST_BUFFER boost::asio::BOOST_ASIO_CONST_BUFFER
+# else
+#  define ASIOEXT_MUTABLE_BUFFER boost::asio::mutable_buffer
+#  define ASIOEXT_CONST_BUFFER boost::asio::const_buffer
+# endif
 #else
-# define ASIOEXT_MUTABLE_BUFFER asio::ASIO_MUTABLE_BUFFER
-# define ASIOEXT_CONST_BUFFER asio::ASIO_CONST_BUFFER
+# if defined(ASIO_MUTABLE_BUFFER) && defined(ASIO_CONST_BUFFER)
+#  define ASIOEXT_MUTABLE_BUFFER asio::ASIO_MUTABLE_BUFFER
+#  define ASIOEXT_CONST_BUFFER asio::ASIO_CONST_BUFFER
+# else
+#  define ASIOEXT_MUTABLE_BUFFER asio::mutable_buffer
+#  define ASIOEXT_CONST_BUFFER asio::const_buffer
+# endif
 #endif
 
 ASIOEXT_NS_BEGIN
